@@ -1,0 +1,2 @@
+,Number of CPUs,Number SDS above mean,Soma Diameter,XY Plane Cell Size,Z Plane Cell Size,Gaussian Filter,Trained Model
+1,20,4,4,3,3,0.2,/home/cellfinder_data/training_out/model.h5
