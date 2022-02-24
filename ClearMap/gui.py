@@ -6,10 +6,12 @@ from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import Qt
 import os
-import sys
 import pathlib
 import re
 import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from ClearMap.Environment import *
 import numpy.lib.recfunctions as rfn
 import napari
@@ -144,6 +146,7 @@ class Main_Window(QWidget):
         tabs.addTab(self.rename_layout(), "Determine Path | Rename Path")
         tabs.addTab(self.resample_layout(), "Resampling | Alignment")
         tabs.addTab(self.cd_layout(),"Cell Detection")
+        tabs.addTab(self.analysis_layout(),"Analysis")
         #tabs.addTab(self.visualization_layout(),"Visualization")
         layout.addWidget(tabs)
         #self.init_workspace()
@@ -1352,6 +1355,233 @@ class Main_Window(QWidget):
         outer_layout.addStretch()
         tab.setLayout(outer_layout)
         return tab
+
+
+        def analysis_layout():
+            tab = QWidget()
+            outer_layout = QVBoxLayout()
+            inner_layout = QGridLayout()
+
+            result_dir = QLineEdit("")
+            choose_resultdir_button = QPushButton("Load Directory of analysis files")
+
+            start_analysis_button = QPushButton("Start Analysis")
+
+            inner_layout.addWidget(start_analysis_button, 1, 0)
+            inner_layout.addWidget(result_dir, 2, 0)
+            inner_layout.addWidget(choose_resultdir_button, 2, 1)
+
+            def choose_resultdir():
+                path = QFileDialog.setDirectory(self, "Choose Directory")
+                result_dir.setText(str(path[0]))
+
+            def filterDatasetByLevel(df, level):
+                if (level == None or level == ""):
+                    return
+
+                TrueIndex = []
+                count = 0
+                for i in df["CorrespondingLevel"]:
+                    if (i == []):
+                        TrueIndex.append(True)
+                        continue
+                    TrueIndex.append(i[0] == level)
+                df = df[np.array(TrueIndex, dtype=bool)]
+                return df
+
+            def filterDatasetByRegion(df, region):
+                if (region == None or region == ""):
+                    return
+
+                TrueIndex = []
+                for i in range(len(df["CorrespondingLevel"])):
+                    TrueIndex.append(any(region in sub for sub in df["TrackedWay"][i]))
+                df = df[np.array(TrueIndex, dtype=bool)]
+
+                return df
+
+            def filterDatasetByPercentage(df, bound):
+                df = df[(df.iloc[:, 1:df.shape[1]] > bound).any(axis=1)]
+                df = df.reset_index(drop=True)
+                return df
+
+            def createTrackingList(dataframe, reference_df_ID, reference_df_Name):
+                len_dataframe = len(list(dataframe["name"]))
+
+                trackedlevels = [[] for x in range(len_dataframe)]
+                correspondingLevel = [[] for x in range(len_dataframe)]
+
+                for i in range(len(dataframe) - 1):
+                    name = dataframe.iloc[i, 5]  # iterate over all rows of "names"
+                    df_temp = reference_df_Name.loc[name]
+                    temp_name = df_temp["name"]
+
+                    trackedlevels[i].append(temp_name)
+                    correspondingLevel[i].append(int(df_temp["st_level"]))
+                    if not df_temp.empty:
+                        while (int(df_temp["st_level"]) >= 0):
+                            if (int(df_temp["st_level"]) == 0):
+                                break  # index of Brain_structure of parent_ID is taken
+                            df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])]
+                            temp_name = df_temp["name"]
+                            trackedlevels[i].append(temp_name)
+                            correspondingLevel[i].append(int(df_temp["st_level"]))
+
+                df = np.array([trackedlevels, correspondingLevel], dtype=object)
+
+                df = np.transpose(df)
+
+                df = pd.DataFrame(data=df,
+                                  columns=["TrackedWay",
+                                           "CorrespondingLevel"])
+                return df
+
+            def createResultframe(df, df_level, num_rows):
+                resultframe = np.array([list(df["name"]),  # Takes all important Brain Regions in first Col
+                                        df_level["TrackedWay"],
+                                        df_level["CorrespondingLevel"],
+                                        [0 for x in range(num_rows)],  # Sets the count of each Brain Region to 0
+                                        [0 for x in range(num_rows)]])  # Creates a column for normalized Values
+
+                resultframe = np.transpose(resultframe)
+
+                resultframe = pd.DataFrame(data=resultframe,
+                                           columns=["Region",
+                                                    "TrackedWay",
+                                                    "CorrespondingLevel",
+                                                    "RegionCellCount",
+                                                    "NormalizedValues"])
+
+                resultframe["RegionCellCount"] = pd.to_numeric(resultframe["RegionCellCount"])
+                resultframe["NormalizedValues"] = pd.to_numeric(resultframe["NormalizedValues"], downcast="float")
+
+                return resultframe
+
+            def readCSV(file, sep, header, indexCol):
+                df = pd.read_csv(file, sep=sep, header=header)
+
+                return df
+
+            def getColnames(df):
+                colnames = []
+
+                for col in df.columns:
+                    colnames.append(col)
+
+                return colnames
+
+            def getFilenames(path2dir):
+                directory = os.fsencode(path2dir)
+                filenames = []
+
+                for file in os.listdir(directory):
+                    filenames.append(os.fsdecode(file))
+
+                return filenames
+
+            def analyse_csv(path2dir, filename, reference_df, trackedLevels):
+                data = path2dir + filename
+                df = readCSV(data, ",", 0, None)
+                total_cellcount = int(df["total_cells"].sum())  # get total cellcount for reference
+
+                df["name"] = df["structure_name"]
+                reference_df_ID = reference_df.set_index(reference_df["id"])
+                reference_df_Name = reference_df.set_index(reference_df["name"])
+
+                num_rows = len(list(reference_df["name"]))
+
+                resultframe = createResultframe(reference_df, trackedLevels, num_rows)
+
+                for i in range(len(df.iloc[:, 0])):  # Iterates over all entries in summary.csv
+                    name = df.iloc[i]["name"]  # get the Name of the Region at current index
+                    df_temp = reference_df_Name.loc[name]
+                    temp_name = df_temp["name"]
+                    index_outerCount = resultframe.index[resultframe["Region"] == temp_name]
+                    x = 0
+                    cellcountRegion = df[df["structure_name"] == resultframe["Region"][index_outerCount[0]]][
+                        "total_cells"].sum()  # Hier mit temp_name arbeiten
+                    resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion
+                    resultframe.loc[index_outerCount[0], "NormalizedValues"] += (
+                                cellcountRegion / total_cellcount * 100)
+                    if not df_temp.empty:
+                        while (int(df_temp["st_level"]) >= 0):
+                            if (int(df_temp["st_level"]) == 0):
+                                break  # index of Brain_structure of parent_ID is taken
+                            df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])]
+                            temp_name = df_temp["name"]
+                            index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
+                            x += cellcountRegion
+                            resultframe.loc[index_innerCount[0], "RegionCellCount"] += cellcountRegion
+                            resultframe.loc[index_innerCount[0], "NormalizedValues"] += (
+                                        cellcountRegion / total_cellcount * 100)  # Normalized by total count
+                    else:
+                        resultframe.loc[[len(resultframe) - 1], "RegionCellCount"] += 1
+
+                return resultframe
+
+            def analysis_main():
+
+                path2dir = result_dir.text()
+                filesnames = getFilenames(path2dir)
+
+                reference_df = readCSV("/home/margaryta/Brainmap/ClearMap/ontology.csv",
+                                       # File which stores all important Brain Regions (Atlas?)
+                                       ";",  # Separator
+                                       0,  # Header
+                                       0)  # Index Col
+
+                reference_df_ID = reference_df.set_index(reference_df["id"])
+                reference_df_Name = reference_df.set_index(reference_df["name"])
+
+                trackedLevels = createTrackingList(reference_df, reference_df_ID, reference_df_Name)
+
+                outerlist = []
+
+                for i in range(len(filesnames)):  # makes a resultframe for each file in the given directory
+                    print(filesnames[i])
+                    df = analyse_csv(path2dir, filesnames[i], reference_df, trackedLevels)
+                    df = filterDatasetByRegion(df, "Cerebrum")  # TODO: Parameter in GUI Per abfrage übernehmen
+                    df = filterDatasetByLevel(df, 6)  # TODO: Parameter In GUI Per abfrage übernehmen
+                    outerlist.append(df)
+
+                # TODO: Alert, falls df nach Filterung leer
+
+                heatmapdata = outerlist[0]["Region"]
+                heatmapdata = pd.DataFrame(heatmapdata)
+
+                for i in range(len(
+                        outerlist)):  # Appends for each Sample in the given directory the normalized Values for Analysis Purpose
+                    heatmapdata.insert(i + 1, "Sample{}".format(i), outerlist[i]["RegionCellCount"])  # .astype(int))
+                    # heatmapdata.insert(i+1,"Sample{}".format(i), outerlist[i]["NormalizedValues"])  #.astype(int))
+
+                # heatmapdata = heatmapdata.iloc[1:, :]  #drop first row (root) from dataframe #TODO: wird gebraucht?
+                # heatmapdata = filterDatasetByPercentage(heatmapdata, 5)
+
+                regions = heatmapdata["Region"].to_numpy()
+                sns.heatmap(heatmapdata.iloc[:, 1:heatmapdata.shape[1]], yticklabels=regions,
+                            annot=False)
+                plt.savefig(os.getcwd() + "/AnalysisOutput/Heatmap.png")
+
+            def start_analysis():
+                if not os.path.exists(os.getcwd() + "/AnalysisOutput"):
+                    os.makedirs(os.getcwd() + "/AnalysisOutput")
+
+                if not result_dir.text():
+                    alert = QMessageBox()
+                    alert.setText("Please load a existing directory!")
+                    alert.exec()
+                    return
+
+                analysis_main()
+
+            start_analysis_button.pressed.connect(lambda: start_analysis())
+            choose_resultdir_button.pressed.connect(lambda: choose_resultdir())
+
+            outer_layout.addLayout(inner_layout)
+            outer_layout.addStretch()
+            tab.setLayout(outer_layout)
+
+            return tab
 
 
         '''
