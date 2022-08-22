@@ -82,21 +82,6 @@ class Plot_Window(QDialog):
         # setting layout to the main window
         self.setLayout(layout)
 
-    #def plot(self):  
-        # random data
-    #    data = [random.random() for i in range(10)]
-
-        # clearing old figure
-    #    self.figure.clear()
-
-        # create an axis
-    #    ax = self.figure.add_subplot(111)
-
-        # plot data
-    #    ax.plot(data, '*-')
-
-        # refresh canvas
-    #    self.canvas.draw()
 
 class RenameBox(QWidget):
     def __init__(self,
@@ -153,7 +138,10 @@ class RenameBox(QWidget):
 
         return self.layout
 
-    def update(self, currentPosition: int) -> str:  #Searches for the desired pattern in filename, if not found directly (isFirstUpdate), the user needs to shift the string in the desired form
+    #Finds the position of Z{3|4}_C0X.tif in every filename provided by the user
+    #It is mandatory to include the pattern at the end of each filename to use this application 
+    #Search is automatized but the user has the opportunity to change the desired position if algorithm is not precise
+    def update(self, currentPosition: int) -> str:  
         self.position = currentPosition
         if self.isFirstUpdate:
             if (re.search(r'Z[0-9]{4}_C0+', self.filenameToCheck)):
@@ -168,6 +156,7 @@ class RenameBox(QWidget):
 
         self.currentFilename = self.filenameToCheck[self.position:len(self.filenameToCheck)]
 
+    #Function for refreshing the visualization of rename window
     def deleteItemsOfLayout(self, layout):
         if layout is not None:
             while layout.count():
@@ -178,7 +167,7 @@ class RenameBox(QWidget):
                 else:
                     self.deleteItemsOfLayout(item.layout())
 
-    def perform_cut(self):  # Performs the renaming of the files
+    def perform_cut(self):  # Performs the final renaming of the files
         print("path:", self.path)
         for file in pathlib.Path(self.path).iterdir():
             if file.is_file():
@@ -216,19 +205,25 @@ class Main_Window(QWidget):
     """
     Initialize Workspace, WorkingDirectory and Channel of Analysis
     """
-    def initWorkspace(self, path='/home/cellfinder_data', channel=0):
+    def initWorkspace(self, path='/home/cellfinder_data', channel=0, choice="Hemisphere"):
         if channel == 0:
             channelStr = "C01"
         elif channel == 1:
             channelStr = "C02"
         self.chosenChannel = channelStr
         myWorkingDirectory = path
-
+        if choice == "Hemisphere":
+            self.slicing = (slice(None),slice(None),slice(0,566))
+        else:
+            self.slicing = (slice(None),slice(None),slice(None))
+        print(self.slicing, "Self Slicing as ", choice, "\n")
         if os.path.exists(myWorkingDirectory):
             #myWorkingDirectory is the base directory <- alles relativ dazu
             expression_raw = 'Signal/' + channelStr + '/Z<Z,4>_' + channelStr + '.tif'  # applies for example : "Z0001_C01.tif, Z0023..."
             expression_auto = 'Auto/Z<Z,4>_' + 'C01' + '.tif'
             ws = wsp.Workspace('CellMap', directory=myWorkingDirectory);
+            
+            #This update is necessary to evoke usage of more than one channel 
             ws.update(raw_C01='Signal/C01/Z<Z,4>_C01.tif',
                       raw_C02='Signal/C02/Z<Z,4>_C02.tif',
                       stitched_C01='stitched_C01.npy',
@@ -326,9 +321,7 @@ class Main_Window(QWidget):
             print(self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel + " already exists\n")
 
         resourcesDirectory = settings.resources_path
-        annotation_file, reference_file, distance_file = ano.prepare_annotation_files(slicing=(slice(None),
-                                                                                               slice(None),
-                                                                                               slice(0,640)),
+        annotation_file, reference_file, distance_file = ano.prepare_annotation_files(slicing=self.slicing,
                                                                                       orientation=(orientation_x, orientation_y, orientation_z),
                                                                                       overwrite=False,
                                                                                       verbose=True);
@@ -390,6 +383,8 @@ class Main_Window(QWidget):
         # dimensionsfehler möglicherweise
         elx.align(**align_reference_parameter);
         return
+
+        
 
     """
     Input: pd.Dataframe (of mouse_ontology.csv) 
@@ -467,36 +462,47 @@ class Main_Window(QWidget):
     def analyse_csv(self,df: pd.DataFrame,reference_df: pd.DataFrame, trackedLevels: list) -> pd.DataFrame:
         total_cellcount = int(df["total_cells"].sum())  # get total cellcount for reference
         df["name"] = df["structure_name"]
+
+        #Reference_df_ID becomes copied twice to allow O(1) access to "id" or "name" as index of reference_frame
         reference_df_ID = reference_df.set_index(reference_df["id"])
         reference_df_Name = reference_df.set_index(reference_df["name"])
+        
+        #Creation of a template resultframe including all regions and a fusion of ontology_csv and trackedLevels mask, 
+        # all entries in RegionCellCount and RegionCellCountSummedUp are initialized as 0
+        resultframe = self.createResultframe(reference_df, trackedLevels)
 
-        resultframe = self.createResultframe(reference_df, trackedLevels) # Todo: Schauen ob alles läuft und umbenennen, damit klarer wird was getan wird
-        for i in range(len(df.iloc[:, 0])):  # Iterates over all entries in summary.csv
+        # Loop Iterates over all entries in summary.csv and tries to embed them into resultframe
+        # For each entry in summary.csv the parent_id will iteratively indentify the parent structure of this entry 
+        # and sum these entries up, until the root is reached. In that way the cellcounts become summarized over all brain regions in different hierarchies
+        for i in range(len(df.iloc[:, 0])):
             name = df.iloc[i]["name"]  # get the Name of the Region at current index
             print(name)
+
+            # Structures like "No label" and "universe" are not part of ontology.csv and therefore will be removed with this try nd except function    
             try:
                 df_temp = reference_df_Name.loc[name]
             except KeyError:
-                samplename = self.myWorkingDirectory[-4:]
-                filename = self.myWorkingDirectory + "/" + samplename + "_unmapped_regions.csv" #Todo: Passt das, sollte jetzt nicht mehr in Analysis Output sondern in SampleFolder greschrieben werden
+                samplename = os.path.basename(self.myWorkingDirectory)
+                filename = self.myWorkingDirectory + "/" + samplename + "_unmapped_regions.csv"
         
                 with open(filename, "a+") as KeyError_file:
                     KeyError_file.write(str(name) + ";" + str(df.iloc[i]["total_cells"]) + "\n")
                 continue
-            temp_name = df_temp["name"]
-            index_outerCount = resultframe.index[resultframe["Region"] == temp_name]
+
+            temp_name = df_temp["name"] #Name of current region
+            index_outerCount = resultframe.index[resultframe["Region"] == temp_name] # Find index in resultframe where current region occurs
             cellcountRegion = df[df["structure_name"] == resultframe["Region"][index_outerCount[0]]][
-                "total_cells"].sum()  # Hier mit temp_name arbeiten
-            resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion
-            resultframe.loc[index_outerCount[0], "RegionCellCountSummedUp"] += cellcountRegion
+                "total_cells"].sum()  # Cell counts in current region become saved as integer
+            resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
+            resultframe.loc[index_outerCount[0], "RegionCellCountSummedUp"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
             if not df_temp.empty:
                 while (int(df_temp["st_level"]) >= 0):
                     if (int(df_temp["st_level"]) == 0):
-                        break  # index of Brain_structure of parent_ID is taken
-                    df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])]
-                    temp_name = df_temp["name"]
-                    index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
-                    resultframe.loc[index_innerCount[0], "RegionCellCountSummedUp"] += cellcountRegion
+                        break  # While loop breaks if root structure is reached in hierarchical tree
+                    df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region 
+                    temp_name = df_temp["name"] #Update name of parent region 
+                    index_innerCount = resultframe.index[resultframe["Region"] == temp_name] 
+                    resultframe.loc[index_innerCount[0], "RegionCellCountSummedUp"] += cellcountRegion # Add cell count of leaf structure to parent structure
 
         return resultframe
 
@@ -602,12 +608,16 @@ class Main_Window(QWidget):
         p5 = Process(target=self.write_transformed_xml, args=(df_final, pathname2xmlfolder, df_final_transformed_filename))
         p5.start()
 
+        #Counts abundancy in different brain regions
         df_final = df_final["name"].value_counts()
         df_final = pd.DataFrame(df_final)
+        
+        #Creates column structure name with region names 
         df_final["structure_name"] = df_final.index
         df_final = df_final.reset_index(drop=True)
-        df_final.rename(columns={"name": "total_cells"}, inplace=True)
 
+        #Writes a final csv with single cell counts 
+        df_final.rename(columns={"name": "total_cells"}, inplace=True)
         df_final.to_csv(self.myWorkingDirectory + "/cells_" + self.chosenChannel + "_summarized_counts.csv", sep=";")
 
 
@@ -616,6 +626,7 @@ class Main_Window(QWidget):
     calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
     """
     def embedOntology(self):
+        # Reads ontology file holding the reference region dictionairy
         reference_df = pd.read_csv("/home/clearmap_data/ClearMap/ontology_mouse.csv",
                                # Current Refernce Dataframe for mapping
                                # File which stores all important Brain Regions (Atlas?)
@@ -623,10 +634,14 @@ class Main_Window(QWidget):
                                header=0,  # Header
                                index_col=0)  # Index Col
 
+        #Creates a mask table with all regions abundant in the ontology file for comparibility
+        # Additionally allt the structural abundancies between regions of different hierarchy become recorded in form of id- and structurename arrays 
         trackedLevels = self.createTrackingList(reference_df)
+
+        #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
         df = pd.read_csv(self.myWorkingDirectory + "/cells_" + self.chosenChannel + "_summarized_counts.csv", header=0, sep=";")
 
-        samplename = self.myWorkingDirectory[-4:]
+        samplename = os.path.basename(self.myWorkingDirectory)
         new_df = self.analyse_csv(df,reference_df, trackedLevels)
         new_df_name = self.myWorkingDirectory + "/" + samplename + "_" + self.chosenChannel + "_embedded_ontology.csv"
         new_df.to_csv(new_df_name, sep=";", index=0)
@@ -1012,6 +1027,7 @@ class Main_Window(QWidget):
                 alert = QMessageBox()
                 alert.setText("Path does not exist!")
                 alert.exec()
+        
 
         tab = QWidget()
         outer_layout = QVBoxLayout()
@@ -1034,6 +1050,9 @@ class Main_Window(QWidget):
         make_testdata = QPushButton("Make Testdata")
         debug_button = QPushButton("Test Mode")
         debug_button.setCheckable(True)
+        hemisphere_whole_brain = QComboBox()
+        hemisphere_whole_brain.insertItem(0,"Hemisphere")
+        hemisphere_whole_brain.insertItem(1,"Whole brain")
 
         ##
         inner_layout.addWidget(QLabel("<b>Set Workspace:</b>"), 0, 0)
@@ -1041,10 +1060,11 @@ class Main_Window(QWidget):
         inner_layout.addWidget(ws_path, 1, 1)
         inner_layout.addWidget(choose_workspacedir_button, 1, 2)
         inner_layout.addWidget(channel_button, 1, 3)
-        inner_layout.addWidget(set_ws, 1, 4)
-        inner_layout.addWidget(rename_button1, 1, 5)
-        inner_layout.addWidget(rename_button2, 1, 6)
-        inner_layout.addWidget(rename_button3, 1, 7)
+        inner_layout.addWidget(hemisphere_whole_brain, 1,4)
+        inner_layout.addWidget(set_ws, 1, 5)
+        inner_layout.addWidget(rename_button1, 1, 6)
+        inner_layout.addWidget(rename_button2, 1, 7)
+        inner_layout.addWidget(rename_button3, 1, 8)
         inner_layout.addWidget(QLabel("      "), 2, 0)
         inner_layout.addWidget(QLabel("<b>Testdata option:</b>"), 3, 0)
         inner_layout.addWidget(make_testdata, 4, 0)
@@ -1052,7 +1072,7 @@ class Main_Window(QWidget):
         inner_layout.addWidget(debug_button, 5, 0, 5, 4)
 
         choose_workspacedir_button.clicked.connect(lambda: choose_sample())
-        set_ws.clicked.connect(lambda: self.initWorkspace(ws_path.text(), channel_button.currentIndex()))
+        set_ws.clicked.connect(lambda: self.initWorkspace(ws_path.text(), channel_button.currentIndex(),hemisphere_whole_brain.currentText()))
         rename_button1.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Auto'))
         rename_button2.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Signal/C01'))
         rename_button3.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Signal/C02'))
@@ -1288,7 +1308,7 @@ class Main_Window(QWidget):
 
         # Widgets for equalization
         execute_equalization = QCheckBox()
-        percentile_equalization_low = QLineEdit("0.5")
+        percentile_equalization_low = QLineEdit("0.05")
         percentile_equalization_high = QLineEdit("0.95")
         max_value_equalization = QLineEdit("1.5")
         selem_equalization_x = QLineEdit("200")
@@ -1682,22 +1702,22 @@ class Main_Window(QWidget):
         #choose_normalization_ComboBox.insertItem(3,"Percentile normalization (0.05,0.95)")
         
 
-        filter_level_ComboBox = QComboBox()
-        filter_level_ComboBox.insertItem(0,"None")
-        filter_level_ComboBox.insertItem(1,"1")
-        filter_level_ComboBox.insertItem(2,"2")
-        filter_level_ComboBox.insertItem(3,"3")
-        filter_level_ComboBox.insertItem(4,"4")
-        filter_level_ComboBox.insertItem(5,"5")
-        filter_level_ComboBox.insertItem(6,"6")
-        filter_level_ComboBox.insertItem(7,"7")
-        filter_level_ComboBox.insertItem(8,"8")
-        filter_level_ComboBox.insertItem(9,"9")
-        filter_level_ComboBox.insertItem(10,"10")
-        filter_level_ComboBox.insertItem(11,"11")
-        filter_level_ComboBox.insertItem(12,"12")
+        #filter_level_ComboBox = QComboBox()
+        #filter_level_ComboBox.insertItem(0,"None")
+        #filter_level_ComboBox.insertItem(1,"1")
+        #filter_level_ComboBox.insertItem(2,"2")
+        #filter_level_ComboBox.insertItem(3,"3")
+        #filter_level_ComboBox.insertItem(4,"4")
+        #filter_level_ComboBox.insertItem(5,"5")
+        #filter_level_ComboBox.insertItem(6,"6")
+        #filter_level_ComboBox.insertItem(7,"7")
+        #filter_level_ComboBox.insertItem(8,"8")
+        #filter_level_ComboBox.insertItem(9,"9")
+        #filter_level_ComboBox.insertItem(10,"10")
+        #filter_level_ComboBox.insertItem(11,"11")
+        #filter_level_ComboBox.insertItem(12,"12")
 
-        filter_region_LineEdit = QLineEdit("")
+        #filter_region_LineEdit = QLineEdit("")
 
         filter_normalization_button = QPushButton("Log Transform | Normalize | Filter ")
 
@@ -1726,35 +1746,31 @@ class Main_Window(QWidget):
         inner_layout1.addWidget(create_final_output_directory)
         inner_layout1.addWidget(make_analysis_data)
         
-        inner_layout2.addWidget(QFrame())
-        inner_layout2.addWidget(QLabel("<b>Log Transformation</b>"))
+        inner_layout2.addWidget(QLabel("<b>Normalization</b>"))
         
-        inner_layout2.addWidget(QLabel("                                          "))
-        inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(QLabel("Normalization"))
         inner_layout2.addWidget(choose_normalization_ComboBox)
 
-        
-        inner_layout2.addWidget(QLabel("                                          "))
-        inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(QLabel("Choose log transformation or None"))
         inner_layout2.addWidget(choose_log_transformation_ComboBox)
         
 
         
+        #inner_layout2.addWidget(QLabel("                                          "))
+        #inner_layout2.addWidget(QLabel("                                          "))
+        #inner_layout2.addWidget(QLabel("Filter for level in hierarchical structure"))
+        #inner_layout2.addWidget(filter_level_ComboBox)
+
+
+
+        #inner_layout2.addWidget(QLabel("                                          "))
+        #inner_layout2.addWidget(QLabel("                                          "))
+        #inner_layout2.addWidget(QLabel("Filter for a region and it's subregions"))
+        #inner_layout2.addWidget(filter_region_LineEdit)
+
         inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(QLabel("                                          "))
-        inner_layout2.addWidget(QLabel("Filter for level in hierarchical structure"))
-        inner_layout2.addWidget(filter_level_ComboBox)
-
-
-
         inner_layout2.addWidget(QLabel("                                          "))
-        inner_layout2.addWidget(QLabel("                                          "))
-        inner_layout2.addWidget(QLabel("Filter for a region and it's subregions"))
-        inner_layout2.addWidget(filter_region_LineEdit)
-
-
         inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(filter_normalization_button)
 
@@ -1914,41 +1930,41 @@ class Main_Window(QWidget):
                     df_abs_filename = "log10_" + df_abs_filename
                     df_hier_abs_filename = "log10_" + df_hier_abs_filename
 
-                if filter_level_ComboBox.currentText() != "None":
-                    level = int(filter_level_ComboBox.currentText())
-                    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
-                    index_list = []
-                    for i,val in enumerate(information["CorrespondingLevel"]):
-                        array = eval(val)
-                        if level == array[0]:
-                            index_list.append(i)
+                #if filter_level_ComboBox.currentText() != "None":
+                #    level = int(filter_level_ComboBox.currentText())
+                #    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
+                #    index_list = []
+                #    for i,val in enumerate(information["CorrespondingLevel"]):
+                #        array = eval(val)
+                #        if level == array[0]:
+                #            index_list.append(i)
 
-                    df_abs = df_abs.iloc[index_list,:]
-                    df_hier_abs = df_hier_abs.iloc[index_list,:]
+                #    df_abs = df_abs.iloc[index_list,:]
+                #    df_hier_abs = df_hier_abs.iloc[index_list,:]
 
-                    df_abs_filename = "level_" + str(level) + "_" + df_abs_filename
-                    df_hier_abs_filename = "level_" + str(level) + "_" + df_hier_abs_filename
+                #    df_abs_filename = "level_" + str(level) + "_" + df_abs_filename
+                #    df_hier_abs_filename = "level_" + str(level) + "_" + df_hier_abs_filename
 
-                if filter_region_LineEdit.text() != "":
-                    region = filter_region_LineEdit.text()
-                    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
-                    if region in information["TrackedWay"]:
-                        index_list = []
-                        for i,val in enumerate(information["TrackedWay"]):
-                            if region in val:
-                                index_list.append(i)  
+                #if filter_region_LineEdit.text() != "":
+                #    region = filter_region_LineEdit.text()
+                #    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
+                #    if region in information["TrackedWay"]:
+                #        index_list = []
+                #        for i,val in enumerate(information["TrackedWay"]):
+                #            if region in val:
+                #                index_list.append(i)  
 
 
-                        df_abs = df_abs.iloc[index_list,:]
-                        df_hier_abs = df_hier_abs.iloc[index_list,:]
+                #        df_abs = df_abs.iloc[index_list,:]
+                #        df_hier_abs = df_hier_abs.iloc[index_list,:]
 
-                        df_abs_filename = "region_" + str(region) + "_" + df_abs_filename
-                        df_hier_abs_filename = "level_" + str(region) + "_" + df_hier_abs_filename
-                    else:
-                        alert = QMessageBox()
-                        alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
-                        alert.exec()
-                        return
+                #       df_abs_filename = "region_" + str(region) + "_" + df_abs_filename
+                #       df_hier_abs_filename = "level_" + str(region) + "_" + df_hier_abs_filename
+                #    else:
+                #        alert = QMessageBox()
+                #        alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
+                #        alert.exec()
+                #        return
 
 
                 df_abs.to_csv(final_output_directory.text() + "/" + df_abs_filename, sep = ";")
@@ -2030,7 +2046,7 @@ class Main_Window(QWidget):
 
         create_pca = QPushButton("PCA")
         create_heatmap = QPushButton("Heatmap")
-        create_vol_plot = QPushButton("Volcano Plot")
+        #create_vol_plot = QPushButton("Volcano Plot")
         create_boxplot = QPushButton("Boxplot")
 
 
@@ -2052,9 +2068,9 @@ class Main_Window(QWidget):
         inner_layout2.addWidget(create_pca)
         inner_layout2.addStretch()
 
-        inner_layout3.addWidget(QLabel("<b>Volcano Plot</b>"))
-        inner_layout3.addWidget(create_vol_plot)
-        inner_layout3.addStretch()
+        #inner_layout3.addWidget(QLabel("<b>Volcano Plot</b>"))
+        #inner_layout3.addWidget(create_vol_plot)
+        #inner_layout3.addStretch()
 
         inner_layout4.addWidget(QLabel("<b>Heatmap</b>"))
         inner_layout4.addWidget(QLabel("Select a structure level to filter for"))
@@ -2090,6 +2106,7 @@ class Main_Window(QWidget):
         choose_information_file.pressed.connect(lambda: select_information_file())
         create_pca.pressed.connect(lambda: pca())
         create_heatmap.pressed.connect(lambda:heatmap())
+        create_boxplot.pressed.connect(lambda:boxplot())
         set_input.pressed.connect(lambda: set_input_and_metadata())
         
     
@@ -2198,8 +2215,8 @@ class Main_Window(QWidget):
 
 
 
-        def volcano():
-            pass
+        #def volcano():
+        #    pass
 
         def heatmap():
             input_csv = self.input_csv.copy()
@@ -2278,7 +2295,97 @@ class Main_Window(QWidget):
 
 
         def boxplot():
-            pass 
+            input_csv = self.input_csv.copy()
+            print(input_csv)
+            information = self.information_csv.copy()
+            if filter_specific_region_LineEdit.text() != "":
+                region = filter_specific_region_LineEdit.text()
+                if region in input_csv.index:
+                    input_csv = input_csv[input_csv.index == region]
+            
+                conditions = self.metadata_csv["condition"].unique()
+                
+
+                sample_names = list(input_csv.columns)
+                for i in sample_names:
+                    cpm_name = i + "_processed"
+                    input_csv[cpm_name] = input_csv[i]
+
+
+                for i in conditions:
+                    array_of_means = []
+                    array_of_stdd = []
+                    array_of_medians = []
+                    array_of_single_values = []
+                    metadata_list_tmp = self.metadata_csv[self.metadata_csv["condition"] == i]
+                    for j in range(len(input_csv)):
+                        array_of_cpms = []
+                        array_of_condition_samples = []
+                        for k in range(len(input_csv.iloc[0, :])):
+                            print(input_csv.columns[k])
+                            print(list([str(i) + "_processed" for i in list(metadata_list_tmp["sample"])]))
+                            if input_csv.columns[k] in list(
+                                    [str(i) + "_processed" for i in list(metadata_list_tmp["sample"])]):
+                                array_of_cpms.append(input_csv.iloc[j, k])
+                                array_of_condition_samples.append(input_csv.columns[k])
+                        if len(array_of_cpms) < 2:
+                            mean = array_of_cpms[0]
+                            stdd = 0
+                            med = array_of_cpms[0]
+                        else:
+                            mean = np.mean(array_of_cpms)
+                            stdd = np.std(array_of_cpms)
+                            med = np.median(array_of_cpms)
+                        array_of_means.append(mean)
+                        array_of_stdd.append(stdd)
+                        array_of_medians.append(med)
+                        array_of_single_values.append(array_of_cpms)
+                    input_csv[str(i) + "_mean"] = array_of_means
+                    input_csv[str(i) + "_stdd"] = array_of_stdd
+                    input_csv[str(i) + "_med"] = array_of_medians
+                    input_csv[str(i) + "_single_values"] = array_of_single_values
+                
+                print(input_csv)
+                array_for_boxplots = []
+
+                for i in conditions:
+                    spread = list(input_csv[str(i) + "_single_values"])
+
+                    data = np.concatenate(spread)
+                    array_for_boxplots.append(data)
+                print("Array for boxplots\n",array_for_boxplots)
+
+                df_boxplot = pd.DataFrame()
+
+                for val, i in enumerate(conditions):
+                    method = "absolute"
+                    region_name = region
+                    df_tmp = pd.DataFrame({method: array_for_boxplots[val]})
+                    df_tmp["condition"] = i
+                    df_boxplot = pd.concat([df_boxplot, df_tmp])
+                    fig, ax = plt.subplots()
+                    ax = sns.boxplot(x="condition", y=method, data=df_boxplot)
+                    ax = sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
+                    
+                    region_name = str(region_name).replace(" ", "")
+                    region_name = str(region_name).replace("/", "")
+                    plt.title(region)
+                
+                output_dir = os.path.dirname(input_file.text())
+                output_name = "/" + region + "_boxplot_" + os.path.basename(input_file.text())[:-4] + ".png"
+                plt.savefig( output_dir + output_name, bbox_inches='tight')
+                plt.close
+                
+                plot_window.figure.clear()
+                ax2 = plot_window.figure.add_subplot(111)
+                sns.boxplot(x="condition", y=method, data=df_boxplot,ax = ax2)
+                sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax = ax2)
+                plot_window.canvas.draw()
+                
+
+
+                
+                
         
         
 
