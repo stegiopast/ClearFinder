@@ -491,7 +491,7 @@ class Main_Window(QWidget):
                     trained_model_string = ""
                 else:
                     if os.path.exists(_trained_model):
-                        trained_model_string = "--trained-model " + _trained_model_string + " "
+                        trained_model_string = "--trained-model " + _trained_model + " "
                     else:
                         trained_model_string = ""
                         alert = QMessageBox()
