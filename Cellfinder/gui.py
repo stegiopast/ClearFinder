@@ -926,7 +926,7 @@ class Main_Window(QWidget):
     """
     def embedOntology(self,choice):
         # Reads ontology file holding the reference region dictionairy
-        reference_df = pd.read_csv("/home/cellfinder_data/Cellfinder/ontology_mouse.csv",
+        reference_df = pd.read_csv(str(os.path.dirname(os.path.realpath(sys.argv[0]))) + "/ontology_mouse.csv",
                                # Current Refernce Dataframe for mapping
                                # File which stores all important Brain Regions (Atlas?)
                                sep=";",  # Separator
