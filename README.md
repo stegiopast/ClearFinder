@@ -9,6 +9,8 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 cd ~
 git clone git@github.com:your_username/Brainmap_dev.git
 sudo chown your_username ~/Brainmap_dev -R
+cd ~/Brainmap_dev/ClearMap
+git clone git@github.com:ChristophKirst/ClearMap2.git
 ```
 
 ### 2. Download conda if not installed
