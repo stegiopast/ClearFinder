@@ -8,6 +8,7 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 ```
 cd ~
 git clone git@github.com:your_username/Brainmap_dev.git
+sudo chown username ~/Brainmap_dev -R
 ```
 
 ### 2. Download conda if not installed
