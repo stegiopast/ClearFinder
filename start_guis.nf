@@ -29,7 +29,7 @@ process preparation_napari(){
     stdout into napari_channel
 
     """
-    conda env list | grep napari-env | awk -F' ' '{print \$NF}'
+    conda env list | grep Napari_env | awk -F' ' '{print \$NF}'
     """
 }
 
