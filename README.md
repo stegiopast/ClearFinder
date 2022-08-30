@@ -60,3 +60,9 @@ Napari_env
 ```
 conda env create --file ~/Brainmap_dev/Napari/requirements.yml
 ```
+
+### 5.Start application
+```
+cd ~/Brainmap_dev
+nextflow run start_guis.nf
+```
