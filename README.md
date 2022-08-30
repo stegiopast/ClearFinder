@@ -36,6 +36,7 @@ Please follow the instructions of the conda installation guide
 cd ~
 curl -fsSL https://get.nextflow.io | bash
 cp nextflow /usr/bin/
+sudo chown yout_username /usr/bin/nextflow
 ```
 Please follow the instructions of the nextflow installation guide
 
