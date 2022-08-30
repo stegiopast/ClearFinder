@@ -35,8 +35,6 @@ Please follow the instructions of the nextflow installation guide
 
 ### 4. install different environments
 
-It is mandatory to call the environments with the following names
-
 Cellfinder_env
 ```
 conda env create --file ~/Brainmap_dev/Cellfinder/requirements.yml
