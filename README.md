@@ -52,5 +52,5 @@ conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
 
 Napari_env
 ```
-mamba create -n Napari_env --file ~/Brainmap_dev/Napari/requirements.txt
+conda env create --file ~/Brainmap_dev/Napari/requirements.yml
 ```
