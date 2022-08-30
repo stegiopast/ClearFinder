@@ -39,7 +39,7 @@ It is mandatory to call the environments with the following names
 
 Cellfinder_env
 ```
-mamba create -n Cellfinder_env --file ~/Brainmap_dev/Cellfinder/requirements.txt
+conda env create --file ~/Brainmap_dev/Cellfinder/requirements.yml
 conda activate Cellfinder_env
 pip install cellfinder
 conda deactivate
@@ -47,7 +47,7 @@ conda deactivate
 
 Clearmap_env
 ```
-mamba create -n Clearmap_env --file ~/Brainmap_dev/ClearMap/requirements.txt
+conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
 ```
 
 Napari_env
