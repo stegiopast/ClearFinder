@@ -66,7 +66,9 @@ conda env create --file ~/Brainmap_dev/Napari/requirements.yml
 cd ~/Brainmap_dev
 nextflow run start_guis.nf
 ```
-Note that with the first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs run
+
+### 6.Alternative start
+Note that with the first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
 ```
 conda activate Clearmap_env
 python3 ~/Brainmap_dev/ClearMap/gui.py
