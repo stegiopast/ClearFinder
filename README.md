@@ -11,6 +11,7 @@ git clone git@github.com:your_username/Brainmap_dev.git
 sudo chown your_username ~/Brainmap_dev -R
 cd ~/Brainmap_dev/ClearMap
 git clone git@github.com:ChristophKirst/ClearMap2.git
+mv ClearMap2/ClearMap ~/Brainmap_dev/ClearMap
 ```
 
 ### 2. Download conda if not installed
