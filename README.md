@@ -42,6 +42,7 @@ Cellfinder_env
 mamba create -n Cellfinder_env --file ./Brainmap_dev/Cellfinder/requirements.txt
 conda activate Cellfinder_env
 pip install cellfinder
+conda deactivate
 ```
 
 Clearmap_env
