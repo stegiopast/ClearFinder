@@ -37,6 +37,7 @@ cd ~
 curl -fsSL https://get.nextflow.io | bash
 cp nextflow /usr/bin/
 sudo chown your_username /usr/bin/nextflow
+sudo chown your_username ~/.nextflow -R
 ```
 Please follow the instructions of the nextflow installation guide
 
