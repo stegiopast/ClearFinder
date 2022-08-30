@@ -29,7 +29,9 @@ Please follow the instructions of the conda installation guide
 ### 3. install nextflow 
 
 ```
+cd ~
 curl -fsSL https://get.nextflow.io | bash
+cp nextflow /usr/bin/
 ```
 Please follow the instructions of the nextflow installation guide
 
