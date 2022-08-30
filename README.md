@@ -68,7 +68,7 @@ nextflow run start_guis.nf
 ```
 
 ### 6.Alternative start
-Note that with the first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
+Note that with it's first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
 ```
 conda activate Clearmap_env
 python3 ~/Brainmap_dev/ClearMap/gui.py
