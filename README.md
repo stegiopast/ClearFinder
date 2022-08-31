@@ -33,11 +33,7 @@ Please follow the instructions of the conda installation guide
 ### 3. install nextflow 
 
 ```
-cd ~
-curl -fsSL https://get.nextflow.io | bash
-cp nextflow /usr/bin/
-sudo chown your_username /usr/bin/nextflow
-sudo chown your_username ~/.nextflow -R
+conda install -c bioconda nextflow
 ```
 Please follow the instructions of the nextflow installation guide
 
