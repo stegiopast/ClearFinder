@@ -15,7 +15,7 @@ mv ClearMap2/ClearMap ~/Brainmap_dev/ClearMap
 ```
 
 ### 2. Download conda if not installed
-  -> For linux 64 based distributions use the following code snippet, otherwise visit anaconda.com and follow the installation instructions
+  -> For linux x86_64 based distributions use the following code snippet, otherwise visit anaconda.com and follow the installation instructions for your distribution.
 
 ```
 cd ~
