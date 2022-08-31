@@ -84,3 +84,29 @@ conda activate Napari_env
 napari
 conda deactivate
 ```
+
+### 7.Create an alias in the ~/.bashrc file for quickstart
+```
+sudo apt-get install gedit
+gedit ~/.bashrc
+```
+
+Insert the following line in the ~/.bashrc file that should open in the texteditor:
+
+```
+alias Brainmap="cd path/to/Brainmap_dev && nextflow run start_guis.nf"
+```
+
+Safe the file with Ctrl+S or with the save button of the editor. Then close the editor and get back to the terminal. Type:
+
+```
+source ~/.bashrc
+```
+
+You can from now and forever start the applications with the following command:
+
+```
+Brainmap
+```
+
+
