@@ -1,7 +1,7 @@
-#from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
+ #from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
 
 import sys
-print(sys.version)
+#print(sys.version)
 import os
 import pathlib
 from pathlib import Path
@@ -549,57 +549,58 @@ class Main_Window(QWidget):
         else:
             self.warning_ws()
 
-
-
+        
     def train_network(self, _yaml_files="",
-                            _trained_model = "",
-                            _continue_training=True, 
-                            _test_fraction=0.1, 
-                            _learning_rate=0.0001, 
-                            _batch_size=32,
-                            _epochs=1):
+                        _trained_model = "",
+                        _continue_training=True, 
+                        _test_fraction=0.1, 
+                        _learning_rate=0.0001, 
+                        _batch_size=32,
+                        _epochs=1,
+                        _output_directory=""):
 
-        if not os.path.exists(self.my_working_directory + "/" + self.channel_chosen + "_output_training"):
 
-            os.mkdir(self.my_working_directory + "/" + self.channel_chosen + "_output_training")
-            _output_directory = self.my_working_directory + "/" + self.channel_chosen + "_output_training"
+        output_directory = _output_directory
 
-            print("Output directory will be", _output_directory)
-
-            home = Path.home()
-            install_path = home / ".cellfinder"
-            
-            if _trained_model != "":
-                run_training(output_dir=Path(_output_directory),
-                             trained_model = _trained_model,
-                             yaml_file=[Path(_yaml_files)],
-                             install_path=install_path,
-                             learning_rate=_learning_rate, 
-                             continue_training=_continue_training,
-                             test_fraction=_test_fraction,
-                             batch_size=_batch_size,
-                             save_progress=True,
-                             epochs=_epochs)
-            else:
-                if os.path.exists(_output_directory):
-                    run_training(output_dir=Path(_output_directory),
-                                 yaml_file=[Path(_yaml_files)],
-                                 install_path=install_path,
-                                 learning_rate=_learning_rate,
-                                 continue_training=_continue_training,
-                                 test_fraction=_test_fraction,
-                                 batch_size=_batch_size,
-                                 save_progress=True,
-                                 epochs=_epochs)
-                else:
-                    alert = QMessageBox()
-                    alert.setText("Output directory already exists! Please save old output_training directory somewhere and remove it from this path!")
-                    alert.exec()
-
-        else:
+        print(output_directory)
+        if output_directory == "":
             alert = QMessageBox()
-            alert.setText("Output directory already exists! Please save old output_training directory somewhere and remove it from this path!")
+            alert.setText("Please choose output directory!")
             alert.exec()
+            return
+        
+        print("Output directory will be", output_directory)
+
+        home = Path.home()
+        install_path = home / ".cellfinder"
+        
+        if _trained_model != "":
+            run_training(output_dir=Path(output_directory),
+                        trained_model = _trained_model,
+                        yaml_file=[Path(_yaml_files)],
+                        install_path=install_path,
+                        learning_rate=_learning_rate, 
+                        continue_training=_continue_training,
+                        test_fraction=_test_fraction,
+                        batch_size=_batch_size,
+                        save_progress=True,
+                        epochs=_epochs)
+        else:
+            if os.path.exists(output_directory):
+                run_training(output_dir=Path(_output_directory),
+                            yaml_file=[Path(_yaml_files)],
+                            install_path=install_path,
+                            learning_rate=_learning_rate,
+                            continue_training=_continue_training,
+                            test_fraction=_test_fraction,
+                            batch_size=_batch_size,
+                            save_progress=True,
+                            epochs=_epochs)
+            else:
+                alert = QMessageBox()
+                alert.setText("Output directory doesn't exists!")
+                alert.exec()
+                return
 
 
 
@@ -688,7 +689,7 @@ class Main_Window(QWidget):
         inner_layout.addWidget(QLabel("<b>Set Workspace:</b>"),0,0)
         inner_layout.addWidget(QLabel("Input path of interest:"),1,0)
         inner_layout.addWidget(ws_path,1,1)
-        inner_layout.addWidget(channel_button,1,2)
+        #inner_layout.addWidget(channel_button,1,2)
         inner_layout.addWidget(set_ws,1,3)
         inner_layout.addWidget(rename_button1,1,4)
         inner_layout.addWidget(rename_button2,1,5)
@@ -879,7 +880,7 @@ class Main_Window(QWidget):
         
                 with open(filename, "a+") as KeyError_file:
                     KeyError_file.write(str(name) + ";" + str(df.iloc[i][total_cells]) + "\n")
-                continue
+                continuetraining_layout
 
             temp_name = df_temp["name"] #Name of current region
             index_outerCount = resultframe.index[resultframe["Region"] == temp_name] # Find index in resultframe where current region occurs
@@ -1120,6 +1121,8 @@ class Main_Window(QWidget):
         learning_rate = QLineEdit("0.0001")
         batch_size = QLineEdit("32")
         epochs  = QLineEdit("1")
+        training_output_directory = QLabel("")
+        choose_training_output_button = QPushButton("Choose your base directory")
 
         ###Widgets for starting training,loading and saving parametes
         config_path = QLineEdit("Insert filename extension")
@@ -1152,11 +1155,15 @@ class Main_Window(QWidget):
         
         inner_layout.addWidget(QLabel("Epochs"),6,0)
         inner_layout.addWidget(epochs,6,1)
+
+        inner_layout.addWidget(QLabel("Choose base directory and create new one"),7,0)
+        inner_layout.addWidget(training_output_directory,7,1)
+        inner_layout.addWidget(choose_training_output_button,7,2)
         
-        inner_layout.addWidget(config_path,7,0)
-        inner_layout.addWidget(load_config_button,7,1)
-        inner_layout.addWidget(save_config_button,7,2)
-        inner_layout.addWidget(train_network_button,7,3)
+        inner_layout.addWidget(config_path,8,0)
+        inner_layout.addWidget(load_config_button,8,1)
+        inner_layout.addWidget(save_config_button,8,2)
+        inner_layout.addWidget(train_network_button,8,3)
 
         ###Save and load paramters function
         def save_config(save_path):
@@ -1193,7 +1200,7 @@ class Main_Window(QWidget):
                 alert.setText("Path does not exist!")
                 alert.exec()   
 
-        ### Function for choosing .yaml fiels or trained models (.h5) files
+        ### Functions for choosing .yaml fiels or trained models (.h5) files
         def choose_yaml():
             path = QFileDialog.getOpenFileName(self, "Choose a Model file (.h5)")
             if path != ('', ''):
@@ -1212,11 +1219,24 @@ class Main_Window(QWidget):
                 trained_model.setText('')
                 print("Trained model text",trained_model.text())
 
+        ### Function for choosing output training directory
+        def choose_output_directory():
+            path = QFileDialog.getExistingDirectory(self, "Save Output training data")
+            print(path)
+            if path != '':
+                training_output_directory.setText(str(path)+ "/")
+                print("Output training", training_output_directory.text())
+            else:
+                training_output_directory.setText('')
+                print("Output training", training_output_directory.text())
+
+
 
         ### Connection of widgets with fundtion, start training, save and load, choose yaml or trained models
         
         load_config_button.pressed.connect(lambda: load_config(load_path = os.getcwd() + "/train_network_" + config_path.text() + ".csv"))
         save_config_button.pressed.connect(lambda: save_config(save_path = os.getcwd() + "/train_network_" + config_path.text() + ".csv"))
+        
         
         train_network_button.clicked.connect(lambda: self.train_network(_yaml_files=str(yaml_files.text()),
                                                                         _trained_model =str(trained_model.text()),
@@ -1224,10 +1244,12 @@ class Main_Window(QWidget):
                                                                         _test_fraction=float(test_fraction.text()),
                                                                         _learning_rate=float(learning_rate.text()),
                                                                         _batch_size=int(batch_size.text()),
-                                                                        _epochs=int(epochs.text())))
+                                                                        _epochs=int(epochs.text()),
+                                                                        _output_directory = str(training_output_directory.text())))
 
         choose_yaml_button.clicked.connect(lambda: choose_yaml())
         choose_trained_model_button.clicked.connect(lambda: choose_model())
+        choose_training_output_button.pressed.connect(lambda: choose_output_directory())
 
         ### Add inner layout to outer layout, add outer layout to tab and return tab
         outer_layout.addLayout(inner_layout)
@@ -1264,25 +1286,6 @@ class Main_Window(QWidget):
         choose_normalization_ComboBox.insertItem(0,"None") 
         choose_normalization_ComboBox.insertItem(1,"Counts per million")
         choose_normalization_ComboBox.insertItem(2,"Median of ratio")
-        #choose_normalization_ComboBox.insertItem(3,"Percentile normalization (0.05,0.95)")
-        
-
-        #filter_level_ComboBox = QComboBox()
-        #filter_level_ComboBox.insertItem(0,"None")
-        #filter_level_ComboBox.insertItem(1,"1")
-        #filter_level_ComboBox.insertItem(2,"2")
-        #filter_level_ComboBox.insertItem(3,"3")
-        #filter_level_ComboBox.insertItem(4,"4")
-        #filter_level_ComboBox.insertItem(5,"5")
-        #filter_level_ComboBox.insertItem(6,"6")
-        #filter_level_ComboBox.insertItem(7,"7")
-        #filter_level_ComboBox.insertItem(8,"8")
-        #filter_level_ComboBox.insertItem(9,"9")
-        #filter_level_ComboBox.insertItem(10,"10")
-        #filter_level_ComboBox.insertItem(11,"11")
-        #filter_level_ComboBox.insertItem(12,"12")
-
-        #filter_region_LineEdit = QLineEdit("")
 
         filter_normalization_button = QPushButton("Log Transform | Normalize | Filter ")
 
@@ -1319,20 +1322,6 @@ class Main_Window(QWidget):
         inner_layout2.addWidget(QLabel("Choose log transformation or None"))
         inner_layout2.addWidget(choose_log_transformation_ComboBox)
         
-
-        
-        #inner_layout2.addWidget(QLabel("                                          "))
-        #inner_layout2.addWidget(QLabel("                                          "))
-        #inner_layout2.addWidget(QLabel("Filter for level in hierarchical structure"))
-        #inner_layout2.addWidget(filter_level_ComboBox)
-
-
-
-        #inner_layout2.addWidget(QLabel("                                          "))
-        #inner_layout2.addWidget(QLabel("                                          "))
-        #inner_layout2.addWidget(QLabel("Filter for a region and it's subregions"))
-        #inner_layout2.addWidget(filter_region_LineEdit)
-
         inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(QLabel("                                          "))
         inner_layout2.addWidget(QLabel("                                          "))
@@ -1504,8 +1493,6 @@ class Main_Window(QWidget):
                 #        if level == array[0]:
                 #            index_list.append(i)
 
-                #    df_abs = df_abs.iloc[index_list,:]
-                #    df_hier_abs = df_hier_abs.iloc[index_list,:]
 
                 #    df_abs_filename = "level_" + str(level) + "_" + df_abs_filename
                 #    df_hier_abs_filename = "level_" + str(level) + "_" + df_hier_abs_filename
