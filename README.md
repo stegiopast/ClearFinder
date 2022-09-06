@@ -22,11 +22,7 @@ cd ~
 wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh
 bash ~/Anaconda3-2022.05-Linux-x86_64.sh
 ```
-  -> Install mamba for fast environment setup
 
-```
-conda install -c conda-forge mamba
-```
 
 Please follow the instructions of the conda installation guide
 
