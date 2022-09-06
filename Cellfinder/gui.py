@@ -698,7 +698,7 @@ class Main_Window(QWidget):
 
         
         choose_ws.clicked.connect(lambda: choose_sample())
-        set_ws.clicked.connect(lambda: self.init_workspace(ws_path.text(),channel_button.currentIndex()))
+        set_ws.clicked.connect(lambda: self.init_workspace(ws_path.text(),0))
         rename_button1.clicked.connect(lambda: rename_files(_path = self.my_working_directory, extend='/Auto'))
         rename_button2.clicked.connect(lambda: rename_files(_path = self.my_working_directory, extend='/Signal/' + self.channel_chosen))
                 
@@ -908,7 +908,7 @@ class Main_Window(QWidget):
         df_name = self.my_working_directory + df_filename
         df = pd.read_csv(df_name, header=0)
 
-        df_final_filename = "/analysis/cells_" + self.channel_chosen + "_final.csv"
+        df_final_filename = "/analysis/cells_final.csv"
         df_final_name = self.my_working_directory + df_final_filename
         df_final = df[df["structure_name"] != "universe"]
         df_final = df_final[df_final["structure_name"] != "No label"]
@@ -918,7 +918,7 @@ class Main_Window(QWidget):
         df_final = pd.DataFrame(df_final)
 
         #Writes a final csv with single cell counts 
-        df_final.to_csv(self.my_working_directory + "/analysis/cells_" + self.channel_chosen + "_summarized_counts.csv", sep=";")
+        df_final.to_csv(self.my_working_directory + "/analysis/cells_summarized_counts.csv", sep=";")
 
 
 
@@ -939,11 +939,11 @@ class Main_Window(QWidget):
         trackedLevels = self.createTrackingList(reference_df)
 
         #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
-        df = pd.read_csv(self.my_working_directory + "/analysis/cells_" + self.channel_chosen + "_summarized_counts.csv", header=0, sep=";")
+        df = pd.read_csv(self.my_working_directory + "/analysis/cells_summarized_counts.csv", header=0, sep=";")
 
         samplename = os.path.basename(self.my_working_directory)
         new_df = self.analyse_csv(df,reference_df, trackedLevels, choice)
-        new_df_name = self.my_working_directory + "/" + samplename + "_" + self.channel_chosen + "_embedded_ontology.csv"
+        new_df_name = self.my_working_directory + "/" + samplename + "_embedded_ontology.csv"
         new_df.to_csv(new_df_name, sep=";", index=0)
         return
 
@@ -1484,41 +1484,6 @@ class Main_Window(QWidget):
                     df_abs_filename = "log10_" + df_abs_filename
                     df_hier_abs_filename = "log10_" + df_hier_abs_filename
 
-                #if filter_level_ComboBox.currentText() != "None":
-                #    level = int(filter_level_ComboBox.currentText())
-                #    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
-                #    index_list = []
-                #    for i,val in enumerate(information["CorrespondingLevel"]):
-                #        array = eval(val)
-                #        if level == array[0]:
-                #            index_list.append(i)
-
-
-                #    df_abs_filename = "level_" + str(level) + "_" + df_abs_filename
-                #    df_hier_abs_filename = "level_" + str(level) + "_" + df_hier_abs_filename
-
-                #if filter_region_LineEdit.text() != "":
-                #    region = filter_region_LineEdit.text()
-                #    information = pd.read_csv(final_output_directory.text() + "/list_information.csv", sep = ";",index_col = 0)
-                #    if region in information["TrackedWay"]:
-                #        index_list = []
-                #        for i,val in enumerate(information["TrackedWay"]):
-                #            if region in val:
-                #                index_list.append(i)  
-
-
-                #        df_abs = df_abs.iloc[index_list,:]
-                #        df_hier_abs = df_hier_abs.iloc[index_list,:]
-
-                #       df_abs_filename = "region_" + str(region) + "_" + df_abs_filename
-                #       df_hier_abs_filename = "level_" + str(region) + "_" + df_hier_abs_filename
-                #    else:
-                #        alert = QMessageBox()
-                #        alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
-                #        alert.exec()
-                #        return
-
-
                 df_abs.to_csv(final_output_directory.text() + "/" + df_abs_filename, sep = ";")
                 df_hier_abs.to_csv(final_output_directory.text() + "/" + df_hier_abs_filename, sep = ";")
 
@@ -1564,11 +1529,7 @@ class Main_Window(QWidget):
         
         plot_window = Plot_Window()
         
-        
-        
-        
-        
-        
+
         
         
         self.input_csv = pd.DataFrame()
