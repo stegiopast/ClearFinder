@@ -12,12 +12,12 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import Qt
-from cellfinder_core.train.train_yml import run as run_training
-from cellfinder_core.main import main as cellfinder_run
-from cellfinder_core.tools.IO import read_with_dask
+#from cellfinder_core.train.train_yml import run as run_training
+#from cellfinder_core.main import main as cellfinder_run
+#from cellfinder_core.tools.IO import read_with_dask
 import tifffile
 from tifffile import imread,imwrite
-from imlib.IO.cells import save_cells
+#from imlib.IO.cells import save_cells
 from PIL import Image
 from natsort import natsorted
 from skimage.transform import rescale,resize, downscale_local_mean
@@ -488,7 +488,7 @@ class Main_Window(QWidget):
                 
                 ###Trained model
                 if _trained_model == "":
-                    trained_model_string = ""
+                    trained_model_string = None
                 else:
                     if os.path.exists(_trained_model):
                         trained_model_string = "--trained-model " + _trained_model + " "
@@ -574,33 +574,54 @@ class Main_Window(QWidget):
         home = Path.home()
         install_path = home / ".cellfinder"
         
-        if _trained_model != "":
-            run_training(output_dir=Path(output_directory),
-                        trained_model = _trained_model,
-                        yaml_file=[Path(_yaml_files)],
-                        install_path=install_path,
-                        learning_rate=_learning_rate, 
-                        continue_training=_continue_training,
-                        test_fraction=_test_fraction,
-                        batch_size=_batch_size,
-                        save_progress=True,
-                        epochs=_epochs)
+        
+        training_string = "cellfinder_train "
+        training_yml_string = "-y " + str(_trained_model) + " "
+        if _continue_training and _trained_model != "":
+            continue_str = "--continue-training "
+            trained_model_str = "--trained-model " + str(_trained_model) + " "
         else:
-            if os.path.exists(output_directory):
-                run_training(output_dir=Path(_output_directory),
-                            yaml_file=[Path(_yaml_files)],
-                            install_path=install_path,
-                            learning_rate=_learning_rate,
-                            continue_training=_continue_training,
-                            test_fraction=_test_fraction,
-                            batch_size=_batch_size,
-                            save_progress=True,
-                            epochs=_epochs)
-            else:
-                alert = QMessageBox()
-                alert.setText("Output directory doesn't exists!")
-                alert.exec()
-                return
+            continue_str = ""
+            trained_model_str = ""
+
+        learning_rate_string = "--learning-rate " + str(_learning_rate) + " "
+        
+        batch_size_str = "--batch-size " + str(_batch_size) + " "
+        epochs_str = "--epochs " + str(_epochs)
+        output_dir_str = "-o " + str(output_directory)
+
+        final_string = training_string + training_yml_string + continue_str + trained_model_str + learning_rate_string + batch_size_str + epochs_str + output_dir_str
+
+                         
+        if os.path.exists(output_directory):
+            os.system(final_string)
+
+
+            
+            #run_training(output_dir=Path(output_directory),
+            #            trained_model = _trained_model,
+            #            yaml_file=[Path(_yaml_files)],
+            #            install_path=install_path,
+            #            learning_rate=_learning_rate, 
+            #            continue_training=_continue_training,
+            #            test_fraction=_test_fraction,
+            #            batch_size=_batch_size,
+            #            save_progress=True,
+            #            epochs=_epochs)
+                #run_training(output_dir=Path(_output_directory),
+                #            yaml_file=[Path(_yaml_files)],
+                #            install_path=install_path,
+                #            learning_rate=_learning_rate,
+                #            continue_training=_continue_training,
+                #            test_fraction=_test_fraction,
+                #            batch_size=_batch_size,
+                #           save_progress=True,
+                #           epochs=_epochs)
+        else:
+            alert = QMessageBox()
+            alert.setText("Output directory doesn't exists!")
+            alert.exec()
+            return
 
 
 
