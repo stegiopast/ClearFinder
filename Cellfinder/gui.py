@@ -12,18 +12,11 @@ import numpy as np
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import Qt
-#from cellfinder_core.train.train_yml import run as run_training
-#from cellfinder_core.main import main as cellfinder_run
-#from cellfinder_core.tools.IO import read_with_dask
-#import tifffile
-#from tifffile import imread,imwrite
-#from imlib.IO.cells import save_cells
 from PIL import Image
 from natsort import natsorted
 from skimage.transform import rescale,resize, downscale_local_mean
 from skimage.util import img_as_uint
 
-#from dask_image.imread import imread
 from multiprocessing import Process
 
 from sklearn.datasets import make_blobs
