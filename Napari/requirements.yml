@@ -218,4 +218,3 @@ dependencies:
     - werkzeug==2.1.2
     - wrapt==1.14.1
     - zipp==3.8.0
-prefix: /home/stefan/anaconda3/envs/napari-env
