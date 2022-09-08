@@ -153,4 +153,3 @@ dependencies:
   - zlib=1.2.12
   - zlib-ng=2.0.6
   - zstd=1.5.2
-prefix: /home/stefan/anaconda3/envs/CellFinder
