@@ -272,4 +272,3 @@ dependencies:
   - zipp=3.1.0
   - zlib=1.2.11
   - zstd=1.4.4
-prefix: /home/margaryta/anaconda3/envs/Clearmap_env

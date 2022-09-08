@@ -4,47 +4,47 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - _libgcc_mutex=0.1=conda_forge
-  - _openmp_mutex=4.5=2_gnu
-  - bzip2=1.0.8=h7f98852_4
-  - ca-certificates=2022.07.19=h06a4308_0
-  - dbus=1.13.18=hb2f20db_0
-  - expat=2.4.4=h295c915_0
-  - fontconfig=2.13.1=h6c09931_0
-  - freetype=2.11.0=h70c0345_0
-  - glib=2.56.2=hd408876_0
-  - gst-plugins-base=1.14.0=hbbd80ab_1
-  - gstreamer=1.14.0=hb453b48_1
-  - icu=58.2=he6710b0_3
-  - jpeg=9e=h7f8727e_0
-  - ld_impl_linux-64=2.36.1=hea4e1c9_2
-  - libffi=3.3=he6710b0_2
-  - libgcc-ng=12.1.0=h8d9b700_16
-  - libgomp=12.1.0=h8d9b700_16
-  - libnsl=2.0.0=h7f98852_0
-  - libpng=1.6.37=hbc83047_0
-  - libstdcxx-ng=11.2.0=h1234567_1
-  - libuuid=1.0.3=h7f8727e_2
-  - libxcb=1.15=h7f8727e_0
-  - libxml2=2.9.14=h74e7548_0
-  - libzlib=1.2.12=h166bdaf_1
-  - ncurses=6.3=h27087fc_1
-  - openssl=1.1.1q=h7f8727e_0
-  - pcre=8.45=h295c915_0
-  - pip=22.1.2=pyhd8ed1ab_0
-  - pyqt=5.9.2=py39h2531618_6
-  - python=3.9.12=h12debd9_1
-  - python_abi=3.9=2_cp39
-  - qt=5.9.7=h5867ecd_1
-  - readline=8.1.2=h0f457ee_0
-  - setuptools=62.6.0=py39hf3d152e_0
-  - sip=4.19.13=py39h295c915_0
-  - sqlite=3.39.0=h4ff8645_0
-  - tk=8.6.12=h27826a3_0
-  - tzdata=2022a=h191b570_0
-  - wheel=0.37.1=pyhd8ed1ab_0
-  - xz=5.2.5=h516909a_1
-  - zlib=1.2.12=h166bdaf_1
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - bzip2=1.0.8
+  - ca-certificates=2022.07.19
+  - dbus=1.13.18
+  - expat=2.4.4
+  - fontconfig=2.13.1
+  - freetype=2.11.0
+  - glib=2.56.2
+  - gst-plugins-base=1.14.0
+  - gstreamer=1.14.0
+  - icu=58.2
+  - jpeg=9e
+  - ld_impl_linux-64=2.36.1
+  - libffi=3.3
+  - libgcc-ng=12.1.0
+  - libgomp=12.1.0
+  - libnsl=2.0.0
+  - libpng=1.6.37
+  - libstdcxx-ng=11.2.0
+  - libuuid=1.0.3
+  - libxcb=1.15
+  - libxml2=2.9.14
+  - libzlib=1.2.12
+  - ncurses=6.3
+  - openssl=1.1.1q
+  - pcre=8.45
+  - pip=22.1.2
+  - pyqt=5.9.2
+  - python=3.9.12
+  - python_abi=3.9
+  - qt=5.9.7
+  - readline=8.1.2
+  - setuptools=62.6.0
+  - sip=4.19.13
+  - sqlite=3.39.0
+  - tk=8.6.12
+  - tzdata=2022a
+  - wheel=0.37.1
+  - xz=5.2.5
+  - zlib=1.2.12
   - pip:
     - absl-py==1.1.0
     - alabaster==0.7.12
@@ -218,4 +218,3 @@ dependencies:
     - werkzeug==2.1.2
     - wrapt==1.14.1
     - zipp==3.8.0
-prefix: /home/stefan/anaconda3/envs/napari-env
