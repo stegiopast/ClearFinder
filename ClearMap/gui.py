@@ -129,7 +129,7 @@ class RenameBox(QWidget):
         innerLayout.addWidget(self.accept, 6, 1)
         innerLayout.addWidget(QLabel("      "), 7, 0)
         innerLayout.addWidget(QLabel("Doesn't the filename fit at all?"), 8, 0)
-        innerLayout.addWidget(QLabel("Press Quit:"), 9, 0)
+        innerLayout.addWidget(Qgui.pyLabel("Press Quit:"), 9, 0)
         innerLayout.addWidget(self.quitRenaming, 9, 1)
 
         self.deleteItemsOfLayout(self.layout)
@@ -2212,17 +2212,19 @@ class Main_Window(QWidget):
             
             
 
-
-
-
         #def volcano():
         #    pass
 
+
         def heatmap():
             input_csv = self.input_csv.copy()
-            print(input_csv)
+            print(input_csv.head())
             information = self.information_csv.copy()
-
+            # while ClearMap runs ()
+            # if filter region is 
+            #if input_csv.empty:
+            #    input_csv = self.input_csv()
+            
             if filter_region_LineEdit.text() != "":
                 region = filter_region_LineEdit.text()
                 print(information["TrackedWay"])
@@ -2230,7 +2232,7 @@ class Main_Window(QWidget):
                     index_list = []
                     for i,val in enumerate(information["TrackedWay"]):
                         if region in val:
-                            index_list.append(i)  
+                            index_list.append(i)            
 
 
                     input_csv = input_csv.iloc[index_list,:]
@@ -2250,20 +2252,23 @@ class Main_Window(QWidget):
                     array = eval(val)
                     if level == array[0]:
                         index_list.append(i)
+                
 
                 input_csv = input_csv.iloc[index_list,:]
                 information = information.iloc[index_list,:]
                 brainregion = "level_" + str(level)
-            
-            
 
+            print("afterwards \n", input_csv.head(), "\n")
+        
             brainregion = brainregion + "_heatmap"
+
 
             if input_csv.empty:
                 alert = QMessageBox()
                 alert.setText("After filtering the region the dataframe it is empty! - Try other filters")
                 alert.exec()
                 return
+
 
             input_csv = input_csv.dropna()
             input_csv = input_csv.loc[:,input_csv.columns != "Region"]
@@ -2276,21 +2281,31 @@ class Main_Window(QWidget):
             output_dir = os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + os.path.basename(input_file.text())[:-4] + ".png"
 
-            sns.heatmap(input_csv, yticklabels=regions, annot=False)
-            plt.title(brainregion)
-            plt.savefig(output_dir + output_name, bbox_inches='tight')
-            plt.close()
-            
-            plot_window.figure.clear()
-            
-            ax = plot_window.figure.add_subplot(111)
-            
-            sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
-            plt.close()
-            
+            #if (input_csv.loc[(input_csv != 0).any(axis = 1)].size() < 1):
+            if np.all(input_csv == 0):
+                alert = QMessageBox()
+                alert.setText("After filtering the region the dataframe only contains 0! - Try other filters")
+                alert.exec()
+                return
+            else:
+                
+                print(input_csv)
+                sns.heatmap(input_csv, yticklabels=regions, annot=False)
+                plt.title(brainregion)
+                plt.savefig(output_dir + output_name, bbox_inches='tight')
+                plt.close()
+                
+                plot_window.figure.clear()
+                
+                ax = plot_window.figure.add_subplot(111)
+                
+                sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
+                plt.close()
+                
 
-            plot_window.canvas.draw()
-            
+                plot_window.canvas.draw()
+
+
 
 
 
