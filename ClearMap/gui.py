@@ -129,7 +129,7 @@ class RenameBox(QWidget):
         innerLayout.addWidget(self.accept, 6, 1)
         innerLayout.addWidget(QLabel("      "), 7, 0)
         innerLayout.addWidget(QLabel("Doesn't the filename fit at all?"), 8, 0)
-        innerLayout.addWidget(Qgui.pyLabel("Press Quit:"), 9, 0)
+        innerLayout.addWidget(QLabel("Press Quit:"), 9, 0)
         innerLayout.addWidget(self.quitRenaming, 9, 1)
 
         self.deleteItemsOfLayout(self.layout)
@@ -627,7 +627,7 @@ class Main_Window(QWidget):
     """
     def embedOntology(self):
         # Reads ontology file holding the reference region dictionairy
-        reference_df = pd.read_csv("/home/clearmap_data/ClearMap/ontology_mouse.csv",
+        reference_df = pd.read_csv("ontology_mouse.csv",
                                # Current Refernce Dataframe for mapping
                                # File which stores all important Brain Regions (Atlas?)
                                sep=";",  # Separator
@@ -678,7 +678,7 @@ class Main_Window(QWidget):
                        shape_maxima_det_x=6,
                        shape_maxima_det_y=6,
                        shape_maxima_det_z=11,
-                       threshold_maxima_det=297.380,
+                       #threshold_maxima_det=297.380,
                        measure_intensity_det="Source",
                        method_intensity_det="mean",
                        threshold_shape_det=200,             # Todo: Change Default to 200? If yes see also belonging QWidget
@@ -746,12 +746,12 @@ class Main_Window(QWidget):
         shape_maxima_det_y = int(shape_maxima_det_y)
         shape_maxima_det_z = int(shape_maxima_det_z)
 
-        if threshold_maxima_det == 0:
-            threshold_maxima_det = None
-        elif threshold_maxima_det == 1:
-            threshold_maxima_det = "background mean"
-        elif threshold_maxima_det == 2:
-            threshold_maxima_det = "total mean"
+        #if threshold_maxima_det == 0:
+        threshold_maxima_det = None
+        #elif threshold_maxima_det == 1:
+        #    threshold_maxima_det = "background mean"
+        #elif threshold_maxima_det == 2:
+        #    threshold_maxima_det = "total mean"
 
         # conversion of intensity detection values
         measure_intensity_det = ['source', 'illumination', 'background', 'equalized', 'dog'];
@@ -797,7 +797,8 @@ class Main_Window(QWidget):
                                                                  shape_maxima_det_z)  # Shape of the structural element. Near typical cell size. // tuple(int, int)
         # Idea is to take the mean of the values in each procedure + 2*std_deviation, to always predict a significant upregulation Z-test // Has to be implemented
         # We could also implement a filter function at that point, by overwriting data that is 4 std_dev away from the mean, whcih seems unrealistic
-        cell_detection_parameter['maxima_detection']['threshold'] = None  # 0.55 good value fter dog + equalizaziont for 3258  #5 good value after equalization for 3258 #250 Best so fat without equalization for 3258 # Only maxima above this threshold are detected. If None all are detected // float
+        '''Philipp: auskommentiert von cell_detection_parameter'''
+        #cell_detection_parameter['maxima_detection']['threshold'] = None  # 0.55 good value fter dog + equalizaziont for 3258  #5 good value after equalization for 3258 #250 Best so fat without equalization for 3258 # Only maxima above this threshold are detected. If None all are detected // float
 
         ## Intensity_detection
         cell_detection_parameter['intensity_detection']['measure'] = measure_intensity_det;  # we decided to measure all intensities
@@ -807,7 +808,7 @@ class Main_Window(QWidget):
         cell_detection_parameter['shape_detection']['threshold'] = threshold_shape_det;
 
         ## Self edited threshold
-        cell_detection_parameter['threshold'] = threshold_maxima_det
+        #cell_detection_parameter['threshold'] = threshold_maxima_det
 
         processing_parameter = cells.default_cell_detection_processing_parameter.copy();
         processing_parameter.update(processes=amount_processes,  # 15, #20,
@@ -1334,10 +1335,14 @@ class Main_Window(QWidget):
         shape_maxima_det_x = QLineEdit("6")
         shape_maxima_det_y = QLineEdit("6")
         shape_maxima_det_z = QLineEdit("11")
+
+        '''
+        Philipp: auskommentiert 
         threshold_maxima_det = QComboBox()
         threshold_maxima_det.insertItem(0, "None")
         threshold_maxima_det.insertItem(1, "background mean")
         threshold_maxima_det.insertItem(2, "total mean")
+        '''
         save_maxima_det = QCheckBox()
 
         # widgets for intensity detection
@@ -1395,7 +1400,7 @@ class Main_Window(QWidget):
                                     shape_maxima_det_x.text(),
                                     shape_maxima_det_y.text(),
                                     shape_maxima_det_z.text(),
-                                    threshold_maxima_det.currentIndex(),
+                                    #threshold_maxima_det.currentIndex(),
                                     measure_intensity_det.currentIndex(),
                                     method_intensity_det.currentIndex(),
                                     threshold_shape_det.text(),
@@ -1475,7 +1480,7 @@ class Main_Window(QWidget):
                 shape_maxima_det_x.setText(str(cd_df["shape maxima x"][0]))
                 shape_maxima_det_y.setText(str(cd_df["shape maxima y"][0]))
                 shape_maxima_det_z.setText(str(cd_df["shape maxima z"][0]))
-                threshold_maxima_det.setCurrentIndex(cd_df["threshold maxima"][0])
+                #threshold_maxima_det.setCurrentIndex(cd_df["threshold maxima"][0])
                 measure_intensity_det.setCurrentIndex(cd_df["measure intensity"][0])
                 method_intensity_det.setCurrentIndex(cd_df["method intensity det"][0])
                 threshold_shape_det.setText(str(cd_df["threshold shape det"][0]))
@@ -1558,6 +1563,7 @@ class Main_Window(QWidget):
         # visualization of maxima detection
         inner_layout5 = QGridLayout()
 
+
         inner_layout5.addWidget(QLabel("<b>Maxima Detection:</b>"), 1, 0)
         inner_layout5.addWidget(QLabel("H max:"), 2, 0)
         inner_layout5.addWidget(hmax_maxima_det, 2, 1)
@@ -1565,8 +1571,11 @@ class Main_Window(QWidget):
         inner_layout5.addWidget(shape_maxima_det_x, 3, 1)
         inner_layout5.addWidget(shape_maxima_det_y, 3, 2)
         inner_layout5.addWidget(shape_maxima_det_z, 3, 3)
-        inner_layout5.addWidget(QLabel("Threshold:"), 4, 0)
-        inner_layout5.addWidget(threshold_maxima_det, 4, 1)
+        '''Philipp:auskommentiert'''
+        #inner_layout5.addWidget(QLabel("Threshold:"), 4, 0)
+        #inner_layout5.addWidget(threshold_maxima_det, 4, 1)
+
+
         # inner_layout5.addWidget(QLabel("Save:"),5,0)
         # inner_layout5.addWidget(save_maxima_det,5,1)
 
@@ -1583,7 +1592,7 @@ class Main_Window(QWidget):
         inner_layout7 = QGridLayout()
 
         inner_layout7.addWidget(QLabel("<b>Shape detection:</b>"), 0, 0)
-        inner_layout7.addWidget(QLabel("Threshold:"), 1, 0)
+        #inner_layout7.addWidget(QLabel("Threshold:"), 1, 0)
         inner_layout7.addWidget(threshold_shape_det, 1, 1)
         # inner_layout7.addWidget(QLabel("Save:"),2,0)
         # inner_layout7.addWidget(save_shape_det,2,1)
@@ -1646,7 +1655,7 @@ class Main_Window(QWidget):
                                         shape_maxima_det_x=shape_maxima_det_x.text(),
                                         shape_maxima_det_y=shape_maxima_det_y.text(),
                                         shape_maxima_det_z=shape_maxima_det_z.text(),
-                                        threshold_maxima_det=threshold_maxima_det.currentIndex(),
+                                        #threshold_maxima_det=threshold_maxima_det.currentIndex(),
                                         measure_intensity_det=measure_intensity_det.currentIndex(),
                                         method_intensity_det=method_intensity_det.currentIndex(),
                                         threshold_shape_det=threshold_shape_det.text(),
@@ -2212,10 +2221,11 @@ class Main_Window(QWidget):
             
             
 
+
+
+
         #def volcano():
         #    pass
-
-
         def heatmap():
             input_csv = self.input_csv.copy()
             print(input_csv.head())
@@ -2304,9 +2314,6 @@ class Main_Window(QWidget):
                 
 
                 plot_window.canvas.draw()
-
-
-
 
 
         def boxplot():
