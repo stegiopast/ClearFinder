@@ -213,7 +213,7 @@ class Main_Window(QWidget):
         self.chosenChannel = channelStr
         myWorkingDirectory = path
         if choice == "Hemisphere":
-            self.slicing = (slice(None),slice(None),slice(0,566))
+            self.slicing = (slice(None),slice(None),slice(0,256))
         else:
             self.slicing = (slice(None),slice(None),slice(None))
         print(self.slicing, "Self Slicing as ", choice, "\n")
