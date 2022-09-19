@@ -51,7 +51,9 @@ conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
 
 Napari_env
 ```
-conda env create --file ~/Brainmap_dev/Napari/requirements.yml
+conda create -y -n Napari_env -c conda-forge python=3.9
+conda activate Napari_env
+pip install napari[all]
 ```
 
 ### 5.Start application
