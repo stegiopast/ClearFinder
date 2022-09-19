@@ -38,7 +38,7 @@ Please follow the instructions of the nextflow installation guide
 
 Cellfinder_env
 ```
-conda env create --file ~/Brainmap_dev/Cellfinder/requirements.yml
+conda env create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 pip install cellfinder
 conda deactivate
@@ -54,6 +54,7 @@ Napari_env
 conda create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
 pip install napari[all]
+conda deactivate
 ```
 
 ### 5.Start application
