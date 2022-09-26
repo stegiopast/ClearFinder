@@ -124,14 +124,14 @@ For the usage of ClearMap a few things have to be considered:
     Files hacve to be converted to tif format. 
 -> Additionally we follow a strict folder structure:
    Sample_folder
-      |\n
+      |\
       -> Auto -> *Z(X)XXX_C01.tif
-      |\n
-      |\n
+      |\
+      |\
       -> Signal
-              |
+              |\
               -> C01 -> *Z(X)XXX_C01.tif
-              |
+              |\
               -> C02 -> *Z(X)XXX_C02.tif
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename. 
    
