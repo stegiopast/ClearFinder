@@ -51,7 +51,7 @@ conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
 
 Napari_env
 ```
-conda create -y -n Napari_env -c conda-forge python=3.9
+conda env create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
 pip install napari[all]
 conda deactivate
@@ -62,6 +62,9 @@ conda deactivate
 cd ~/Brainmap_dev
 nextflow run start_guis.nf
 ```
+Once you start napari be aware to download the napari-cellfinder plugin in the tab menu under Plugin -> Install/ Uninstall plugins.
+Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated. 
+
 
 ### 6.Alternative start
 Note that with it's first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
@@ -108,5 +111,32 @@ You can from now and forever start the applications with the following command:
 ```
 Brainmap
 ```
+
+##Usage
+
+###ClearMap
+
+For the usage of ClearMap a few things have to be considered:
+
+#### Data organization for the software:
+-> We follow a strict filename structure:
+    All files should end with the following pattern -> *ZX[3-4]_C0Y.tif -> (X can be a number between 0-9 and must consist of at least three numbers (000-9999), Y can be number between 1-2)
+    Files hacve to be converted to tif format. 
+-> Additionally we follow a strict folder structure:
+   Sample_folder
+      |
+      -> Auto -> *Z(X)XXX_C01.tif
+      |
+      |
+      -> Signal
+              |
+              -> C01 -> *Z(X)XXX_C01.tif
+              |
+              -> C02 -> *Z(X)XXX_C02.tif
+   Be aware that also the autofluorescent pictures need a _C01 signature in the filename. 
+   
+  
+
+###Cellfinder
 
 
