@@ -175,7 +175,16 @@ In this tab data of samples form different conditions can be created. The proces
 5. Additionally to the metadata.csv a list_information.csv is exported, which allows the analysis of the dataset over different ontology hierarchies. 
 
 #### Preliminary analysis
+All the datsets you need for the following step should be located in the output_folder you defined in the last step
+1. Choose an input count file by clicking the "Choose input file button". You can load eather hierarchical or non-hierarchical counts. 
+2. Similarly as in step 1 chosse the metadata.csv file.
+3. Similarly as in step 1 choose the list_information.csv file.
+4. After the selection of the three files please press "Set input and metadata" to confirm your choice.
+5. Press the "PCA" button to perform a principal component analysis.
+6. For the cell count heatmap you can choose one of Brain regions and its hierarchical subregions that you are interested in or filter for a specific hierarchical level. Press the "Heatmap" button.
+7. With the boxplot one can have an insight in the count distribution of a specific region of interest. Please choose a Region of interest and press the "Boxplot" button. 
 
+You can search for the existence of regions in the table on the right side of the tab. 
 
 ### Cellfinder
 
