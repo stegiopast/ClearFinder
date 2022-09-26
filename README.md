@@ -150,7 +150,8 @@ With this tab a ClearMap workspace can be initialized. The following steps shoul
 1. Please insert information about the resolution of signal_channel and atlas images for the X,Y,Z dimensions at Resample parameters. 
 2. Similarly, insert information about the resolution of auto_channel and atlas images for the X,Y,Z dimensions at Resample parameters.  
 3. By inserting a filename the inserted resolutions can be saved and loaded for later experiments. (A unique basename has to be used)
-4. Resampling can be started by clicking the "Resample" button
+4. Add the orientation of the brain. For more information about which orientation to choose visit -> https://christophkirst.github.io/ClearMap2Documentation/html/CellMap.html
+5. Resampling can be started by clicking the "Resample" button
 
 This process usually takes around 10-20 minutes.
 
