@@ -166,8 +166,16 @@ The process has several files as an output. The embedded_ontology.csv files can 
 
 #### Grouping and Normalization of data 
 
+In this tab data of samples form different conditions can be created. The process will create raw count files and counts that summarize the detected cell counts over different hierarchical structures based on the ontology of Allen Brain atlas. Data can be "median of ratio" or "cellcounts per million" normalized. Additionally, a logarithmic conversion can be performed. A metadata file can be exported for further analytical processing. I is recommended to at least use three samples per condition for further analysis. 
+
+1. Press the "add analysis" button to open a file dialogue and choose an embedded_ontology_C0Y.csv file from the sample_folder of interest. Press "Open" on the dialogue window to confirm you choice. If you made a wrong choice, remove the last selection with "Remove last file"
+2. The chosen files should appear in the list below.
+3. Once your selection is completed determine an output path by clicking the "Set output dir" button. This opens a folder dialogue window. Create or select an output folder for your count file and press "Open". If you want to normalize your data please chosse a normalization option. If you want raw counts just use the None option. After the selection press "Create analysis data". Twi count files with the raw or normalized counts of hierarchically embedded and non embedded data will be written into your output folder.
+4. After the creation of the count file a metadata file is required for condition wise comparison. Please insert the sample names (matching the sample_folder names) and the condition name into the Metadata table on the right side of the tab. Click save metadata to write a metadata.csv  
+5. Additionally to the metadata.csv a list_information.csv is exported, which allows the analysis of the dataset over different ontology hierarchies. 
+
 #### Preliminary analysis
-  
+
 
 ### Cellfinder
 
