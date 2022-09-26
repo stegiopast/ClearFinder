@@ -135,6 +135,7 @@ For the usage of ClearMap a few things have to be considered:
             &emsp;-> C02 -> *ZXXXX_C02.tif \
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename.
  
+ -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
   
 
 ### Cellfinder
@@ -156,4 +157,5 @@ For the usage of ClearMap a few things have to be considered:
 
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename.
 
+ -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
 
