@@ -129,9 +129,9 @@ For the usage of ClearMap a few things have to be considered:
       \|\
       \|\
       -> Signal
-              \|\
+              \t|\
               -> C01 -> *Z(X)XXX_C01.tif
-              \|\
+              \t|\
               -> C02 -> *Z(X)XXX_C02.tif
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename. 
    
