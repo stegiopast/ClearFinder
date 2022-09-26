@@ -139,4 +139,24 @@ For the usage of ClearMap a few things have to be considered:
 
 ### Cellfinder
 
+#### Data organization for the software:
+-> We follow a strict filename structure:
+    All files should end with the following pattern -> *ZX[3-4]_C01.tif -> (X can be a number between 0-9 and must consist of at least three numbers (000-9999))
+    
+   Be aware, that Cellfinder is only working for a single channel right now.
+   If you want to process to channels, please split the datasets up in different folders. 
+   
+ -> Additionally we follow a strict folder structure: 
+   Sample_folder\
+      |\
+      -> Auto -> *ZXXXX_C01.tif\
+      |\
+      |\
+      -> Signal\
+            &emsp;|\
+            &emsp;-> C01 -> *Z(X)XXX_C01.tif \
+            &emsp;|\
+            &emsp;-> C02 -> *Z(X)XXX_C02.tif \
+   Be aware that also the autofluorescent pictures need a _C01 signature in the filename.
+
 
