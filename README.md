@@ -216,7 +216,28 @@ You can search for the existence of regions in the table on the right side of th
 
 #### Network training 
 
-#### Preparation of analysis files
+#### Grouping and Normalization of data 
+
+In this tab data of samples form different conditions can be created. The process will create raw count files and counts that summarize the detected cell counts over different hierarchical structures based on the ontology of Allen Brain atlas. Data can be "median of ratio" or "cellcounts per million" normalized. Additionally, a logarithmic conversion can be performed. A metadata file can be exported for further analytical processing. I is recommended to at least use three samples per condition for further analysis. 
+
+1. Press the "add analysis" button to open a file dialogue and choose an embedded_ontology_C0Y.csv file from the sample_folder of interest. Press "Open" on the dialogue window to confirm you choice. If you made a wrong choice, remove the last selection with "Remove last file"
+2. The chosen files should appear in the list below.
+3. Once your selection is completed determine an output path by clicking the "Set output dir" button. This opens a folder dialogue window. Create or select an output folder for your count file and press "Open". If you want to normalize your data please chosse a normalization option. If you want raw counts just use the None option. After the selection press "Create analysis data". Twi count files with the raw or normalized counts of hierarchically embedded and non embedded data will be written into your output folder.
+4. After the creation of the count file a metadata file is required for condition wise comparison. Please insert the sample names (matching the sample_folder names) and the condition name into the Metadata table on the right side of the tab. Click save metadata to write a metadata.csv  
+5. Additionally to the metadata.csv a list_information.csv is exported, which allows the analysis of the dataset over different ontology hierarchies. 
 
 #### Preliminary analysis
+All the datsets you need for the following step should be located in the output_folder you defined in the last step
+1. Choose an input count file by clicking the "Choose input file button". You can load eather hierarchical or non-hierarchical counts. 
+2. Similarly as in step 1 chosse the metadata.csv file.
+3. Similarly as in step 1 choose the list_information.csv file.
+4. After the selection of the three files please press "Set input and metadata" to confirm your choice.
+5. Press the "PCA" button to perform a principal component analysis.
+6. For the cell count heatmap you can choose one of Brain regions and its hierarchical subregions that you are interested in or filter for a specific hierarchical level. Press the "Heatmap" button.
+7. With the boxplot one can have an insight in the count distribution of a specific region of interest. Please choose a Region of interest and press the "Boxplot" button. 
+
+You can search for the existence of regions in the table on the right side of the tab. 
+
+#### Processing of ClearMap and Cellfinder after Atlas assignment
+The application is designed to produce similar output data with Cellfinder and ClearMap to enable the comparison of both software packages. The grouping and normalization step can therefore be performed together with samples of one or the other processing. Be aware that we do not guarantee a scientific relevance of your experiments. Be aware the statistical meaningfulness of the experiment still lies on the users responsibility. Be carefull which data you use or combine and how you normalize it!
 
