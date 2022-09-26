@@ -137,13 +137,34 @@ For the usage of ClearMap a few things have to be considered:
  
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
  
-#### Initialize and choose workspace
+#### Determine Path | Rename samples
+With this tab a ClearMap workspace can be initialized. The following steps should be performed:
+1. Choose a Workspace by pressing the "Pick Workspace Directory" button. A dialogue window will open wheren one needs to choose the sample_folder of insterest. 
+2. The channel of interest (C01,C02) should be selected by choosing from the Box beside the "Pick Workspace Directory" button. 
+3. One should clarify whether the sample is hemispheric or whole brain tissue. This can also be chosen from the Box beside the channel box.
+4. The Workspace can be initialized by clicking the "set workspace" button.
+5. The "Rename buttons" will allow the renaming of files in the respective channels. Clicking the button will open a Rename window. The renaming is semi-automatized so that a representative file within the folder is shortened to the pattern ZX[3-4]_C0Y.tif. (The shown filename in the rename window should be between Z000_C0Y.tif-Z9999_C0Y.tif). If the filenames are matching the pattern continue the renaming by clicking the "Accept" button in the renaming window . This will perform a renaming of all the files within Auto, Signal->C01 or Signal->C02 respectively. It is necessary to rename the files in order to automatize the cell detection.  
+6. After files are renamed one can continue with the resampling step.
 
 #### Resampling
+1. Please insert information about the resolution of signal_channel and atlas images for the X,Y,Z dimensions at Resample parameters. 
+2. Similarly, insert information about the resolution of auto_channel and atlas images for the X,Y,Z dimensions at Resample parameters.  
+3. By inserting a filename the inserted resolutions can be saved and loaded for later experiments. (A unique basename has to be used)
+4. Resampling can be started by clicking the "Resample" button
+
+This process usually takes around 10-20 minutes.
 
 #### Cell-detection and atlas assignment
+1. For Cell detection we inserted default values,that were tailored to our experiments. For each experiments the optimal values can vary. Please visit https://christophkirst.github.io/ClearMap2Documentation/html/home.html for more information. The possible processing settings are all based on options provided by ClearMap2. 
+2. Please be aware that usually only half of the available threads should be used since the usage of working memory is extraordinary high with more threads. We used 10 parallel processes with 128GB RAM. We recommend 5 threads for 64GB RAM machines. 
+3. Once the prefered settings are selected, one can start cell detection by clicking the "Detects cells" button.
+4. After cell detection one has to perform Atlass assignment by clicking the "Atlas assignment" button. 
 
-#### Preparation of analysis files
+These two processes are executed in 2-3 hours, depending on the machine and the amount of detected cells. 
+The process has several files as an output. The embedded_ontology.csv files can be used for further quantification analysis. Fles that have been produced in the C0YXmlFiles folders can be used together with the Signal tif-files for visualisation in napari to validate the cell detection. Cells that are stored in the universe.xml or no_label.xml files were detected as maximas, but could not be aligned to a reference region. 
+
+
+#### Grouping and Normalization of data 
 
 #### Preliminary analysis
   
