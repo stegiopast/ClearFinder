@@ -136,6 +136,16 @@ For the usage of ClearMap a few things have to be considered:
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename.
  
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
+ 
+#### Initialize and choose workspace
+
+#### Resampling
+
+#### Cell-detection and atlas assignment
+
+#### Preparation of analysis files
+
+#### Preliminary analysis
   
 
 ### Cellfinder
@@ -158,4 +168,16 @@ For the usage of ClearMap a few things have to be considered:
    Be aware that also the autofluorescent pictures need a _C01 signature in the filename.
 
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
+ 
+#### Initialize and choose workspace
+
+#### Resampling
+
+#### Cell-detection and atlas assignment
+
+#### Network training 
+
+#### Preparation of analysis files
+
+#### Preliminary analysis
 
