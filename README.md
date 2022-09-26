@@ -125,7 +125,7 @@ For the usage of ClearMap a few things have to be considered:
 -> Additionally we follow a strict folder structure: 
    Sample_folder\
       |\
-      -> Auto -> *Z(X)XXX_C01.tif\
+      -> Auto -> *ZXXXX_C01.tif\
       |\
       |\
       -> Signal\
