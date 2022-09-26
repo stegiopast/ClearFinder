@@ -123,7 +123,7 @@ For the usage of ClearMap a few things have to be considered:
     All files should end with the following pattern -> *ZX[3-4]_C0Y.tif -> (X can be a number between 0-9 and must consist of at least three numbers (000-9999), Y can be number between 1-2)
     Files hacve to be converted to tif format. 
 -> Additionally we follow a strict folder structure: 
-   Sample_folder\
+   Sample_folder\\\
       |\
       -> Auto -> *Z(X)XXX_C01.tif\
       |\
@@ -133,7 +133,7 @@ For the usage of ClearMap a few things have to be considered:
             &emsp;-> C01 -> *Z(X)XXX_C01.tif \
             &emsp;|\
             &emsp;-> C02 -> *Z(X)XXX_C02.tif \
-   Be aware that also the autofluorescent pictures need a _C01 signature in the filename. 
+   Be aware that also the autofluorescent pictures need a _C01 signature in the filename. \\\
  
   
 
