@@ -122,7 +122,7 @@ For the usage of ClearMap a few things have to be considered:
 -> We follow a strict filename structure:
     All files should end with the following pattern -> *ZX[3-4]_C0Y.tif -> (X can be a number between 0-9 and must consist of at least three numbers (000-9999), Y can be number between 1-2)
     Files hacve to be converted to tif format.\
--> Additionally we follow a strict folder structure: 
+-> Additionally we follow a strict folder structure:\
    Sample_folder\
       |\
       -> Auto -> *ZXXXX_C01.tif\
@@ -196,7 +196,7 @@ You can search for the existence of regions in the table on the right side of th
    Be aware, that Cellfinder is only working for a single channel right now.
    If you want to process to channels, please split the datasets up in different folders. 
    
- -> Additionally we follow a strict folder structure: 
+ -> Additionally we follow a strict folder structure: \
    Sample_folder\
       |\
       -> Auto -> *ZXXXX_C01.tif\
