@@ -138,6 +138,9 @@ For the usage of ClearMap a few things have to be considered:
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
  
 #### Determine Path | Rename samples
+
+Always use a copy of your original data for processing ! Make backups !
+
 With this tab a ClearMap workspace can be initialized. The following steps should be performed:
 1. Choose a Workspace by pressing the "Pick Workspace Directory" button. A dialogue window will open wheren one needs to choose the sample_folder of insterest. 
 2. The channel of interest (C01,C02) should be selected by choosing from the Box beside the "Pick Workspace Directory" button. 
@@ -208,12 +211,35 @@ You can search for the existence of regions in the table on the right side of th
 
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups ! 
  
-#### Initialize and choose workspace
+#### Determine Path and rename samples
+
+Always use a copy of your original data for processing ! Make backups !
+
+With this tab a ClearMap workspace can be initialized. The following steps should be performed:
+1. Choose a Workspace by pressing the "Choose sample" button. A dialogue window will open wheren one needs to choose the sample_folder of insterest. 
+2. The Workspace can be initialized by clicking the "set workspace" button.
+3. The "Rename buttons" will allow the renaming of files in the respective channels. Clicking the button will open a Rename window. The renaming is semi-automatized so that a representative file within the folder is shortened to the pattern ZX[3-4]_C0Y.tif. (The shown filename in the rename window should be between Z000_C0Y.tif-Z9999_C0Y.tif). If the filenames are matching the pattern continue the renaming by clicking the "Accept" button in the renaming window. This will perform a renaming of all the files within Auto or Signal respectively. It is necessary to rename the files in order to automatize the cell detection.  
+6. After files are renamed one can continue with the resampling step.
+
+Note that Cellfinder is only capable of processing whole brain tissue. Additionally only a single signal folder per sample can be processed. If you want to process two channels, please copy the sample folder and create a signal folder with the repective image files for the channel of interest. Additionally, be aware not to use your original data, but a copy of it. Images will be resized in further steps if they do not have the same size. 
 
 #### Resampling
 
+1. For resampling please insert the voxel sizes X,Y,Z for Signal and Auto to determine the resolution.
+2. Press "Start preprocessing"
+
+The resampling will resize your images, if they do not have the same size. We recommend once again to only use copies of your original data. In case the images have to be resized, be aware that also the voxel sizes change respectively and will be stored in a voxel_sizes_file within the sample folder. If you plan to resample the same data more than once please use the new voxel_sizes after the first attempt.   
+
+
 #### Cell-detection and atlas assignment
 
+1. Insert the number of CPUs that your computer is able to process (We used 8)
+2. Insert a threshold,being defined as the minimal amount of standarddeviations above mean illumination, in order to consider a spot as maximum (Integer)
+3. Insert a mean soma diameter of your cells (Integer)
+4. Insert the mean cell size in xy plane (Integer)
+5. Insert the gaussian filter variable (Float, 0.2 is default)
+6. If you want to use your own trained model please pick a model file in h5 format, otherwise leave the entry free to use the default model
+7. 
 #### Network training 
 
 #### Grouping and Normalization of data 
