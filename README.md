@@ -239,8 +239,22 @@ The resampling will resize your images, if they do not have the same size. We re
 4. Insert the mean cell size in xy plane (Integer)
 5. Insert the gaussian filter variable (Float, 0.2 is default)
 6. If you want to use your own trained model please pick a model file in h5 format, otherwise leave the entry free to use the default model
-7. 
+7. Please insert the orientation of your brain during recording. You have to explain which directional part of the brain will occur first when parsing through the first image of the stack starting from the upper left corner. Choose one orienation out of anterior/posterior ("a"/"p"), superior/inferior ("s"/"i") and left/right ("l"/"r"). Our default is the anterior ("a"), superior ("s"), left ("l") part of the brain. --> asl
+8. Click on start cell detection
+9. After cell detection one has to click Embed ontology to obtain a count file comparable to ClearMap data.
+
 #### Network training 
+Training data can be generated with the Cellfinder plugin of napari. Please check the documentation on https://docs.brainglobe.info/cellfinder-napari/user-guide/training-data-generation. 
+
+1. After training data generation click on "Choose Yaml" which opens a dialogue window. Navigate to the yaml file created with the cellfinder-napari plugin.
+2. Choose a pretrained model, if you want to continue training a custom model. A dialogue window will open where you have to choose the a file that contains a model you want to continue training on. The file is in .h5 format. Click open in the dialogue window to proceed. 
+3. Click on continue training to use the custom model as template model for continuation of the training.
+4. Choose a test fraction the programm will use as subset for the model training during an epoch.
+5. Determine the learning rate used for backpropagation during the weight changes of the neural network.
+6. Determine a batch size in which the data will be processed. The bigger the batch size, the more demanding it will be for your GPU comptation. (Default: 32, Options: 8,16,32,64). 
+7. Determine the number of epochs you want to perform during network training. 
+8. Choose a directory or create a new one to store your data in. Click on "Choose your base directory" to open a dialogue window. By clicking on the "folder+" icon on the dialogue you can create a new window. Rename the newly created folder and proceed by clicking "Choose".  
+9. Start the network training by clicking the "Train network" button.
 
 #### Grouping and Normalization of data 
 
