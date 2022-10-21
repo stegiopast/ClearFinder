@@ -1,4 +1,4 @@
-# Brainmap_dev
+# ClearFinder
 ## Installation
 
 Open your terminal (Ctrl + Alt + T) or manually on the desktop.
@@ -7,7 +7,7 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 
 ```
 cd ~
-git clone git@github.com:stegiopast/Brainmap_dev.git
+git clone git@github.com:stegiopast/ClearFinder.git
 sudo chown your_local_username ~/Brainmap_dev -R
 cd ~/Brainmap_dev/ClearMap
 git clone git@github.com:ChristophKirst/ClearMap2.git
