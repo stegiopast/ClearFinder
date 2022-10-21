@@ -8,10 +8,10 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 ```
 cd ~
 git clone git@github.com:stegiopast/ClearFinder.git
-sudo chown your_local_username ~/Brainmap_dev -R
-cd ~/Brainmap_dev/ClearMap
+sudo chown your_local_username ~/ClearFinder -R
+cd ~/ClearFinder/ClearMap
 git clone git@github.com:ChristophKirst/ClearMap2.git
-mv ClearMap2/ClearMap ~/Brainmap_dev/ClearMap
+mv ClearMap2/ClearMap ~/ClearFinder/ClearMap
 ```
 
 ### 2. Download conda if not installed
@@ -59,7 +59,7 @@ conda deactivate
 
 ### 5.Start application
 ```
-cd ~/Brainmap_dev
+cd ~/ClearFinder
 nextflow run start_guis.nf
 ```
 Once you start napari be aware to download the napari-cellfinder plugin in the tab menu under Plugin -> Install/ Uninstall plugins.
@@ -70,7 +70,7 @@ Type napari-cellfinder in the search bar and install the plugin. Restart napari 
 Note that with it's first start ClearMap needs to be compiled, which takes around half an hour. Until then the gui window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
 ```
 conda activate Clearmap_env
-python3 ~/Brainmap_dev/ClearMap/gui.py
+python3 ~/ClearFinder/ClearMap/gui.py
 conda deactivate
 ```
 
@@ -78,7 +78,7 @@ Similarly the other guis can be started sperately in a similar way
 For Cellfinder type:
 ```
 conda activate Cellfinder_env
-python3 ~/Brainmap_dev/Cellfinder/gui.py
+python3 ~/ClearFinder/Cellfinder/gui.py
 conda deactivate
 ```
 For napari type:
@@ -97,7 +97,7 @@ gedit ~/.bashrc
 Insert the following line in the ~/.bashrc file that should open in the texteditor:
 
 ```
-alias Brainmap="cd path/to/Brainmap_dev && nextflow run start_guis.nf"
+alias ClearFinder="cd path/to/ClearFinder && nextflow run start_guis.nf"
 ```
 
 Safe the file with Ctrl+S or with the save button of the editor. Then close the editor and get back to the terminal. Type:
@@ -109,7 +109,7 @@ source ~/.bashrc
 You can from now and forever start the applications with the following command:
 
 ```
-Brainmap
+ClearFinder
 ```
 
 ## Usage
