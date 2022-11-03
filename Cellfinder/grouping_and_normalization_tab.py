@@ -9,7 +9,7 @@ class GroupingAndNormalization:
         inner_layout1 = utils.QVBoxLayout()
         inner_layout2 = utils.QVBoxLayout()
         inner_layout3 = utils.QVBoxLayout()
-       
+
         #Widgets for inner layout 1
         result_file_list = utils.QListWidget()
         add_resultfile_button = utils.QPushButton("Add analysis file")
@@ -17,10 +17,15 @@ class GroupingAndNormalization:
         final_output_directory = utils.QLineEdit("")
         create_final_output_directory = utils.QPushButton("Set output dir")
         make_analysis_data = utils.QPushButton("Create analysis data (absolute values)")
-       
+
         #Widgets for inner Layout2
+        choose_log_transformation_ComboBox = utils.QComboBox()
+        choose_log_transformation_ComboBox.insertItem(0, "None")
+        choose_log_transformation_ComboBox.insertItem(1, "log_10")
+        choose_log_transformation_ComboBox.insertItem(2, "log_2")
+
         choose_normalization_ComboBox = utils.QComboBox()
-        choose_normalization_ComboBox.insertItem(0,"None") 
+        choose_normalization_ComboBox.insertItem(0,"None")
         choose_normalization_ComboBox.insertItem(1,"Counts per million")
         choose_normalization_ComboBox.insertItem(2,"Median of ratio")
 
@@ -34,9 +39,9 @@ class GroupingAndNormalization:
             for j in range(metadata_table.columnCount()):
                 metadata_table.setCellWidget(i,j,utils.QLineEdit(""))
 
-        metadata_table.setHorizontalHeaderLabels(["sample","condition"]) 
-            
-        inner_layout1.addWidget(utils.QLabel("<b>Pre-analysis steps</b>"))       
+        metadata_table.setHorizontalHeaderLabels(["sample","condition"])
+
+        inner_layout1.addWidget(utils.QLabel("<b>Pre-analysis steps</b>"))
         inner_layout1.addWidget(utils.QLabel("Input for count table:"))
         inner_layout1.addWidget(add_resultfile_button)
         inner_layout1.addWidget(remove_resultfile_button)
@@ -45,12 +50,12 @@ class GroupingAndNormalization:
         inner_layout1.addWidget(final_output_directory)
         inner_layout1.addWidget(create_final_output_directory)
         inner_layout1.addWidget(make_analysis_data)
-        
-        inner_layout2.addWidget(utils.QLabel("<b>Normalization</b>"))       
+
+        inner_layout2.addWidget(utils.QLabel("<b>Normalization</b>"))
         inner_layout2.addWidget(utils.QLabel("Normalization"))
         inner_layout2.addWidget(choose_normalization_ComboBox)
         inner_layout2.addWidget(utils.QLabel("Choose log transformation or None"))
-        inner_layout2.addWidget(choose_log_transformation_ComboBox)       
+        inner_layout2.addWidget(choose_log_transformation_ComboBox)
         inner_layout2.addWidget(utils.QLabel("                                          "))
         inner_layout2.addWidget(utils.QLabel("                                          "))
         inner_layout2.addWidget(utils.QLabel("                                          "))
@@ -60,15 +65,15 @@ class GroupingAndNormalization:
         inner_layout3.addWidget(utils.QLabel("<b>Metadata</b>"))
         inner_layout3.addWidget(metadata_table)
         inner_layout3.addWidget(save_metadata)
-        #Embed inner layouts in outer layout      
+        #Embed inner layouts in outer layout
         inner_layout1.addStretch()
         inner_layout2.addStretch()
         inner_layout3.addStretch()
-        
+
         outer_layout.addLayout(inner_layout1)
         outer_layout.addLayout(inner_layout2)
         outer_layout.addLayout(inner_layout3)
-        
+
         tab.setLayout(outer_layout)
 
         add_resultfile_button.pressed.connect(lambda: add_analysis_file())
@@ -77,8 +82,8 @@ class GroupingAndNormalization:
         make_analysis_data.pressed.connect(lambda: preprocess_analysis_data())
         filter_normalization_button.pressed.connect(lambda: logtransform_normalize_filter())
         save_metadata.pressed.connect(lambda: save_metadata())
-        
-        #Functions for preprocessing  
+
+        #Functions for preprocessing
         def add_analysis_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose embedded_ontology.csv of interest")
             if "ontology.csv" in str(path[0]):
@@ -88,7 +93,7 @@ class GroupingAndNormalization:
                 alert.setText("Please load an embedded_ontology.csv file !")
                 alert.exec()
                 return
-               
+
         def remove_last_element():
             result_file_list.takeItem(result_file_list.count()-1)
 
@@ -103,7 +108,7 @@ class GroupingAndNormalization:
                     alert.setText("Directory  is not creatable!\n Make sure the parent path to the new directory exists.")
                     alert.exec()
                     return
-                   
+
         def save_metadata():
             metadata_list = []
             for i in range(metadata_table.rowCount()):
@@ -114,9 +119,9 @@ class GroupingAndNormalization:
             metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list),columns = ["sample","condition"])
             metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep = ";")
             print(metadata_list)
-             
+
         def preprocess_analysis_data():
-            files_to_analyse = [result_file_list.item(i).text() for i in range(result_file_list.count())] 
+            files_to_analyse = [result_file_list.item(i).text() for i in range(result_file_list.count())]
             df_list = []
             print(files_to_analyse)
             for i in files_to_analyse:
@@ -125,7 +130,7 @@ class GroupingAndNormalization:
             new_df = utils.pd.DataFrame(df_list[0]["Region"])
             new_df2 = utils.pd.DataFrame(df_list[0]["Region"])
             new_df3 = utils.pd.DataFrame(df_list[0][["Region","TrackedWay","CorrespondingLevel"]])
-            
+
             for i,val in enumerate(df_list):
                 new_df[str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))] = val["RegionCellCount"]
 
@@ -139,7 +144,7 @@ class GroupingAndNormalization:
         def logtransform_normalize_filter():
             if utils.os.path.exists(final_output_directory.text()):
                 df_abs = utils.pd.read_csv(final_output_directory.text() + "/absolute_counts.csv", sep = ";", header = 0,index_col=0)
-                df_hier_abs = utils.pd.read_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep = ";",header = 0,index_col = 0)                
+                df_hier_abs = utils.pd.read_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep = ";",header = 0,index_col = 0)
                 df_abs_filename = "absolute_counts.csv"
                 df_hier_abs_filename = "hierarchical_absolute_counts.csv"
 
@@ -161,13 +166,13 @@ class GroupingAndNormalization:
 
                    # print(df_abs_rowmean)
                    # print(df_hier_abs_rowmean)
-                    
+
                     df_abs_copy = df_abs.copy()
                     df_hier_abs_copy = df_hier_abs.copy()
 
                     for i in range(len(df_abs_copy.iloc[0,:])):
                         df_abs_copy.iloc[:,i] = df_abs_copy.iloc[:,i] / df_abs_rowmean
-                       
+
                     for i in range(len(df_hier_abs_copy.iloc[0,:])):
                         df_hier_abs_copy.iloc[:,i] = df_hier_abs_copy.iloc[:,i] / df_hier_abs_rowmean
 
@@ -176,10 +181,10 @@ class GroupingAndNormalization:
 
                     df_abs = df_abs / df_abs_copy_median
                     df_hier_abs = df_hier_abs / df_hier_abs_copy_median
-                    
+
                     df_abs_filename = "mor_norm_" + df_abs_filename
                     df_hier_abs_filename = "mor_norm_" + df_hier_abs_filename
-    
+
                 if choose_log_transformation_ComboBox.currentText() == "log_2":
                     print("Running log2 transformation")
 
