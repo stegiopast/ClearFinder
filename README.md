@@ -48,8 +48,7 @@ Clearmap_env
 ```
 conda create -n Clearmap_env python=3.6
 conda activate Clearmap_env
-conda install -c conda-forge graph-tool
-conda env update --file ~/Brainmap_dev/ClearMap/requirements.yml
+conda env update -f ~/Brainmap_dev/ClearMap/requirements.yml 
 conda deactivate
 ```
 
