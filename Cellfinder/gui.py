@@ -1,3 +1,4 @@
+
 import utils
 import determine_path_and_rename_filenames_tab
 import preprocessing_tab
@@ -5,7 +6,6 @@ import cell_detection_assignment_tab
 import train_network_tab
 import grouping_and_normalization_tab
 import analysis_and_plots_tab
-
 
 def on_top_clicked():
     alert = utils.QMessageBox()
@@ -48,7 +48,6 @@ class MainWindow(utils.QWidget,
         alert.setText("You didn't choose a sample yet! Please choose a sample.")
         alert.exec()
 
- 
 if __name__ == "__main__":
     app = utils.QApplication([])
     MainWindow = MainWindow()
