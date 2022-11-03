@@ -2,7 +2,7 @@ import utils
 
 ## Contains all features of the grouping and normalization tab
 
-def create_tracking_list(self,dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
+def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
     reference_df_ID = dataframe.set_index(dataframe["id"])
     reference_df_Name = dataframe.set_index(dataframe["name"])
     trackedlevels = [[] for x in range(dataframe.shape[0])]
@@ -36,7 +36,7 @@ Input: pd.Dataframe (mouse_ontology.csv) , trackedList (pd.Dataframe from create
 Creates a Template-Resultframe, which can be used for every sample
 Cols: Region, trackedWay, CorrespondingLevel, RegionCellCount, RegionCellCountSummedUp
 """
-def create_result_frame(self, df, trackedList):
+def create_result_frame(df, trackedList):
     resultframe = utils.np.array([list(df["name"]),  # Takes all important Brain Regions in first Col
                             trackedList["TrackedWay"],
                             trackedList["CorrespondingLevel"],
@@ -69,32 +69,32 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
         total_cells = "left_cell_count"
     else:
         total_cells = "right_cell_count"
-    
+
     #total_cellcount = int(df[total_cells].sum())  # get total cellcount for reference
     df["name"] = df["structure_name"]
 
     #Reference_df_ID becomes copied twice to allow O(1) access to "id" or "name" as index of reference_frame
     reference_df_ID = reference_df.set_index(reference_df["id"])
     reference_df_Name = reference_df.set_index(reference_df["name"])
-    
-    #Creation of a template resultframe including all regions and a fusion of ontology_csv and trackedLevels mask, 
+
+    #Creation of a template resultframe including all regions and a fusion of ontology_csv and trackedLevels mask,
     # all entries in RegionCellCount and RegionCellCountSummedUp are initialized as 0
     resultframe = create_result_frame(reference_df, trackedLevels)
 
     # Loop Iterates over all entries in summary.csv and tries to embed them into resultframe
-    # For each entry in summary.csv the parent_id will iteratively indentify the parent structure of this entry 
+    # For each entry in summary.csv the parent_id will iteratively indentify the parent structure of this entry
     # and sum these entries up, until the root is reached. In that way the cellcounts become summarized over all brain regions in different hierarchies
-        
+
     for i in range(len(df.iloc[:, 0])):
         name = df.iloc[i]["name"]  # get the Name of the Region at current index
         print(name)
-        # Structures like "No label" and "universe" are not part of ontology.csv and therefore will be removed with this try nd except function    
+        # Structures like "No label" and "universe" are not part of ontology.csv and therefore will be removed with this try nd except function
         try:
             df_temp = reference_df_Name.loc[name]
         except KeyError:
             samplename = utils.os.path.basename(my_working_directory)
             filename = my_working_directory + "/" + samplename + "_unmapped_regions.csv"
-    
+
             with open(filename, "a+") as KeyError_file:
                 KeyError_file.write(str(name) + ";" + str(df.iloc[i][total_cells]) + "\n")
             utils.continuetraining_layout
@@ -109,9 +109,9 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
             while (int(df_temp["st_level"]) >= 0):
                 if (int(df_temp["st_level"]) == 0):
                     break  # While loop breaks if root structure is reached in hierarchical tree
-                df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region 
-                temp_name = df_temp["name"] #Update name of parent region 
-                index_innerCount = resultframe.index[resultframe["Region"] == temp_name] 
+                df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region
+                temp_name = df_temp["name"] #Update name of parent region
+                index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
                 resultframe.loc[index_innerCount[0], "RegionCellCountSummedUp"] += cellcountRegion # Add cell count of leaf structure to parent structure
 
     return resultframe
@@ -130,7 +130,7 @@ def process_cells_csv(my_working_directory):
     df_final.to_csv(df_final_name, sep=";")
     #Counts abundancy in different brain regions
     df_final = utils.pd.DataFrame(df_final)
-    #Writes a final csv with single cell counts 
+    #Writes a final csv with single cell counts
     df_final.to_csv(my_working_directory + "/analysis/cells_summarized_counts.csv", sep=";")
 
 """
@@ -146,21 +146,21 @@ def embeded_ontology(choice, my_working_directory):
                             index_col=0)  # Index Col
 
     #Creates a mask table with all regions abundant in the ontology file for comparibility
-    # Additionally allt the structural abundancies between regions of different hierarchy become recorded in form of id- and structurename arrays 
+    # Additionally allt the structural abundancies between regions of different hierarchy become recorded in form of id- and structurename arrays
     trackedLevels = create_tracking_list(reference_df)
 
     #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
     df = utils.pd.read_csv(my_working_directory + "/analysis/cells_summarized_counts.csv", header=0, sep=";")
 
     samplename = utils.os.path.basename(my_working_directory)
-    new_df = analyse_csv(df,reference_df, trackedLevels, choice)
+    new_df = analyse_csv(df,reference_df, trackedLevels, choice, my_working_directory)
     new_df_name = my_working_directory + "/" + samplename + "_embedded_ontology.csv"
     new_df.to_csv(new_df_name, sep=";", index=0)
     return
 
-def assignment(self, choice):
-    self.process_cells_csv()
-    self.embeded_ontology(choice)
+def assignment(choice, wd):
+    process_cells_csv(wd)
+    embeded_ontology(choice,wd)
     return
 
 class CellDetection:
@@ -176,12 +176,12 @@ class CellDetection:
 
         ##Basic comman for cellfinder
         if self.my_working_directory != "":
-            basic_string = "cellfinder "            
+            basic_string = "cellfinder "
             if self.channel_chosen != "":
                 filepath = self.my_working_directory + "/Signal/" + str(self.channel_chosen)
             else:
                 filepath = self.my_working_directory + "/Signal"
-            
+
             if utils.os.path.exists(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"):
 
                 with open(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal/voxel_sizes.txt", "r") as file:
@@ -196,16 +196,16 @@ class CellDetection:
                     signal_string = "-s " + str(self.my_working_directory) + "/Signal/" + str(self.channel_chosen) + " "
                 else:
                     signal_string = "-s " + self.my_working_directory + "/Signal" + " "
-                
+
                 ###Mandatory Background folder path
                 background_string = "-b " + self.my_working_directory + "/Auto" + " "
-                
+
                 ###Mandatory voxel sizes
                 voxel_sizes_string = "-v " + str(voxel_x) + " " + str(voxel_y) + " " + str(voxel_z) + " "
-                
-                ###Threshold 
+
+                ###Threshold
                 threshold_string = "--threshold " + str(_n_sds_above_mean_thresh) + " "
-                
+
                 ###Trained model
                 if _trained_model == "":
                     trained_model_string = ""
@@ -222,43 +222,43 @@ class CellDetection:
 
                 ###Soma diameter
                 soma_diameter_string = "--soma-diameter " + str(_soma_diameter) + " "
-               
+
                 ###Cell size in XY Plane
                 xy_cell_size_string = "--ball-xy-size " + str(_xy_cell_size) + " "
-                
-                ###Cell size in Z 
+
+                ###Cell size in Z
                 z_cell_size_string = "--ball-z-size " + str(_z_cell_size) + " "
-                
-                ###Gaussian filter sigma 
+
+                ###Gaussian filter sigma
                 gaussian_filter_string = "--log-sigma-size " + str(_gaussian_filter) + " "
-                
+
                 ###Orientation
-                orientation_string = "--orientation " + _orientation + " " 
-                
+                orientation_string = "--orientation " + _orientation + " "
+
                 ###Batch size
                 batch_size_string = "--batch-size " + str(_batch_size) + " "
 
-                ###Output 
+                ###Output
                 output_string = "-o " + self.my_working_directory + " "
 
                 ###Final command construction
                 final_string = (basic_string +
-                                signal_string + 
+                                signal_string +
                                 background_string +
-                                voxel_sizes_string + 
-                                threshold_string + 
+                                voxel_sizes_string +
+                                threshold_string +
                                 trained_model_string +
-                                cpu_string + 
+                                cpu_string +
                                 soma_diameter_string +
                                 xy_cell_size_string +
                                 z_cell_size_string +
                                 gaussian_filter_string +
                                 batch_size_string +
                                 orientation_string +
-                                output_string) 
+                                output_string)
 
                 ###Execute contructed command
-                utils.os.system(final_string)           
+                utils.os.system(final_string)
             else:
                 alert = utils.QMessageBox()
                 alert.setText("Please perform Preprocessing first!")
@@ -275,14 +275,14 @@ class CellDetectionLayout:
 
         ### Widgets for technical Technical Settings
         n_cpus = utils.QLineEdit("4")
-        
+
         ### Widgets for Parameters
         n_sds_above_mean = utils.QLineEdit("10")
         soma_diameter = utils.QLineEdit("16")
         xy_cell_size = utils.QLineEdit("6")
         z_cell_size = utils.QLineEdit("6")
         gaussian_filter = utils.QLineEdit("0.2")
-        
+
         ### Widget for trained model
         path = ""
         trained_model = utils.QLabel()
@@ -295,13 +295,13 @@ class CellDetectionLayout:
                 trained_model.setText(str(path[0]))
             else:
                 trained_model.setText('')
-        
+
         ### Widget for orientation
         orientation = utils.QLineEdit("asl")
 
         ## Widget for starting cell detection
         start_CellDetection_button = utils.QPushButton("Start Cell Detection")
-       
+
         ## Widget for saving | loading settings
         config_path = utils.QLineEdit("Insert filename extension")
         load_config_button = utils.QPushButton("Load parameters")
@@ -315,7 +315,7 @@ class CellDetectionLayout:
 
         assignment_button = utils.QPushButton("Embed Ontology")
 
-        ### Visualization of Widgets for cell detection tab on GUI      
+        ### Visualization of Widgets for cell detection tab on GUI
         inner_layout.addWidget(utils.QLabel("Number of cpus available:"),1,0)
         inner_layout.addWidget(n_cpus,1,1)
         inner_layout.addWidget(utils.QLabel(" "),2,0)
@@ -334,7 +334,7 @@ class CellDetectionLayout:
         inner_layout.addWidget(choose_model_button,8,2)
         inner_layout.addWidget(utils.QLabel("Choose brain orientation (anterior/posterior,superior/inferior,left/right)"),9,0)
         inner_layout.addWidget(orientation,9,1)
-        
+
         inner_layout.addWidget(config_path,10,0)
         inner_layout.addWidget(load_config_button,10,1)
         inner_layout.addWidget(save_config_button,10,2)
@@ -344,7 +344,7 @@ class CellDetectionLayout:
         inner_layout.addWidget(assignment_button,11,1)
 
         def save_config(save_path):
-            if not utils.os.path.exists(save_path):    
+            if not utils.os.path.exists(save_path):
                 print(save_path)
                 resample_variable_list = [n_cpus.text(),
                                           n_sds_above_mean.text(),
@@ -355,8 +355,8 @@ class CellDetectionLayout:
                                           trained_model.text(),
                                           orientation.text()]
 
-                pd_df = utils.pd.DataFrame([resample_variable_list], 
-                                     index = [1], 
+                pd_df = utils.pd.DataFrame([resample_variable_list],
+                                     index = [1],
                                      columns = ["Number of CPUs", "Number SDS above mean",
                                                 "Soma Diameter", "XY Plane Cell Size",
                                                 "Z Plane Cell Size","Gaussian Filter",
@@ -366,9 +366,9 @@ class CellDetectionLayout:
                 alert = utils.QMessageBox()
                 alert.setText("File already exists!")
                 alert.exec()
-               
+
         def load_config(load_path):
-            if utils.os.path.exists(load_path):    
+            if utils.os.path.exists(load_path):
                 print(load_path)
                 pd_df = utils.pd.read_csv(load_path, header = 0)
                 n_cpus.setText(str(pd_df["Number of CPUs"][0]))
@@ -377,14 +377,14 @@ class CellDetectionLayout:
                 xy_cell_size.setText(str(pd_df["XY Plane Cell Size"][0]))
                 z_cell_size.setText(str(pd_df["Z Plane Cell Size"][0]))
                 gaussian_filter.setText(str(pd_df["Gaussian Filter"][0]))
-                trained_model.setText(str(pd_df["Trained Model"][0])) 
+                trained_model.setText(str(pd_df["Trained Model"][0]))
                 orientation.setText(str(pd_df["Orientation"][0]))
             else:
                 alert = utils.QMessageBox()
                 alert.setText("Path does not exist!")
-                alert.exec()    
-       
-       ### Connection of Widgets with CellDetection functions       
+                alert.exec()
+
+       ### Connection of Widgets with CellDetection functions
         load_config_button.pressed.connect(lambda: load_config(load_path = utils.os.getcwd() + "/CellDetection_" + config_path.text() + ".csv"))
         save_config_button.pressed.connect(lambda: save_config(save_path = utils.os.getcwd() + "/CellDetection_" + config_path.text() + ".csv"))
 
@@ -396,11 +396,11 @@ class CellDetectionLayout:
                                                                               _z_cell_size=int(z_cell_size.text()),
                                                                               _gaussian_filter=float(gaussian_filter.text()),
                                                                               _orientation = str(orientation.text())))
-        
+
         choose_model_button.clicked.connect(lambda: choose_model())
-        assignment_button.clicked.connect(lambda: self.assignment(choice=str(choose_structure.currentText())))
-        
-        outer_layout.addLayout(inner_layout)       
+        assignment_button.clicked.connect(lambda: assignment(choice=str(choose_structure.currentText()),wd=self.my_working_directory))
+
+        outer_layout.addLayout(inner_layout)
         outer_layout.addStretch()
         tab.setLayout(outer_layout)
         return tab
