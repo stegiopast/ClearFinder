@@ -46,7 +46,9 @@ conda deactivate
 
 Clearmap_env
 ```
-conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
+conda create -n Clearmap_env
+conda install -c conda-forge graph-tool
+conda env update --file ~/Brainmap_dev/ClearMap/requirements.yml
 ```
 
 Napari_env
