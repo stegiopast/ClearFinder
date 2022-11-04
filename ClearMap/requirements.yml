@@ -5,6 +5,7 @@ channels:
   - conda-forge
   - conda-forge/label/cf202003
   - defaults
+  - bioconda
 dependencies:
   - _libgcc_mutex=0.1
   - _pytorch_select=0.2
