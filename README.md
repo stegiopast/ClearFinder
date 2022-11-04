@@ -11,7 +11,6 @@ git clone git@github.com:stegiopast/ClearFinder.git
 sudo chown your_local_username ~/ClearFinder -R
 cd ~/ClearFinder/ClearMap
 git clone git@github.com:ChristophKirst/ClearMap2.git
-mv ClearMap2/ClearMap ~/ClearFinder/ClearMap
 ```
 
 ### 2. Download conda if not installed
@@ -46,7 +45,10 @@ conda deactivate
 
 Clearmap_env
 ```
-conda env create --file ~/Brainmap_dev/ClearMap/requirements.yml
+conda env create -f ~/ClearFinder/ClearMap/requirements.yml
+python compile.py
+mv ~/ClearFinder/ClearMap/ClearMap2/ClearMap ~/ClearFinder/Clearmap/
+conda deactivate
 ```
 
 Napari_env
