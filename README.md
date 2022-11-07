@@ -46,6 +46,7 @@ conda deactivate
 Clearmap_env
 ```
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
+cp compile.py ClearMap2/compile.py
 python compile.py
 mv ~/ClearFinder/ClearMap/ClearMap2/ClearMap ~/ClearFinder/ClearMap/
 conda deactivate
