@@ -1,8 +1,10 @@
 import utils
 
-class Resampling_Alignment:
 
-    def initReference(self, # Default values of resolution Todo: See also belonging QWidget for default values?
+class Resampling_Alignment:
+    """Resampling"""
+    # Default values of resolution
+    def initReference(self, 
                       source_res_x=3.02,
                       source_res_y=3.02,
                       source_res_z=3,
@@ -47,7 +49,7 @@ class Resampling_Alignment:
         source = self.ws.source('raw_' + self.chosenChannel);
         sink = self.ws.filename('stitched_' + self.chosenChannel);
         utils.io.convert(source, sink, verbose=True)
-
+        
         utils.res.resample(self.ws.filename('stitched_' + self.chosenChannel),
                      sink=self.ws.filename('resampled_' + self.chosenChannel), **resample_parameter)
 
@@ -74,7 +76,7 @@ class Resampling_Alignment:
             "result_directory": self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel
         };
 
-        # erstes algnment sollte klappen!
+        # first alginment !
         utils.elx.align(**align_channels_parameter);
 
         align_reference_parameter = {
@@ -88,15 +90,13 @@ class Resampling_Alignment:
             # directory of the alignment result
             "result_directory": self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel
         };
-
-        # dimensionsfehler möglicherweise
         utils.elx.align(**align_reference_parameter);
         return
 
 
 class Resampling_Alignment_Layout:
+    """Layouting related tab"""
     def resample_layout(self):
-
         tab = utils.QWidget()
         outer_layout = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
@@ -132,6 +132,7 @@ class Resampling_Alignment_Layout:
         config_path = utils.QLineEdit("Insert filename extension")
         load_config_button = utils.QPushButton("Load parameters")
         save_config_button = utils.QPushButton("Save parameters")
+
 
         def save_config(save_path):
             if not utils.os.path.exists(save_path):
@@ -175,6 +176,7 @@ class Resampling_Alignment_Layout:
                 alert.setText("File already exists!")
                 alert.exec()
 
+
         def load_config(load_path):
             if utils.os.path.exists(load_path):
                 print(load_path)
@@ -200,8 +202,7 @@ class Resampling_Alignment_Layout:
                 alert.setText("Path does not exist!")
                 alert.exec()
 
-                ### visualization of Widgets for resampling
-
+        ### visualization of Widgets for resampling
         inner_layout.addWidget(utils.QLabel("<b>Resample Paramter: <\b>"), 0, 0)
         inner_layout.addWidget(utils.QLabel("Source Resolution: "), 1, 0)
         inner_layout.addWidget(utils.QLabel("X:"), 1, 1)
@@ -252,32 +253,10 @@ class Resampling_Alignment_Layout:
         inner_layout.addWidget(save_config_button, 10, 7)
         inner_layout.addWidget(start_resampling_button, 10, 8)
 
-        ###Signals and Slots connections for backend configuration
-
-
-        #Every change in the different widgets is saved in a variable list
-        '''
-        orientation_x.textEdited.connect(refresh_variable_list)
-        orientation_y.textEdited.connect(refresh_variable_list)
-        orientation_z.textEdited.connect(refresh_variable_list)
-        source_res_x.textEdited.connect(refresh_variable_list)
-        source_res_y.textEdited.connect(refresh_variable_list)
-        source_res_z.textEdited.connect(refresh_variable_list)
-        sink_res_x.textEdited.connect(refresh_variable_list)
-        sink_res_y.textEdited.connect(refresh_variable_list)
-        sink_res_z.textEdited.connect(refresh_variable_list)
-        auto_source_res_x.textEdited.connect(refresh_variable_list)
-        auto_source_res_y.textEdited.connect(refresh_variable_list)
-        auto_source_res_z.textEdited.connect(refresh_variable_list)
-        auto_sink_res_x.textEdited.connect(refresh_variable_list)
-        auto_sink_res_y.textEdited.connect(refresh_variable_list)
-        auto_sink_res_z.textEdited.connect(refresh_variable_list)
-        '''
-
-
         ## These two functions will load or save a variable list
         load_config_button.pressed.connect(lambda: load_config(load_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
         save_config_button.pressed.connect(lambda: save_config(save_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
+        
         start_resampling_button.clicked.connect(lambda: self.initReference(source_res_x=float(source_res_x.text()),
                                                                            source_res_y=float(source_res_y.text()),
                                                                            source_res_z=float(source_res_z.text()),

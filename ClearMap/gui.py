@@ -1,20 +1,20 @@
 import utils
-import DeterminePath_RenamePath_Tab
-import Resampling_Alignment_Tab
-import Cell_Detection_Tab
-import Grouping_and_Normalization_Tab
-import Analysis_and_Plots_Tab
+import determine_path_rename_path_Tab
+import resampling_alignment_Tab
+import cell_detection_Tab 
+import grouping_and_normalization_Tab 
+import analysis_and_plots_Tab 
 
 
 class Main_Window(utils.QWidget,
-                  DeterminePath_RenamePath_Tab._init_Workspace,
-                  DeterminePath_RenamePath_Tab._rename_Layout,
-                  Resampling_Alignment_Tab.Resampling_Alignment,
-                  Resampling_Alignment_Tab.Resampling_Alignment_Layout,
-                  Cell_Detection_Tab.Cell_Detection,
-                  Cell_Detection_Tab.Cell_Detection_Layout,
-                  Grouping_and_Normalization_Tab._Preanalysis_and_Normalization,
-                  Analysis_and_Plots_Tab._Analysis_and_Plots_Layout,
+                  determine_path_rename_path_Tab._init_Workspace,
+                  determine_path_rename_path_Tab._rename_Layout,
+                  resampling_alignment_Tab.Resampling_Alignment,
+                  resampling_alignment_Tab.Resampling_Alignment_Layout,
+                  cell_detection_Tab.Cell_Detection,
+                  cell_detection_Tab.Cell_Detection_Layout,
+                  grouping_and_normalization_Tab._Preanalysis_and_Normalization,
+                  analysis_and_plots_Tab._Analysis_and_Plots_Layout,
                   ):
 
     def __init__(self):
@@ -23,6 +23,7 @@ class Main_Window(utils.QWidget,
         layout = utils.QVBoxLayout()
         self.setLayout(layout)
         tabs = utils.QTabWidget()
+
         #Initialize Workspace, WorkingDirectory and Channel of Analysis
         tabs.addTab(self.rename_layout(), "Determine Path | Rename Path")
         tabs.addTab(self.resample_layout(), "Resampling | Alignment")
@@ -30,7 +31,6 @@ class Main_Window(utils.QWidget,
         tabs.addTab(self.preanalysis_layout(), "Grouping and Normalization")
         tabs.addTab(self.analysis_layout(),"Analysis and Plots")
         layout.addWidget(tabs)
-        #self.debug = False
 
 
 if __name__ == "__main__":

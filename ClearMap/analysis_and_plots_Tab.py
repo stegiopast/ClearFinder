@@ -1,8 +1,8 @@
 import utils
 
-class Plot_Window(utils.QDialog):
 
-    # constructor
+class Plot_Window(utils.QDialog):
+    """constructor"""
     def __init__(self, parent=None):
         super(Plot_Window, self).__init__(parent)
 
@@ -18,12 +18,6 @@ class Plot_Window(utils.QDialog):
         # it takes the Canvas widget and a parent
         self.toolbar = utils.NavigationToolbar(self.canvas, self)
 
-        # Just some button connected to 'plot' method
-        # self.button = QPushButton('Plot')
-
-        # adding action to the button
-        # self.button.clicked.connect(self.plot)
-
         # creating a Vertical Box layout
         layout = utils.QVBoxLayout()
 
@@ -33,17 +27,13 @@ class Plot_Window(utils.QDialog):
         # adding canvas to the layout
         layout.addWidget(self.canvas)
 
-        # adding push button to the layout
-        #layout.addWidget(self.button)
-
         # setting layout to the main window
         self.setLayout(layout)
 
 
 class _Analysis_and_Plots_Layout:
-
+    """Layout of related tab"""
     def analysis_layout(self):
-
         tab = utils.QWidget()
 
         outer_layout = utils.QVBoxLayout()
@@ -66,9 +56,7 @@ class _Analysis_and_Plots_Layout:
         metadata_file = utils.QLineEdit("")
         choose_metadata_file = utils.QPushButton("Choose metadata file")
 
-
         plot_window = utils.Plot_Window()
-
 
         self.input_csv = utils.pd.DataFrame()
         self.metadata_csv = utils.pd.DataFrame()
@@ -97,9 +85,7 @@ class _Analysis_and_Plots_Layout:
 
         create_pca = utils.QPushButton("PCA")
         create_heatmap = utils.QPushButton("Heatmap")
-        #create_vol_plot = QPushButton("Volcano Plot")
         create_boxplot = utils.QPushButton("Boxplot")
-
 
         inner_layout.addWidget(utils.QLabel("<b>Input file</b>"),0,0)
         inner_layout.addWidget(input_file,0,1)
@@ -119,10 +105,6 @@ class _Analysis_and_Plots_Layout:
         inner_layout2.addWidget(create_pca)
         inner_layout2.addStretch()
 
-        #inner_layout3.addWidget(QLabel("<b>Volcano Plot</b>"))
-        #inner_layout3.addWidget(create_vol_plot)
-        #inner_layout3.addStretch()
-
         inner_layout4.addWidget(utils.QLabel("<b>Heatmap</b>"))
         inner_layout4.addWidget(utils.QLabel("Select a structure level to filter for"))
         inner_layout4.addWidget(filter_level_ComboBox)
@@ -139,8 +121,6 @@ class _Analysis_and_Plots_Layout:
 
         inner_layout6.addWidget(plot_window)
 
-
-
         intermediate_layout.addLayout(inner_layout2)
         intermediate_layout.addLayout(inner_layout3)
         intermediate_layout.addLayout(inner_layout4)
@@ -151,7 +131,6 @@ class _Analysis_and_Plots_Layout:
         outer_layout.addLayout(inner_layout6)
         tab.setLayout(outer_layout)
 
-
         choose_input_file.pressed.connect(lambda: select_input_file())
         choose_metadata_file.pressed.connect(lambda: select_metadata_file())
         choose_information_file.pressed.connect(lambda: select_information_file())
@@ -161,18 +140,20 @@ class _Analysis_and_Plots_Layout:
         set_input.pressed.connect(lambda: set_input_and_metadata())
 
 
-
         def select_input_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose input file of interest")
             input_file.setText(path[0])
+
 
         def select_metadata_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose metadata file of interest")
             metadata_file.setText(path[0])
 
+
         def select_information_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose metadata file of interest")
             input_information_file.setText(path[0])
+
 
         def set_input_and_metadata():
             self.input_csv = utils.pd.read_csv(input_file.text(),sep=";",header = 0,index_col = 0)
@@ -182,8 +163,8 @@ class _Analysis_and_Plots_Layout:
             print(self.metadata_csv)
             print(self.information_csv)
 
-        def pca():
 
+        def pca():
             input_csv = self.input_csv.copy()
             input_csv = input_csv.reset_index(drop = True)
             input_csv = input_csv.loc[:,input_csv.columns != "Region"]
@@ -191,11 +172,9 @@ class _Analysis_and_Plots_Layout:
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             print(input_csv)
 
-
             sample_names = list(input_csv.columns)
             input_csv = utils.np.array(input_csv.transpose())
             print(input_csv)
-
 
             metadata_csv = self.metadata_csv.copy()
             print(sample_names)
@@ -209,7 +188,6 @@ class _Analysis_and_Plots_Layout:
             pc_df = utils.pd.DataFrame(data = pc , columns = ['PC1', 'PC2'])
             print(pc_df)
             pc_df["Cluster"] = sample_names
-
             print(pc_df)
 
             condition_array = []
@@ -229,11 +207,10 @@ class _Analysis_and_Plots_Layout:
             utils.plt.savefig(output_dir + output_name)
             utils.plt.close()
 
+
             def hue_regplot(data, x, y, hue, palette=None, **kwargs):
                 from matplotlib.cm import get_cmap
-
                 regplots = []
-
                 levels = data[hue].unique()
 
                 if palette is None:
@@ -262,20 +239,10 @@ class _Analysis_and_Plots_Layout:
             plot_window.canvas.draw()
 
 
-
-
-
-
-        #def volcano():
-        #    pass
         def heatmap():
             input_csv = self.input_csv.copy()
             print(input_csv.head())
             information = self.information_csv.copy()
-            # while ClearMap runs ()
-            # if filter region is
-            #if input_csv.empty:
-            #    input_csv = self.input_csv()
 
             if filter_region_LineEdit.text() != "":
                 region = filter_region_LineEdit.text()
@@ -286,10 +253,8 @@ class _Analysis_and_Plots_Layout:
                         if region in val:
                             index_list.append(i)
 
-
                     input_csv = input_csv.iloc[index_list,:]
                     information = information.iloc[index_list,:]
-
                 else:
                     alert = utils.QMessageBox()
                     alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
@@ -305,7 +270,6 @@ class _Analysis_and_Plots_Layout:
                     if level == array[0]:
                         index_list.append(i)
 
-
                 input_csv = input_csv.iloc[index_list,:]
                 information = information.iloc[index_list,:]
                 brainregion = "level_" + str(level)
@@ -314,13 +278,11 @@ class _Analysis_and_Plots_Layout:
 
             brainregion = brainregion + "_heatmap"
 
-
             if input_csv.empty:
                 alert = utils.QMessageBox()
                 alert.setText("After filtering the region the dataframe it is empty! - Try other filters")
                 alert.exec()
                 return
-
 
             input_csv = input_csv.dropna()
             input_csv = input_csv.loc[:,input_csv.columns != "Region"]
@@ -333,7 +295,6 @@ class _Analysis_and_Plots_Layout:
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
 
-            #if (input_csv.loc[(input_csv != 0).any(axis = 1)].size() < 1):
             if utils.np.all(input_csv == 0):
                 alert = utils.QMessageBox()
                 alert.setText("After filtering the region the dataframe only contains 0! - Try other filters")
@@ -354,7 +315,6 @@ class _Analysis_and_Plots_Layout:
                 utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
                 utils.plt.close()
 
-
                 plot_window.canvas.draw()
 
 
@@ -369,12 +329,10 @@ class _Analysis_and_Plots_Layout:
 
                 conditions = self.metadata_csv["condition"].unique()
 
-
                 sample_names = list(input_csv.columns)
                 for i in sample_names:
                     cpm_name = i + "_processed"
                     input_csv[cpm_name] = input_csv[i]
-
 
                 for i in conditions:
                     array_of_means = []
@@ -448,6 +406,7 @@ class _Analysis_and_Plots_Layout:
 
         return tab
 
+
     def createHeatmap(path2file: str):
         dataframe = utils.pd.read_csv(path2file, header=0, sep=";")
         dataframe = dataframe.iloc[:, 1:]
@@ -495,6 +454,7 @@ class _Analysis_and_Plots_Layout:
         utils.plt.savefig(utils.result_dir.text() + "/AnalysisOutput/"+ utils.brainregion.text()+"_"+ utils.CountsOrSummedCounts.currentText()+"_Lv"+ utils.struc_level.text()+".png", bbox_inches='tight')
         utils.plt.clf()
         print("FERTIG!")
+
 
     def createHeatmapZScores(path2file: str):
         df = utils.pd.read_csv(path2file, header=0, sep=";")
@@ -563,15 +523,6 @@ class _Analysis_and_Plots_Layout:
                 heatmapdata_zscore.append(zscore_temp)
             df[col_zscore] = heatmapdata_zscore
 
-        # df.to_csv(result_dir.text() + "/AnalysisOutput" + "/Test.csv")
-
-        #if CountsOrSummedCounts.currentText() == "Raw_Counts":
-        #    startindex = int((df.shape[1]) / 2)
-        #    endindex = startindex + int((df.shape[1]) / 4)
-
-        #elif CountsOrSummedCounts.currentText() == "Summed_Counts":
-        #    startindex = int((df.shape[1]) / 2) + int((df.shape[1]) / 4)
-        #    endindex = df.shape[1]
         startindex =int((df.shape[1]) / 2)
         endindex = df.shape[1]
 
@@ -581,6 +532,7 @@ class _Analysis_and_Plots_Layout:
         utils.plt.clf()
 
         return
+
 
     def createBoxplot(path2file: str):
         dataframe = utils.pd.read_csv(path2file, header=0, sep=";")
@@ -629,8 +581,6 @@ class _Analysis_and_Plots_Layout:
             dataframe[str(i) + "_stdd"] = array_of_stdd
             dataframe[str(i) + "_med"] = array_of_medians
             dataframe[str(i) + "_single_values"] = array_of_single_values
-        # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        #    print(dataframe)
 
         desired_region = utils.brainregion.text()
         chosen_data = dataframe[dataframe["Region"] == desired_region]

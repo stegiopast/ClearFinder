@@ -1,5 +1,6 @@
 import utils
 
+
 def createTrackingList(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
     reference_df_ID = dataframe.set_index(dataframe["id"])
     reference_df_Name = dataframe.set_index(dataframe["name"])
@@ -23,8 +24,6 @@ def createTrackingList(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
                 trackedlevels[i].append(temp_name)
                 correspondingLevel[i].append(int(df_temp["st_level"]))
 
-
-
     df = utils.np.array([trackedlevels, correspondingLevel], dtype=object)
 
     df = utils.np.transpose(df)
@@ -34,9 +33,7 @@ def createTrackingList(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
                                "CorrespondingLevel"])
     return df
 
-
 """
-
 #Input: pd.Dataframe (mouse_ontology.csv) , trackedList (pd.Dataframe from createTrackingList), and the length of the pd.Dataframe
 #Creates a Template-Resultframe, which can be used for every sample
 #Cols: Region, trackedWay, CorrespondingLevel, RegionCellCount, RegionCellCountSummedUp
@@ -60,7 +57,6 @@ def createResultframe(df, trackedList):
     resultframe["RegionCellCountSummedUp"] = utils.pd.to_numeric(resultframe["RegionCellCountSummedUp"])
 
     return resultframe
-
 
 """
 #df = summarized_counts
@@ -113,7 +109,6 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
                 temp_name = df_temp["name"] #Update name of parent region
                 index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
                 resultframe.loc[index_innerCount[0], "RegionCellCountSummedUp"] += cellcountRegion # Add cell count of leaf structure to parent structure
-
     return resultframe
 
 """
@@ -148,9 +143,6 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
         file.write('</CellCounter_Marker_File>\n')
 
 
-"""
-
-"""
 def write_transformed_xml(dataframe: utils.pd.DataFrame, pathname:str, filename:str):
     df = utils.pd.DataFrame(dataframe)
     filename = filename[0:-3] + "xml"
@@ -177,7 +169,6 @@ def write_transformed_xml(dataframe: utils.pd.DataFrame, pathname:str, filename:
 """
 #Calls the writeXML-Function to actually transfer certain CSV Files to XML
 """
-
 def processCellsCsv(myWorkingDirectory, chosenChannel):
     pathname2xmlfolder = myWorkingDirectory + "/" + chosenChannel + "xmlFiles"
     if not utils.os.path.exists(pathname2xmlfolder):
@@ -203,9 +194,7 @@ def processCellsCsv(myWorkingDirectory, chosenChannel):
     df_final = df_final[df_final["name"] != "No label"]
     df_final.to_csv(df_final_name, sep=";")
 
-
     df_final_transformed_filename = "/cells_" + chosenChannel + "_transformed_final.csv"
-
 
     # Multiprocessing the convertion from CSV to XML
     p1 = utils.Process(target=writeXml, args=(df, pathname2xmlfolder, df_filename))
@@ -231,12 +220,9 @@ def processCellsCsv(myWorkingDirectory, chosenChannel):
     df_final.rename(columns={"name": "total_cells"}, inplace=True)
     df_final.to_csv(myWorkingDirectory + "/cells_" + chosenChannel + "_summarized_counts.csv", sep=";")
 
-
-
 """
 #calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
 """
-
 # check from where workinDir and chosen channel is coming from 
 def embedOntology(myWorkingDirectory, chosenChannel):
     # Reads ontology file holding the reference region dictionairy
@@ -261,11 +247,7 @@ def embedOntology(myWorkingDirectory, chosenChannel):
     return
 
 
-
-
-
 class Cell_Detection:
-
     def cell_detection(self,    # Defaul Parameter of CellDetectionTab
                        flatfield_illumination=None,
                        scaling_illumination="max",
@@ -362,12 +344,7 @@ class Cell_Detection:
         shape_maxima_det_y = int(shape_maxima_det_y)
         shape_maxima_det_z = int(shape_maxima_det_z)
 
-        #if threshold_maxima_det == 0:
         threshold_maxima_det = None
-        #elif threshold_maxima_det == 1:
-        #    threshold_maxima_det = "background mean"
-        #elif threshold_maxima_det == 2:
-        #    threshold_maxima_det = "total mean"
 
         # conversion of intensity detection values
         measure_intensity_det = ['source', 'illumination', 'background', 'equalized', 'dog'];
@@ -411,10 +388,6 @@ class Cell_Detection:
         cell_detection_parameter['maxima_detection']['shape'] = (shape_maxima_det_x,
                                                                  shape_maxima_det_y,
                                                                  shape_maxima_det_z)  # Shape of the structural element. Near typical cell size. // tuple(int, int)
-        # Idea is to take the mean of the values in each procedure + 2*std_deviation, to always predict a significant upregulation Z-test // Has to be implemented
-        # We could also implement a filter function at that point, by overwriting data that is 4 std_dev away from the mean, whcih seems unrealistic
-        #Philipp: auskommentiert von cell_detection_parameter
-        #cell_detection_parameter['maxima_detection']['threshold'] = None  # 0.55 good value fter dog + equalizaziont for 3258  #5 good value after equalization for 3258 #250 Best so fat without equalization for 3258 # Only maxima above this threshold are detected. If None all are detected // float
 
         ## Intensity_detection
         cell_detection_parameter['intensity_detection']['measure'] = measure_intensity_det;  # we decided to measure all intensities
@@ -438,6 +411,7 @@ class Cell_Detection:
                            self.ws.filename('cells', postfix='raw_' + self.chosenChannel),
                            cell_detection_parameter=cell_detection_parameter,
                            processing_parameter=processing_parameter)
+
 
     def filter_cells(self, filt_size=20):
 
@@ -550,6 +524,7 @@ class Cell_Detection:
         self.embedOntology()
         return
 
+
     def voxelization(self):
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=(slice(None),
                                                                                                slice(None),
@@ -574,8 +549,6 @@ class Cell_Detection:
         utils.vox.voxelize(coordinates,
                      sink=self.ws.filename('density', postfix='counts_' + self.chosenChannel),
                      **voxelization_parameter)
-
-
 
 
 class Cell_Detection_Layout:
@@ -654,6 +627,7 @@ class Cell_Detection_Layout:
         size_max = utils.QLineEdit('20')
         size_min = utils.QLineEdit('11')
         overlap = utils.QLineEdit('10')
+
 
         def save_config(save_path):
             if not utils.os.path.exists(save_path):
@@ -734,6 +708,7 @@ class Cell_Detection_Layout:
                 alert.setText("File already exists!")
                 alert.exec()
 
+
         def load_config(load_path):
             if utils.os.path.exists(load_path):
                 cd_df = utils.pd.read_csv(load_path, header=0)
@@ -776,35 +751,29 @@ class Cell_Detection_Layout:
                 alert.setText("File does not exist!")
                 alert.exec()
 
-                # visualization for all variable features
 
+        # visualization for all variable features
         inner_layout1 = utils.QGridLayout()
         inner_layout1.addWidget(utils.QLabel("<b>Cell Detection Paramter:</b>"), 0, 0)
-
+        
         # visualization for illumination correction
         inner_layout1.addWidget(utils.QLabel("<b>Illumination correction: </b>"), 1, 0)
         inner_layout1.addWidget(utils.QLabel("Flatfield: "), 2, 0)
         inner_layout1.addWidget(flatfield_illumination, 2, 1)
         inner_layout1.addWidget(utils.QLabel("Scaling:"), 3, 0)
         inner_layout1.addWidget(scaling_illumination, 3, 1)
-        # inner_layout1.addWidget(QLabel("Save: "),4,0)
-        # inner_layout1.addWidget(save_illumination,4,1)
 
         # visualization of background correction
         inner_layout2 = utils.QGridLayout()
-
         inner_layout2.addWidget(utils.QLabel("<b>Background Correction:</b>"), 1, 0)
         inner_layout2.addWidget(utils.QLabel("Shape:"), 2, 0)
         inner_layout2.addWidget(shape_background_x, 2, 1)
         inner_layout2.addWidget(shape_background_y, 2, 2)
         inner_layout2.addWidget(utils.QLabel("Form:"), 3, 0)
         inner_layout2.addWidget(form_background, 3, 1)
-        # inner_layout2.addWidget(QLabel("Save:"),4,0)
-        # inner_layout2.addWidget(save_background,4,1)
 
         # visualization of equalization
         inner_layout3 = utils.QGridLayout()
-
         inner_layout3.addWidget(utils.QLabel("<b>Equalization:</b>"), 1, 0)
         inner_layout3.addWidget(utils.QLabel("Perform equalization ?:"), 2, 0)
         inner_layout3.addWidget(execute_equalization, 2, 1)
@@ -823,12 +792,9 @@ class Cell_Detection_Layout:
         inner_layout3.addWidget(spacing_equalization_z, 6, 3)
         inner_layout3.addWidget(utils.QLabel("Interpolate:"), 7, 0)
         inner_layout3.addWidget(interpolate_equalization, 7, 1)
-        # inner_layout3.addWidget(QLabel("Save:"),8,0)
-        # inner_layout3.addWidget(save_equalization,8,1)
 
         # visualization of dog filtering
         inner_layout4 = utils.QGridLayout()
-
         inner_layout4.addWidget(utils.QLabel("<b>DoG-Filtering:</b>"), 1, 0)
         inner_layout4.addWidget(utils.QLabel("Execute DoG-Filtering?: "), 2, 0)
         inner_layout4.addWidget(execute_dog_filter, 2, 1)
@@ -840,13 +806,9 @@ class Cell_Detection_Layout:
         inner_layout4.addWidget(sigma_dog_filter, 4, 1)
         inner_layout4.addWidget(utils.QLabel("Sigma2:"), 5, 0)
         inner_layout4.addWidget(sigma2_dog_filter, 5, 1)
-        # inner_layout4.addWidget(QLabel("Save:"),6,0)
-        # inner_layout4.addWidget(save_dog_filter,6,1)
 
         # visualization of maxima detection
         inner_layout5 = utils.QGridLayout()
-
-
         inner_layout5.addWidget(utils.QLabel("<b>Maxima Detection:</b>"), 1, 0)
         inner_layout5.addWidget(utils.QLabel("H max:"), 2, 0)
         inner_layout5.addWidget(hmax_maxima_det, 2, 1)
@@ -854,17 +816,9 @@ class Cell_Detection_Layout:
         inner_layout5.addWidget(shape_maxima_det_x, 3, 1)
         inner_layout5.addWidget(shape_maxima_det_y, 3, 2)
         inner_layout5.addWidget(shape_maxima_det_z, 3, 3)
-        #Philipp:auskommentiert
-        #inner_layout5.addWidget(QLabel("Threshold:"), 4, 0)
-        #inner_layout5.addWidget(threshold_maxima_det, 4, 1)
-
-
-        # inner_layout5.addWidget(QLabel("Save:"),5,0)
-        # inner_layout5.addWidget(save_maxima_det,5,1)
 
         # visualization of intensity detection
         inner_layout6 = utils.QGridLayout()
-
         inner_layout6.addWidget(utils.QLabel("<b>Intensity Detection:</b>"), 1, 0)
         inner_layout6.addWidget(utils.QLabel("Type of measure:"), 2, 0)
         inner_layout6.addWidget(measure_intensity_det, 2, 1)
@@ -873,17 +827,11 @@ class Cell_Detection_Layout:
 
         # visualization of shape detection
         inner_layout7 = utils.QGridLayout()
-
         inner_layout7.addWidget(utils.QLabel("<b>Shape detection:</b>"), 0, 0)
-        #inner_layout7.addWidget(QLabel("Threshold:"), 1, 0)
         inner_layout7.addWidget(threshold_shape_det, 1, 1)
-        # inner_layout7.addWidget(QLabel("Save:"),2,0)
-        # inner_layout7.addWidget(save_shape_det,2,1)
 
         # visualization of Processing parameter widgets
-
         inner_layout8 = utils.QGridLayout()
-
         inner_layout8.addWidget(utils.QLabel("<b>Processing paramters:</b>"), 0, 0)
         inner_layout8.addWidget(utils.QLabel("No. of parallel processes:"), 1, 0)
         inner_layout8.addWidget(amount_processes, 1, 1)
@@ -896,7 +844,6 @@ class Cell_Detection_Layout:
 
         # visualization of loading,saving and detection functions
         inner_layout9 = utils.QHBoxLayout()
-
         inner_layout9.addWidget(config_path)
         inner_layout9.addWidget(load_config_button)
         inner_layout9.addWidget(save_config_button)
@@ -905,12 +852,10 @@ class Cell_Detection_Layout:
         inner_layout9.addWidget(voxelization_button)
 
         # Connection of signals and slots for cell detection
-
         load_config_button.clicked.connect(
             lambda: load_config(load_path = utils.os.getcwd() + "/cell_detection_" + config_path.text() + ".csv"))
         save_config_button.clicked.connect(
             lambda: save_config(save_path =utils.os.getcwd() + "/cell_detection_" + config_path.text() + ".csv"))
-
         detect_cells_button.clicked.connect(
             lambda: self.cell_detection(flatfield_illumination=flatfield_illumination.currentIndex(),
                                         scaling_illumination=scaling_illumination.currentIndex(),
@@ -938,7 +883,6 @@ class Cell_Detection_Layout:
                                         shape_maxima_det_x=shape_maxima_det_x.text(),
                                         shape_maxima_det_y=shape_maxima_det_y.text(),
                                         shape_maxima_det_z=shape_maxima_det_z.text(),
-                                        #threshold_maxima_det=threshold_maxima_det.currentIndex(),
                                         measure_intensity_det=measure_intensity_det.currentIndex(),
                                         method_intensity_det=method_intensity_det.currentIndex(),
                                         threshold_shape_det=threshold_shape_det.text(),
@@ -949,7 +893,6 @@ class Cell_Detection_Layout:
         atlas_assignment_button.clicked.connect(lambda: self.atlas_assignment())
         voxelization_button.clicked.connect(lambda: self.voxelization())
 
-        # inner_layout.addWidget(QPushButton("Second"))
         outer_layout.addLayout(inner_layout1)
         outer_layout.addLayout(inner_layout2)
         outer_layout.addLayout(inner_layout3)
