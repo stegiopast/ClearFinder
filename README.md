@@ -55,7 +55,7 @@ conda deactivate
 
 Napari_env
 ```
-conda create -n Napari_env python=3.9
+conda env create -y -n Napari_env python=3.9
 conda activate Napari_env
 pip install napari[all]
 conda install pyqt
