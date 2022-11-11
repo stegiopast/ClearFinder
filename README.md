@@ -5,36 +5,40 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 
 ### 1. Download github repository
 
-```
+```bash
 cd ~
 git clone git@github.com:stegiopast/ClearFinder.git
-sudo chown your_local_username ~/ClearFinder -R
+sudo chown ${USER} ~/ClearFinder -R
+cd ClearFinder
+git submodule update --recursive --init
 ```
 
 ### 2. Download conda if not installed
+
   -> For linux x86_64 based distributions use the following code snippet, otherwise visit anaconda.com and follow the installation instructions for your distribution.
 
-```
+```bash
 cd ~
 wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh
 bash ~/Anaconda3-2022.05-Linux-x86_64.sh
 source ~/.bashrc
 ```
 
-
 Please follow the instructions of the conda installation guide
 
 ### 3. install nextflow
 
-```
+```bash
 conda install -c bioconda nextflow
 ```
+
 Please follow the instructions of the nextflow installation guide
 
 ### 4. install different environments
 
 Cellfinder_env
-```
+
+```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 pip install cellfinder
@@ -43,7 +47,8 @@ conda deactivate
 ```
 
 Clearmap_env
-```
+
+```bash
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
 cp compile.py ClearMap2/compile.py
 cd ClearMap2
@@ -54,7 +59,8 @@ conda deactivate
 ```
 
 Napari_env
-```
+
+```bash
 conda create -n Napari_env python=3.9
 conda activate Napari_env
 pip install napari[all]
@@ -64,19 +70,19 @@ conda deactivate
 
 ### 5.Start the application
 
-```
+```bash
 cd ~/ClearFinder
 nextflow run start_guis.nf
 ```
+
 Once you start napari be aware to download the napari-cellfinder plugin in the tab menu under Plugin -> Install/ Uninstall plugins.
 Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
-
 
 ### 6.Alternative start
 
 Note that with it's first start ClearMap needs to be compiled, which takes around half an hour. Until then, the GUI window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
 
-```
+```bash
 conda activate Clearmap_env
 python3 ~/ClearFinder/ClearMap/gui.py
 conda deactivate
@@ -85,13 +91,16 @@ conda deactivate
 Similarly the other GUIs can be started separately in a similar way.
 
 For Cellfinder type:
-```
+
+```bash
 conda activate Cellfinder_env
 python3 ~/ClearFinder/Cellfinder/gui.py
 conda deactivate
 ```
+
 For napari type:
-```
+
+```bash
 conda activate Napari_env
 napari
 conda deactivate
@@ -109,17 +118,15 @@ source ~/.bashrc
 
 From now on, you can start the applications with the following command:
 
-```
+```bash
 ClearFinder
 ```
 
-## Usage
-
-### ClearMap
+## ClearMap usage
 
 For the usage of ClearMap a few things have to be considered:
 
-#### Data organization for the software:
+### Data organization for the software:
 -> We follow a strict filename structure:
 
     All files should end with the following pattern -> *ZX[3-4]_C0Y.tif -> (X is the number of the optical plane, it can be a number between 0-9 and must consist of at least three numbers (000-9999), Y can be a number between 1-2)
@@ -141,7 +148,7 @@ For the usage of ClearMap a few things have to be considered:
 
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !
 
-#### Determine Path | Rename samples
+### Determine Path | Rename samples
 
 Always use a copy of your original data for processing ! Make backups !
 
@@ -154,19 +161,20 @@ With this tab a ClearMap workspace can be initialized. The following steps shoul
 5. The "Rename buttons" will allow the renaming of files in the respective channels. Clicking the button will open a Rename window. The renaming is semi-automatized so that a representative file within the folder is shortened to the pattern ZX[3-4]_C0Y.tif. (The shown filename in the rename window should be between Z000_C0Y.tif-Z9999_C0Y.tif). If the filenames are matching the pattern continue the renaming by clicking the "Accept" button in the renaming window. This will perform a renaming of all the files within Auto, Signal->C01 or Signal->C02 respectively. It is necessary to rename the files in order to automatize the cell detection.
 6. After files are renamed one can continue with the resampling step.
 
-#### Resampling
+### Resampling
+
 1. Please insert information about the resolution of signal_channel and atlas images as micrometer per pixel values for the X,Y,Z dimensions at Resample parameters.
 2. Similarly, insert information about the resolution of auto_channel and the reference atlas images for the X,Y,Z dimensions at Resample parameters.
 3. By inserting a filename the inserted resolutions can be saved and loaded for later experiments. (A unique basename has to be used)
-4. Add the orientation of the brain. The default settings match the orientation of the side of the right hemisphere facing the camera. For more information about which orientation to choose, visit -> https://christophkirst.github.io/ClearMap2Documentation/html/CellMap.html
+4. Add the orientation of the brain. The default settings match the orientation of the side of the right hemisphere facing the camera. For more information about which orientation to choose, visit -> <https://christophkirst.github.io/ClearMap2Documentation/html/CellMap.html>
 5. Resampling can be started by clicking the "Resample" button.
 
 
 This process usually takes around 10-20 minutes.
 
-#### Cell-detection and atlas assignment
+### Cell-detection and atlas assignment
 
-1. For Cell detection we inserted default values that were tailored to our experiments. For each experiments the optimal values can vary. Please visit https://christophkirst.github.io/ClearMap2Documentation/html/home.html for more information. The possible processing settings are all based on options provided by ClearMap2.
+1. For Cell detection we inserted default values that were tailored to our experiments. For each experiments the optimal values can vary. Please visit <https://christophkirst.github.io/ClearMap2Documentation/html/home.html> for more information. The possible processing settings are all based on options provided by ClearMap2.
 2. Please be aware that usually only half of the available threads should be used since the usage of working memory is extraordinary high with more threads. We used 10 parallel processes with 128GB RAM. We recommend 5 threads for 64GB RAM machines.
 3. Once the preferred settings are selected, one can start the cell detection by clicking the "Detects cells" button.
 4. After cell detection, one has to perform the alignment to the reference atlas by clicking the "Atlas assignment" button.
@@ -174,10 +182,7 @@ This process usually takes around 10-20 minutes.
 These two processes are executed in 2-3 hours, depending on the machine and the amount of detected cells.
 The process has several files as an output. The embedded_ontology.csv files can be used for further quantification analysis. Files that have been produced in the C0YXmlFiles folders can be used together with the Signal tif-files for visualization in napari to validate the cell detection. Cells that are stored in the universe.xml or no_label.xml files were detected as maximas, but could not be aligned to a reference region.
 
-
-
-#### Grouping and Normalization of data
-
+### Grouping and Normalization of data
 
 In this tab, data of samples form different conditions can be created. The process will create raw count files and counts that summarize the detected cell counts over different hierarchical structures based on the ontology of Allen Brain atlas. Data can be normalized as "median of ratio" or "cellcounts per million" . Additionally, a logarithmic conversion can be performed. A metadata file can be exported for further analytical processing. It is recommended to at least use three samples per condition for further analysis.
 
@@ -188,7 +193,8 @@ In this tab, data of samples form different conditions can be created. The proce
 
 5. Additionally to the metadata.csv a list_information.csv is exported, which allows the analysis of the dataset over different ontology hierarchies.
 
-#### Preliminary analysis
+### Preliminary analysis
+
 All the datsets you need for the following step should be located in the output_folder you defined in the last step
 
 1. Choose an input count file by clicking the "Choose input file button". You can load either hierarchical or non-hierarchical counts.
@@ -201,9 +207,10 @@ All the datsets you need for the following step should be located in the output_
 
 You can search for the existence of regions in the table on the right side of the tab.
 
-### Cellfinder
+## Cellfinder usage
 
-#### Data organization for the software:
+### Data organization for the software:
+
 -> We follow a strict filename structure:
 
    All files should end with the following pattern -> *ZX[3-4]_C01.tif -> (X is the number of the optical plane, it can be a number between 0-9 and must consist of at least three numbers (000-9999))
@@ -226,28 +233,27 @@ You can search for the existence of regions in the table on the right side of th
 
  -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !
 
-#### Determine Path and rename samples
+### Determine Path and rename samples
 
 Always use a copy of your original data for processing ! Make backups !
 
-
 With this tab a CellFinder workspace can be initialized. The following steps should be performed:
+
 1. Choose a Workspace by pressing the "Choose sample" button. A dialogue window will open where one needs to choose the sample_folder of interest.
 2. The Workspace can be initialized by clicking the "set workspace" button.
 3. The "Rename buttons" will allow the renaming of files in the respective channels. Clicking the button will open a Rename window. The renaming is semi-automatized so that a representative file within the folder is shortened to the pattern ZX[3-4]_C0Y.tif. (The shown filename in the rename window should be between Z000_C0Y.tif-Z9999_C0Y.tif). If the filenames are matching the pattern continue the renaming by clicking the "Accept" button in the renaming window. This will perform a renaming of all the files within Auto or Signal respectively. It is necessary to rename the files in order to automatize the cell detection.
-6. After files are renamed one can continue with the resampling step.
+4. After files are renamed one can continue with the resampling step.
 
 Note that Cellfinder is currently only capable of processing whole brain images. Additionally, only a single signal folder per sample can be processed. If you want to process two channels, please copy the sample folder and create a signal folder with the repective image files for the channel of interest. Additionally, be aware not to use your original data, but a copy of it. Images will be resized in further steps if they do not have the same size.
 
-#### Resampling
+### Resampling
 
 1. For resampling please insert the voxel size in micrometer per pixel X,Y,Z for Signal and Auto to determine the resolution.
 2. Press "Start preprocessing"
 
 The resampling will resize your images, if they do not have the same size. We recommend once again to only use copies of your original data. In case the images have to be resized, be aware that also the voxel sizes change respectively and will be stored in a voxel_sizes_file within the sample folder. If you plan to resample the same data more than once please use the new voxel_sizes after the first attempt.
 
-
-#### Cell-detection and atlas assignment
+### Cell-detection and atlas assignment
 
 1. Insert the number of CPUs that your computer is able to process (We used 8)
 2. Insert a threshold, being defined as the minimal amount of standard deviations above mean illumination, in order to consider a spot as maximum (Integer)
@@ -259,9 +265,9 @@ The resampling will resize your images, if they do not have the same size. We re
 8. Click "Start cell detection"
 9. After cell detection, one has to click "Embed ontology" to obtain a count file comparable to ClearMap data.
 
-#### Network training
-Training data can be generated with the Cellfinder plugin of napari. Please check the documentation on https://docs.brainglobe.info/cellfinder-napari/user-guide/training-data-generation.
+### Network training
 
+Training data can be generated with the Cellfinder plugin of napari. Please check the documentation on <https://docs.brainglobe.info/cellfinder-napari/user-guide/training-data-generation>.
 
 1. After generating the training data, click on "Choose Yaml" which opens a dialogue window. Navigate to the yaml file created with the cellfinder-napari plugin.
 2. Choose a pretrained model, if you want to continue training a custom model. A dialogue window will open where you have to choose a file that contains a model you want to continue training on. The file is in .h5 format. Click open in the dialogue window to proceed.
@@ -273,7 +279,7 @@ Training data can be generated with the Cellfinder plugin of napari. Please chec
 8. Choose a directory or create a new one to store your data. Click on "Choose your base directory" to open a dialogue window. By clicking on the "folder+" icon on the dialogue you can create a new window. Rename the newly created folder and proceed by clicking "Choose".
 9. Start the network training by clicking the "Train network" button.
 
-#### Grouping and Normalization of data
+### Grouping and Normalization of data
 
 In this tab data of samples from different conditions can be created. The process will create raw count files and counts that summarize the detected cell counts over different hierarchical structures, based on the ontology of the Allen Brain Atlas. Data can be normalized as "median of ratio" or "cellcounts per million". Additionally, a logarithmic conversion can be performed. A metadata file can be exported for further analytical processing. It is recommended to at least use three samples per condition for further analysis.
 
@@ -283,8 +289,10 @@ In this tab data of samples from different conditions can be created. The proces
 4. After the creation of the count files, a metadata file is required for condition wise comparison. Please insert the sample names (matching the sample_folder names) and the condition name into the Metadata table on the right side of the tab. Click save metadata to write a metadata.csv
 5. Additionally to the metadata.csv a list_information.csv is exported, which allows the analysis of the dataset over different ontology hierarchies.
 
-#### Preliminary analysis
+### Preliminary analysis
+
 All the datasets you need for the following step should be located in the output_folder you defined in the last step
+
 1. Choose an input count file by clicking the "Choose input file button". You can load eather hierarchical or non-hierarchical counts.
 2. Similarly to step 1, choose the metadata.csv file.
 3. Similarly to step 1, choose the list_information.csv file.
@@ -295,6 +303,6 @@ All the datasets you need for the following step should be located in the output
 
 You can search for the existence of regions in the table on the right side of the tab.
 
-#### Processing of ClearMap and Cellfinder after Atlas alignment
-The application is designed to produce similar output data from Cellfinder and ClearMap to enable the comparison of both software packages. The grouping and normalization step can therefore be performed together with samples of one or the other processing tool. Be aware that we do not guarantee the scientific relevance of your findings. Be aware the statistical meaningfulness of the experiment still lies on the users responsibility. Be careful which data you use or combine and how you normalize it.
+### Processing of ClearMap and Cellfinder after Atlas alignment
 
+The application is designed to produce similar output data from Cellfinder and ClearMap to enable the comparison of both software packages. The grouping and normalization step can therefore be performed together with samples of one or the other processing tool. Be aware that we do not guarantee the scientific relevance of your findings. Be aware the statistical meaningfulness of the experiment still lies on the users responsibility. Be careful which data you use or combine and how you normalize it.
