@@ -1,0 +1,5 @@
+.nextflow.*
+cellfinder*
+.nextflow/
+work/
+*/__pycache__/
