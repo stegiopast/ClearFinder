@@ -35,7 +35,7 @@ Please follow the instructions of the nextflow installation guide
 
 Cellfinder_env
 ```
-conda env create -n Cellfinder_env python=3.9
+conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 pip install cellfinder
 conda deactivate
