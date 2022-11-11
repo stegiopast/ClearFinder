@@ -54,7 +54,7 @@ conda deactivate
 
 Napari_env
 ```
-conda env create -y -n Napari_env -c conda-forge python=3.9
+conda create -n Napari_env python=3.9
 conda activate Napari_env
 pip install napari[all]
 conda deactivate
