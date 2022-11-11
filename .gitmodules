@@ -1,0 +1,3 @@
+[submodule "ClearMap/ClearMap2"]
+	path = ClearMap/ClearMap2
+	url = https://github.com/ChristophKirst/ClearMap2.git
