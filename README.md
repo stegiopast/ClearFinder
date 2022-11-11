@@ -9,8 +9,6 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 cd ~
 git clone git@github.com:stegiopast/ClearFinder.git
 sudo chown your_local_username ~/ClearFinder -R
-cd ~/ClearFinder/ClearMap
-git clone git@github.com:ChristophKirst/ClearMap2.git
 ```
 
 ### 2. Download conda if not installed
@@ -47,8 +45,10 @@ Clearmap_env
 ```
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
 cp compile.py ClearMap2/compile.py
+cd ClearMap2
 python compile.py
-mv ~/ClearFinder/ClearMap/ClearMap2/ClearMap ~/ClearFinder/ClearMap/
+cd ~
+mv ~/ClearFinder/ClearMap/ClearMap2/ClearMap ~/ClearFinder/ClearMap/ClearMap
 conda deactivate
 ```
 
