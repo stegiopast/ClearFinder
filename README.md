@@ -38,7 +38,7 @@ Cellfinder_env
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 pip install cellfinder
-conda env update -f requirements.yml
+conda env update -f ~/ClearFinder/Cellfinder/requirements.yml
 conda deactivate
 ```
 
