@@ -119,7 +119,7 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
     filename = filename[0:-3] + "xml"
     row_counter = 1
     dfLength = len(df)
-    with open(pathname+filename, "a") as file:
+    with open(pathname+filename, "w") as file:
         file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         file.write('<CellCounter_Marker_File>\n')
         file.write('  <Image_Properties>\n')
@@ -132,7 +132,7 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
         for i in range(len(df.iloc[:, 0])):
             row_counter = row_counter + 1
             if (row_counter % 10000 == 0):
-                print(str(row_counter), "/", str(dfLength), " lines are processes")
+                print(str(row_counter), "/", str(dfLength), " lines are processed")
             file.write('      <Marker>\n')
             file.write('        <MarkerX>' + str(df.iloc[i, :].x) + '</MarkerX>\n')
             file.write('        <MarkerY>' + str(df.iloc[i, :].y) + '</MarkerY>\n')
@@ -146,7 +146,7 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
 def write_transformed_xml(dataframe: utils.pd.DataFrame, pathname:str, filename:str):
     df = utils.pd.DataFrame(dataframe)
     filename = filename[0:-3] + "xml"
-    with open(pathname+filename, "a") as file:
+    with open(pathname+filename, "w") as file:
         file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         file.write('<CellCounter_Marker_File>\n')
         file.write('  <Image_Properties>\n')
@@ -241,7 +241,7 @@ def embedOntology(myWorkingDirectory, chosenChannel):
     df = utils.pd.read_csv(myWorkingDirectory + "/cells_" + chosenChannel + "_summarized_counts.csv", header=0, sep=";")
 
     samplename = utils.os.path.basename(myWorkingDirectory)
-    new_df = analyse_csv(df,reference_df, trackedLevels)
+    new_df = analyse_csv(df,reference_df, trackedLevels, myWorkingDirectory)
     new_df_name = myWorkingDirectory + "/" + samplename + "_" + chosenChannel + "_embedded_ontology.csv"
     new_df.to_csv(new_df_name, sep=";", index=0)
     return
@@ -419,7 +419,7 @@ class Cell_Detection:
         utils.cells.filter_cells(self.ws.filename('cells', postfix='raw_' + self.chosenChannel),
                            self.ws.filename('cells', postfix='filtered_' + self.chosenChannel),
                            thresholds=thresholds)
-        return
+
 
     """
     #ClearMap-Code +
@@ -520,8 +520,8 @@ class Cell_Detection:
             data = utils.np.array([ClearMap1_source[name] if name in ClearMap1_source.dtype.names else utils.np.full(ClearMap1_source.shape[0], utils.np.nan) for name in names])
             utils.io.write(sink, data)
 
-        self.processCellsCsv()
-        self.embedOntology()
+        processCellsCsv(self.myWorkingDirectory,self.chosenChannel)
+        embedOntology(self.myWorkingDirectory,self.chosenChannel)
         return
 
 
