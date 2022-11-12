@@ -1,8 +1,8 @@
 from decimal import ROUND_FLOOR
 from fileinput import filename
 from PyQt5.QtGui import QWindow
-# from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget, QLineEdit, QDialog
+from PyQt5.QtWidgets import QGridLayout, QTabWidget, QComboBox, QCheckBox, QHBoxLayout, QListWidget, QTableWidget
 from PyQt5.QtCore import Qt
 
 import os
