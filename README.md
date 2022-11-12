@@ -228,13 +228,19 @@ You can search for the existence of regions in the table on the right side of th
 
 
  -> Additionally we follow a strict folder structure: \
-   Sample_folder\
-      |\
-      -> Auto -> *ZXXXX_C01.tif\
-      |\
-      |\
-      -> Signal -> *ZXXXX_C01.tif \
-
+```
+Sample_folder
+│   
+│      
+│
+└───Auto
+│   |   *ZXXXX_C01.tif
+│      
+│   
+└───Signal
+    |   *ZXXXX_C01.tif
+   
+```
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
