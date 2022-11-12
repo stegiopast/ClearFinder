@@ -131,22 +131,21 @@ For the usage of ClearMap a few things have to be considered:
 -> Additionally we follow a strict folder structure:\
 
 Sample_folder\
-│\   
-│\      
-│\
-└───Auto\
+│   
+│      
+│
+└───Auto
 │ &ensp | &ensp *ZXXXX_C01.tif\
-│\      
-│\   
-│\       
+│      
+│   
 └───Signal\
-    │\   
-    |\
-    |\
-    └───C01\
-    | &ensp | &ensp *ZXXXX_C01.tif \
-    |\
-    |\
+    │
+    |
+    |
+    └───C01
+    | &ensp | &ensp *ZXXXX_C01.tif\
+    |
+    |
     └───C02\
         | &ensp *ZXXXX_C02.tif\
     
