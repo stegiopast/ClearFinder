@@ -60,7 +60,8 @@ Napari_env
 conda create -n Napari_env python=3.9
 conda activate Napari_env
 pip install napari[all]
-conda install pyqt
+pip install PySide6
+pip install PyQt6
 conda deactivate
 ```
 
