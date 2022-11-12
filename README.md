@@ -134,19 +134,19 @@ Sample_folder \
 │   
 │      
 │
-└───Auto
+└───Auto \
 │ &emsp; | &emsp; *ZXXXX_C01.tif \
 │      
 │   
-└───Signal
-     │
-     |
-     |
-     └───C01
+└───Signal \
+     │ \
+     | \
+     | \
+     └───C01 \
      | &emsp; | &emsp; *ZXXXX_C01.tif \
-     |
-     |
-     └───C02\
+     | \
+     | \
+     └───C02 \
          | &emsp; *ZXXXX_C02.tif \
     
 
