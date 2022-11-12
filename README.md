@@ -128,7 +128,7 @@ For the usage of ClearMap a few things have to be considered:
     All files should end with the following pattern -> *ZX[3-4]_C0Y.tif -> (X is the number of the optical plane, it can be a number between 0-9 and must consist of at least three numbers (000-9999), Y can be a number between 1-2)
     Files have to be converted to tif format.\
 
--> Additionally we follow a strict folder structure:\
+-> Additionally we follow a strict folder structure:
 
 ```
 Sample_folder
