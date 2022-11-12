@@ -135,21 +135,20 @@ Sample_folder\
 │\      
 │\
 └───Auto\
-│&ensp|&ensp**ZXXXX_C01.tif\
+│ &ensp | &ensp *ZXXXX_C01.tif\
 │\      
 │\   
-│\   
-│\      
+│\       
 └───Signal\
     │\   
     |\
     |\
     └───C01\
-    |&ensp|&ensp*ZXXXX_C01.tif \
+    | &ensp | &ensp *ZXXXX_C01.tif \
     |\
     |\
     └───C02\
-        |&ensp**ZXXXX_C02.tif\
+        | &ensp *ZXXXX_C02.tif\
     
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
