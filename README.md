@@ -8,7 +8,6 @@ Open your terminal (Ctrl + Alt + T) or manually on the desktop.
 ```bash
 cd ~
 git clone git@github.com:stegiopast/ClearFinder.git
-sudo chown ${USER} ~/ClearFinder -R
 cd ClearFinder
 git submodule update --recursive --init
 ```
