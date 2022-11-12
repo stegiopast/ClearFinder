@@ -227,7 +227,7 @@ You can search for the existence of regions in the table on the right side of th
    If you want to process 2 signal channels, please split the datasets up in different folders.
 
 
- -> Additionally we follow a strict folder structure: \
+ -> Additionally we follow a strict folder structure:
 ```
 Sample_folder
 │   
