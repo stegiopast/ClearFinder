@@ -64,18 +64,8 @@ class _Analysis_and_Plots_Layout:
 
         filter_level_ComboBox = utils.QComboBox()
         filter_level_ComboBox.insertItem(0,"None")
-        filter_level_ComboBox.insertItem(1,"1")
-        filter_level_ComboBox.insertItem(2,"2")
-        filter_level_ComboBox.insertItem(3,"3")
-        filter_level_ComboBox.insertItem(4,"4")
-        filter_level_ComboBox.insertItem(5,"5")
-        filter_level_ComboBox.insertItem(6,"6")
-        filter_level_ComboBox.insertItem(7,"7")
-        filter_level_ComboBox.insertItem(8,"8")
-        filter_level_ComboBox.insertItem(9,"9")
-        filter_level_ComboBox.insertItem(10,"10")
-        filter_level_ComboBox.insertItem(11,"11")
-        filter_level_ComboBox.insertItem(12,"12")
+        for i in range (1, 13):
+            filter_level_ComboBox.insertItem(i, str(i))
 
         filter_region_LineEdit = utils.QLineEdit("")
 
@@ -505,7 +495,7 @@ class _Analysis_and_Plots_Layout:
 
         mean = utils.pd.DataFrame(df.iloc[:, startindex:endindex].mean(axis=1))
         stdd = utils.pd.DataFrame(df.iloc[:, startindex:endindex].std(axis=1))
-        
+
         print(mean)
         print(stdd)
 
@@ -668,10 +658,7 @@ class _Analysis_and_Plots_Layout:
                     if i == j:
                         is_in = True
                         break
-                if is_in:
-                    contains_substring_list.append(True)
-                else:
-                    contains_substring_list.append(False)
+                contains_substring_list.append(is_in)
             dataframe = dataframe.loc[contains_substring_list, :]
             print("Length new df after filter:\n", len(dataframe))
 
@@ -704,7 +691,7 @@ class _Analysis_and_Plots_Layout:
             ax.annotate(txt, (x[i], y[i]), ha="center", va="bottom", size="6")
 
         utils.plt.xlim((-3, 3))
-        utils.plt.title() 
+        utils.plt.title()
         utils.plt.show()
 
         return

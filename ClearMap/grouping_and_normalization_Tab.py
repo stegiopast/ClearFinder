@@ -2,7 +2,7 @@ import utils
 
 
 class _Preanalysis_and_Normalization:
-    
+
     def preanalysis_layout(self):
         tab = utils.QWidget()
         outer_layout = utils.QHBoxLayout()
@@ -59,10 +59,8 @@ class _Preanalysis_and_Normalization:
         inner_layout2.addWidget(utils.QLabel("Choose log transformation or None"))
         inner_layout2.addWidget(choose_log_transformation_ComboBox)
 
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
+        for _ in range(4):
+            inner_layout2.addWidget(utils.QLabel("                                          "))
         inner_layout2.addWidget(filter_normalization_button)
 
         inner_layout3.addWidget(utils.QLabel("<b>Metadata</b>"))
@@ -78,7 +76,7 @@ class _Preanalysis_and_Normalization:
         outer_layout.addLayout(inner_layout2)
         outer_layout.addLayout(inner_layout3)
         tab.setLayout(outer_layout)
- 
+
         add_resultfile_button.pressed.connect(lambda: add_analysis_file())
         remove_resultfile_button.pressed.connect(lambda: remove_last_element())
         create_final_output_directory.pressed.connect(lambda: set_output_directory())
@@ -139,11 +137,9 @@ class _Preanalysis_and_Normalization:
             new_df3 = utils.pd.DataFrame(df_list[0][["Region","TrackedWay","CorrespondingLevel"]])
 
             for i,val in enumerate(df_list):
-                new_df[str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))] = val["RegionCellCount"]
-
-            for i,val in enumerate(df_list):
-                new_df2[str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))] = val["RegionCellCountSummedUp"]
-
+                file_base_name = str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))
+                new_df[file_base_name] = val["RegionCellCount"]
+                new_df2[file_base_name] = val["RegionCellCountSummedUp"]
 
             new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";",index=False)
             new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv",sep=";",index=False)

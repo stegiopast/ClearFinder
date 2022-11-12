@@ -29,11 +29,9 @@ class RenameBox(utils.QWidget):
     def updateLayout(self) -> utils.QGridLayout:
         self.intShift = int(self.shiftBar.text())
         self.newPosition = self.position + self.intShift
-        if self.newPosition >= 0:
-            self.update_rename_box(self.newPosition)
-        else:
+        if self.newPosition < 0:
             self.newPosition = 0
-            self.update_rename_box(self.newPosition)
+        self.update_rename_box(self.newPosition)
         print("Filename: ", self.filenameToCheck[self.position:len(self.filenameToCheck)])
         print("Current Filename: ", self.currentFilename)
         print(self.position)
@@ -77,7 +75,7 @@ class RenameBox(utils.QWidget):
 
             self.isFirstUpdate = False
 
-        self.currentFilename = self.filenameToCheck[self.position:len(self.filenameToCheck)]
+        self.currentFilename = self.filenameToCheck[self.position:]
 
 
     #Function for refreshing the visualization of rename window
@@ -97,7 +95,7 @@ class RenameBox(utils.QWidget):
         for file in utils.pathlib.Path(self.path).iterdir():
             if file.is_file():
                 old_name = file.stem + ".tif"
-                new_name = old_name[self.position:len(old_name)]
+                new_name = old_name[self.position:]
                 dir = file.parent
 
                 newObj = utils.re.match(r'^[0-9]{3}_', new_name)
@@ -111,7 +109,7 @@ class RenameBox(utils.QWidget):
                 file.rename(utils.pathlib.Path(dir, new_name))
 
 
-# initalize working directory 
+# initalize working directory
 class _init_Workspace():
 
     def initWorkspace(self, path='/home/cellfinder_data', channel=0, choice="Hemisphere"):
