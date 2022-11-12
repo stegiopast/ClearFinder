@@ -56,7 +56,7 @@ class _Analysis_and_Plots_Layout:
         metadata_file = utils.QLineEdit("")
         choose_metadata_file = utils.QPushButton("Choose metadata file")
 
-        plot_window = utils.Plot_Window()
+        plot_window = Plot_Window()
 
         self.input_csv = utils.pd.DataFrame()
         self.metadata_csv = utils.pd.DataFrame()
