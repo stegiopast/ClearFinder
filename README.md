@@ -57,11 +57,8 @@ conda deactivate
 Napari_env
 
 ```bash
-conda create -n Napari_env python=3.9
+conda create -y -n Napari_env napari -c conda-forge
 conda activate Napari_env
-pip install napari[all]
-pip install PySide6
-pip install PyQt6
 conda deactivate
 ```
 
