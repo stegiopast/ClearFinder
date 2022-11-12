@@ -3,3 +3,4 @@ cellfinder*
 .nextflow/
 work/
 */__pycache__/
+ClearMap/ClearMap/
