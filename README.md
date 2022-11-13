@@ -49,6 +49,7 @@ Clearmap_env
 
 ```bash
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
+conda activate Clearmap_env
 cp compile.py ClearMap2/compile.py
 python ClearMap2/compile.py
 conda deactivate
@@ -130,25 +131,25 @@ For the usage of ClearMap a few things have to be considered:
 
 ```
 Sample_folder
-│   
-│      
+│
+│
 │
 └───Auto
 │   |   *ZXXXX_C01.tif
-│      
-│   
-└───Signal 
-    │ 
-    | 
-    | 
+│
+│
+└───Signal
+    │
+    |
+    |
     └───C01
     |   |    *ZXXXX_C01.tif
     |
     |
     └───C02
-        |    *ZXXXX_C02.tif 
-``` 
-    
+        |    *ZXXXX_C02.tif
+```
+
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
@@ -228,16 +229,16 @@ You can search for the existence of regions in the table on the right side of th
  -> Additionally we follow a strict folder structure:
 ```
 Sample_folder
-│   
-│      
+│
+│
 │
 └───Auto
 │   |   *ZXXXX_C01.tif
-│      
-│   
+│
+│
 └───Signal
     |   *ZXXXX_C01.tif
-   
+
 ```
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
