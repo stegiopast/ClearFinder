@@ -56,10 +56,8 @@ class GroupingAndNormalization:
         inner_layout2.addWidget(choose_normalization_ComboBox)
         inner_layout2.addWidget(utils.QLabel("Choose log transformation or None"))
         inner_layout2.addWidget(choose_log_transformation_ComboBox)
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
-        inner_layout2.addWidget(utils.QLabel("                                          "))
+        for _ in range(4):
+            inner_layout2.addWidget(utils.QLabel("                                          "))
         inner_layout2.addWidget(filter_normalization_button)
 
         inner_layout3.addWidget(utils.QLabel("<b>Metadata</b>"))
@@ -98,9 +96,7 @@ class GroupingAndNormalization:
             result_file_list.takeItem(result_file_list.count()-1)
 
         def set_output_directory():
-            if utils.os.path.exists(final_output_directory.text()):
-                pass
-            else:
+            if not utils.os.path.exists(final_output_directory.text()):
                 try:
                     utils.os.makedirs(final_output_directory.text())
                 except (ValueError,NameError):
@@ -132,10 +128,9 @@ class GroupingAndNormalization:
             new_df3 = utils.pd.DataFrame(df_list[0][["Region","TrackedWay","CorrespondingLevel"]])
 
             for i,val in enumerate(df_list):
-                new_df[str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))] = val["RegionCellCount"]
-
-            for i,val in enumerate(df_list):
-                new_df2[str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))] = val["RegionCellCountSummedUp"]
+                file_basename = str(utils.os.path.basename(utils.os.path.dirname(files_to_analyse[i])))
+                new_df[file_basename] = val["RegionCellCount"]
+                new_df2[file_basename] = val["RegionCellCountSummedUp"]
 
             new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";",index=False)
             new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv",sep=";",index=False)
