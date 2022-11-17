@@ -1,6 +1,6 @@
 import utils
 
-## Contains all features of the grouping and normalization tab
+# Contains all features of the grouping and normalization tab
 
 def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
     reference_df_ID = dataframe.set_index(dataframe["id"])
@@ -24,9 +24,7 @@ def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
 
     df = utils.np.array([trackedlevels, correspondingLevel], dtype=object)
     df = utils.np.transpose(df)
-    df = utils.pd.DataFrame(data=df,
-                        columns=["TrackedWay",
-                                "CorrespondingLevel"])
+    df = utils.pd.DataFrame(data=df, columns=["TrackedWay", "CorrespondingLevel"])
     return df
 
 """
@@ -42,15 +40,14 @@ def create_result_frame(df, trackedList):
                             [0 for x in range(trackedList.shape[0])]])  # Creates a column for normalized Values
     resultframe = utils.np.transpose(resultframe)
     resultframe = utils.pd.DataFrame(data=resultframe,
-                                columns=["Region",
-                                        "TrackedWay",
-                                        "CorrespondingLevel",
-                                        "RegionCellCount",
+                                columns=["Region", 
+                                        "TrackedWay", 
+                                        "CorrespondingLevel", 
+                                        "RegionCellCount", 
                                         "RegionCellCountSummedUp"])
 
     resultframe["RegionCellCount"] = utils.pd.to_numeric(resultframe["RegionCellCount"])
     resultframe["RegionCellCountSummedUp"] = utils.pd.to_numeric(resultframe["RegionCellCountSummedUp"])
-
     return resultframe
 
 """
@@ -160,15 +157,15 @@ def assignment(choice, wd):
     return
 
 class CellDetection:
-    def detect_cells(self,_number_of_free_cpus=4,
-                          _n_sds_above_mean_thresh=10,
-                          _trained_model="",
-                          _soma_diameter=16,
-                          _xy_cell_size=6,
-                          _z_cell_size=6,
-                          _gaussian_filter=0.2,
-                          _orientation = "asl",
-                          _batch_size = 256,):
+    def detect_cells(self, _number_of_free_cpus=4,
+                           _n_sds_above_mean_thresh=10,
+                           _trained_model="",
+                           _soma_diameter=16,
+                           _xy_cell_size=6,
+                           _z_cell_size=6,
+                           _gaussian_filter=0.2,
+                           _orientation = "asl",
+                           _batch_size = 256,):
 
         ##Basic comman for cellfinder
         if self.my_working_directory != "":
@@ -313,32 +310,32 @@ class CellDetectionLayout:
         assignment_button = utils.QPushButton("Embed Ontology")
 
         ### Visualization of Widgets for cell detection tab on GUI
-        inner_layout.addWidget(utils.QLabel("Number of cpus available:"),1,0)
-        inner_layout.addWidget(n_cpus,1,1)
-        inner_layout.addWidget(utils.QLabel(" "),2,0)
+        inner_layout.addWidget(utils.QLabel("Number of cpus available:"), 1, 0)
+        inner_layout.addWidget(n_cpus, 1, 1)
+        inner_layout.addWidget(utils.QLabel(" "), 2, 0)
         inner_layout.addWidget(utils.QLabel("Lower Boundary measured in number of standarddeviations above mean illumination:"),3,0)
-        inner_layout.addWidget(n_sds_above_mean,3,1)
-        inner_layout.addWidget(utils.QLabel("Mean soma diamter:"),4,0)
-        inner_layout.addWidget(soma_diameter,4,1)
-        inner_layout.addWidget(utils.QLabel("Mean cell size in xy plane:"),5,0)
-        inner_layout.addWidget(xy_cell_size,5,1)
-        inner_layout.addWidget(utils.QLabel("Mean cell size in z plane:"),6,0)
-        inner_layout.addWidget(z_cell_size,6,1)
-        inner_layout.addWidget(utils.QLabel("Gaussian Filter:"),7,0)
-        inner_layout.addWidget(gaussian_filter,7,1)
-        inner_layout.addWidget(utils.QLabel("Custom pretrained model:"),8,0)
-        inner_layout.addWidget(trained_model,8,1)
-        inner_layout.addWidget(choose_model_button,8,2)
-        inner_layout.addWidget(utils.QLabel("Choose brain orientation (anterior/posterior,superior/inferior,left/right)"),9,0)
-        inner_layout.addWidget(orientation,9,1)
+        inner_layout.addWidget(n_sds_above_mean, 3, 1)
+        inner_layout.addWidget(utils.QLabel("Mean soma diamter:"), 4, 0)
+        inner_layout.addWidget(soma_diameter, 4, 1)
+        inner_layout.addWidget(utils.QLabel("Mean cell size in xy plane:"), 5, 0)
+        inner_layout.addWidget(xy_cell_size, 5, 1)
+        inner_layout.addWidget(utils.QLabel("Mean cell size in z plane:"), 6, 0)
+        inner_layout.addWidget(z_cell_size, 6, 1)
+        inner_layout.addWidget(utils.QLabel("Gaussian Filter:"), 7, 0)
+        inner_layout.addWidget(gaussian_filter, 7, 1)
+        inner_layout.addWidget(utils.QLabel("Custom pretrained model:"), 8, 0)
+        inner_layout.addWidget(trained_model, 8, 1)
+        inner_layout.addWidget(choose_model_button, 8, 2)
+        inner_layout.addWidget(utils.QLabel("Choose brain orientation (anterior/posterior,superior/inferior,left/right)"), 9, 0)
+        inner_layout.addWidget(orientation, 9, 1)
 
-        inner_layout.addWidget(config_path,10,0)
-        inner_layout.addWidget(load_config_button,10,1)
-        inner_layout.addWidget(save_config_button,10,2)
-        inner_layout.addWidget(start_CellDetection_button,10,3)
+        inner_layout.addWidget(config_path, 10, 0)
+        inner_layout.addWidget(load_config_button, 10, 1)
+        inner_layout.addWidget(save_config_button, 10, 2)
+        inner_layout.addWidget(start_CellDetection_button, 10, 3)
 
-        inner_layout.addWidget(choose_structure,11,0)
-        inner_layout.addWidget(assignment_button,11,1)
+        inner_layout.addWidget(choose_structure, 11, 0)
+        inner_layout.addWidget(assignment_button, 11, 1)
 
         def save_config(save_path):
             if not utils.os.path.exists(save_path):
