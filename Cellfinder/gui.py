@@ -35,10 +35,10 @@ class MainWindow(utils.QWidget,
         tabs = utils.QTabWidget()
         tabs.addTab(self.rename_layout(), "Determine Path and Rename Filenames")
         tabs.addTab(self.preprocess_layout(), "Preprocessing")
-        tabs.addTab(self.cd_layout(),"Cell Detection | Assignment")
-        tabs.addTab(self.training_layout(),"Train Network")  
+        tabs.addTab(self.cd_layout(), "Cell Detection | Assignment")
+        tabs.addTab(self.training_layout(), "Train Network")  
         tabs.addTab(self.preanalysis_layout(), "Grouping and Normalization")
-        tabs.addTab(self.analysis_layout(),"Analysis and Plots")
+        tabs.addTab(self.analysis_layout(), "Analysis and Plots")
         layout.addWidget(tabs)
         self.my_working_directory = ""
         self.channel_chosen = ""
