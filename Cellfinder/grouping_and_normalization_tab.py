@@ -10,7 +10,7 @@ class GroupingAndNormalization:
         inner_layout2 = utils.QVBoxLayout()
         inner_layout3 = utils.QVBoxLayout()
 
-        #Widgets for inner layout 1
+        # Widgets for inner layout 1
         result_file_list = utils.QListWidget()
         add_resultfile_button = utils.QPushButton("Add analysis file")
         remove_resultfile_button = utils.QPushButton("Remove last file")
@@ -18,7 +18,7 @@ class GroupingAndNormalization:
         create_final_output_directory = utils.QPushButton("Set output dir")
         make_analysis_data = utils.QPushButton("Create analysis data (absolute values)")
 
-        #Widgets for inner Layout2
+        # Widgets for inner Layout2
         choose_log_transformation_ComboBox = utils.QComboBox()
         choose_log_transformation_ComboBox.insertItem(0, "None")
         choose_log_transformation_ComboBox.insertItem(1, "log_10")
@@ -31,7 +31,7 @@ class GroupingAndNormalization:
 
         filter_normalization_button = utils.QPushButton("Log Transform | Normalize | Filter ")
 
-        #Widgets for inner Layout 3
+        # Widgets for inner Layout 3
         metadata_table = utils.QTableWidget(12, 2)
 
         save_metadata = utils.QPushButton("Save Metadata")
@@ -63,7 +63,7 @@ class GroupingAndNormalization:
         inner_layout3.addWidget(utils.QLabel("<b>Metadata</b>"))
         inner_layout3.addWidget(metadata_table)
         inner_layout3.addWidget(save_metadata)
-        #Embed inner layouts in outer layout
+        # Embed inner layouts in outer layout
         inner_layout1.addStretch()
         inner_layout2.addStretch()
         inner_layout3.addStretch()
@@ -81,7 +81,7 @@ class GroupingAndNormalization:
         filter_normalization_button.pressed.connect(lambda: logtransform_normalize_filter())
         save_metadata.pressed.connect(lambda: save_metadata())
 
-        #Functions for preprocessing
+        # Functions for preprocessing
         def add_analysis_file():
             path = utils.QFileDialog.getOpenFileName(self, "Choose embedded_ontology.csv of interest")
             if "ontology.csv" in str(path[0]):
