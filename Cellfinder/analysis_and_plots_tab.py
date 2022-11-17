@@ -1,6 +1,6 @@
 import utils
 
-## Contains all features of the analysis and plots tab
+# Contains all features of the analysis and plots tab
 
 class PlotWindow(utils.QDialog):
     def __init__(self, parent=None):
