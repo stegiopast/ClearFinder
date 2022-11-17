@@ -1,6 +1,6 @@
 import utils
 
-## Contains all features of the grouping and normalization tab
+# Contains all features of the grouping and normalization tab
 
 class GroupingAndNormalization:
     def preanalysis_layout(self):
@@ -25,14 +25,14 @@ class GroupingAndNormalization:
         choose_log_transformation_ComboBox.insertItem(2, "log_2")
 
         choose_normalization_ComboBox = utils.QComboBox()
-        choose_normalization_ComboBox.insertItem(0,"None")
-        choose_normalization_ComboBox.insertItem(1,"Counts per million")
-        choose_normalization_ComboBox.insertItem(2,"Median of ratio")
+        choose_normalization_ComboBox.insertItem(0, "None")
+        choose_normalization_ComboBox.insertItem(1, "Counts per million")
+        choose_normalization_ComboBox.insertItem(2, "Median of ratio")
 
         filter_normalization_button = utils.QPushButton("Log Transform | Normalize | Filter ")
 
         #Widgets for inner Layout 3
-        metadata_table = utils.QTableWidget(12,2)
+        metadata_table = utils.QTableWidget(12, 2)
 
         save_metadata = utils.QPushButton("Save Metadata")
         for i in range(metadata_table.rowCount()):
@@ -83,7 +83,7 @@ class GroupingAndNormalization:
 
         #Functions for preprocessing
         def add_analysis_file():
-            path = utils.QFileDialog.getOpenFileName(self,"Choose embedded_ontology.csv of interest")
+            path = utils.QFileDialog.getOpenFileName(self, "Choose embedded_ontology.csv of interest")
             if "ontology.csv" in str(path[0]):
                 result_file_list.addItem(str(path[0]))
             else:
@@ -108,12 +108,12 @@ class GroupingAndNormalization:
         def save_metadata():
             metadata_list = []
             for i in range(metadata_table.rowCount()):
-                if metadata_table.cellWidget(i,0).text() != ""  and metadata_table.cellWidget(i,1).text() != "":
+                if metadata_table.cellWidget(i, 0).text() != ""  and metadata_table.cellWidget(i,1).text() != "":
                     metadata_list.append([metadata_table.cellWidget(i,j).text() for j in range(metadata_table.columnCount())])
                 else:
                     pass
-            metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list),columns = ["sample","condition"])
-            metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep = ";")
+            metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list), columns=["sample","condition"])
+            metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep=";")
             print(metadata_list)
 
         def preprocess_analysis_data():
@@ -132,14 +132,14 @@ class GroupingAndNormalization:
                 new_df[file_basename] = val["RegionCellCount"]
                 new_df2[file_basename] = val["RegionCellCountSummedUp"]
 
-            new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";",index=False)
-            new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv",sep=";",index=False)
+            new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";", index=False)
+            new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep=";", index=False)
             new_df3.to_csv(final_output_directory.text() + "/list_information.csv", sep = ";", index=False)
 
         def logtransform_normalize_filter():
             if utils.os.path.exists(final_output_directory.text()):
-                df_abs = utils.pd.read_csv(final_output_directory.text() + "/absolute_counts.csv", sep = ";", header = 0,index_col=0)
-                df_hier_abs = utils.pd.read_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep = ";",header = 0,index_col = 0)
+                df_abs = utils.pd.read_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";", header=0, index_col=0)
+                df_hier_abs = utils.pd.read_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep=";", header=0, index_col=0)
                 df_abs_filename = "absolute_counts.csv"
                 df_hier_abs_filename = "hierarchical_absolute_counts.csv"
 
@@ -156,8 +156,8 @@ class GroupingAndNormalization:
                 elif choose_normalization_ComboBox.currentText() == "Median of ratio":
                     print("Running Median of ratio normalization")
 
-                    df_abs_rowmean = df_abs.mean(axis = 1)
-                    df_hier_abs_rowmean = df_hier_abs.mean(axis = 1)
+                    df_abs_rowmean = df_abs.mean(axis=1)
+                    df_hier_abs_rowmean = df_hier_abs.mean(axis=1)
 
                    # print(df_abs_rowmean)
                    # print(df_hier_abs_rowmean)
@@ -165,11 +165,11 @@ class GroupingAndNormalization:
                     df_abs_copy = df_abs.copy()
                     df_hier_abs_copy = df_hier_abs.copy()
 
-                    for i in range(len(df_abs_copy.iloc[0,:])):
-                        df_abs_copy.iloc[:,i] = df_abs_copy.iloc[:,i] / df_abs_rowmean
+                    for i in range(len(df_abs_copy.iloc[0, :])):
+                        df_abs_copy.iloc[:,i] = df_abs_copy.iloc[:, i] / df_abs_rowmean
 
-                    for i in range(len(df_hier_abs_copy.iloc[0,:])):
-                        df_hier_abs_copy.iloc[:,i] = df_hier_abs_copy.iloc[:,i] / df_hier_abs_rowmean
+                    for i in range(len(df_hier_abs_copy.iloc[0, :])):
+                        df_hier_abs_copy.iloc[:,i] = df_hier_abs_copy.iloc[:, i] / df_hier_abs_rowmean
 
                     df_abs_copy_median = df_abs_copy.median()
                     df_hier_abs_copy_median = df_hier_abs_copy.median()
@@ -194,8 +194,8 @@ class GroupingAndNormalization:
                     df_abs_filename = "log10_" + df_abs_filename
                     df_hier_abs_filename = "log10_" + df_hier_abs_filename
 
-                df_abs.to_csv(final_output_directory.text() + "/" + df_abs_filename, sep = ";")
-                df_hier_abs.to_csv(final_output_directory.text() + "/" + df_hier_abs_filename, sep = ";")
+                df_abs.to_csv(final_output_directory.text() + "/" + df_abs_filename, sep=";")
+                df_hier_abs.to_csv(final_output_directory.text() + "/" + df_hier_abs_filename, sep=";")
 
             else:
                 alert = utils.QMessageBox()
