@@ -1,6 +1,6 @@
 import utils
 
-## Contains all features of the train network tab
+# Contains all features of the train network tab
 
 class TrainNetwork:
     def train_network(self, _yaml_files="",
@@ -79,37 +79,37 @@ class TrainingNetworkLayout:
         train_network_button = utils.QPushButton("Train network")
         
         ### Visualization of Widgets 
-        inner_layout.addWidget(utils.QLabel("Training data"),0,0)
-        inner_layout.addWidget(yaml_files,0,1)
-        inner_layout.addWidget(choose_yaml_button,0,2)
+        inner_layout.addWidget(utils.QLabel("Training data"), 0, 0)
+        inner_layout.addWidget(yaml_files, 0, 1)
+        inner_layout.addWidget(choose_yaml_button, 0, 2)
         
-        inner_layout.addWidget(utils.QLabel("Pretrained Model"),1,0)
-        inner_layout.addWidget(trained_model,1,1)
-        inner_layout.addWidget(choose_trained_model_button,1,2)
+        inner_layout.addWidget(utils.QLabel("Pretrained Model"), 1, 0)
+        inner_layout.addWidget(trained_model, 1, 1)
+        inner_layout.addWidget(choose_trained_model_button, 1, 2)
 
-        inner_layout.addWidget(utils.QLabel("Continue training ?"),2,0)
-        inner_layout.addWidget(continue_training,2,1)
+        inner_layout.addWidget(utils.QLabel("Continue training ?"), 2, 0)
+        inner_layout.addWidget(continue_training, 2, 1)
 
-        inner_layout.addWidget(utils.QLabel("Test fraction"),3,0)
-        inner_layout.addWidget(test_fraction,3,1)
+        inner_layout.addWidget(utils.QLabel("Test fraction"), 3, 0)
+        inner_layout.addWidget(test_fraction, 3, 1)
         
-        inner_layout.addWidget(utils.QLabel("Learning Rate"),4,0)
-        inner_layout.addWidget(learning_rate,4,1)
+        inner_layout.addWidget(utils.QLabel("Learning Rate"), 4, 0)
+        inner_layout.addWidget(learning_rate, 4, 1)
         
-        inner_layout.addWidget(utils.QLabel("Batch size"),5,0)
-        inner_layout.addWidget(batch_size,5,1)
+        inner_layout.addWidget(utils.QLabel("Batch size"), 5, 0)
+        inner_layout.addWidget(batch_size, 5, 1)
         
-        inner_layout.addWidget(utils.QLabel("Epochs"),6,0)
-        inner_layout.addWidget(epochs,6,1)
+        inner_layout.addWidget(utils.QLabel("Epochs"), 6, 0)
+        inner_layout.addWidget(epochs, 6, 1)
 
-        inner_layout.addWidget(utils.QLabel("Choose base directory and create new one"),7,0)
-        inner_layout.addWidget(training_output_directory,7,1)
-        inner_layout.addWidget(choose_training_output_button,7,2)
+        inner_layout.addWidget(utils.QLabel("Choose base directory and create new one"), 7, 0)
+        inner_layout.addWidget(training_output_directory, 7, 1)
+        inner_layout.addWidget(choose_training_output_button, 7, 2)
         
-        inner_layout.addWidget(config_path,8,0)
-        inner_layout.addWidget(load_config_button,8,1)
-        inner_layout.addWidget(save_config_button,8,2)
-        inner_layout.addWidget(train_network_button,8,3)
+        inner_layout.addWidget(config_path, 8, 0)
+        inner_layout.addWidget(load_config_button, 8, 1)
+        inner_layout.addWidget(save_config_button, 8, 2)
+        inner_layout.addWidget(train_network_button, 8, 3)
 
         ### Save and load paramters function
         def save_config(save_path):
@@ -134,7 +134,7 @@ class TrainingNetworkLayout:
         def load_config(load_path):
             if utils.os.path.exists(load_path):    
                 print(load_path)
-                pd_df = utils.pd.read_csv(load_path, header = 0)
+                pd_df = utils.pd.read_csv(load_path, header=0)
                 continue_training.setCheckState(bool(pd_df["Continue training"][0]))
                 test_fraction.setText(str(pd_df["Test fraction"][0]))
                 learning_rate.setText(str(pd_df["Learning rate"][0]))
