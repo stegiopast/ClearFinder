@@ -1,6 +1,6 @@
 import utils
 
-## Contains all features of the grouping and normalization tab
+# Contains all features of the grouping and normalization tab
 
 class RenameBox(utils.QWidget):
     def __init__(self, filename_to_check, acceptor, position, _path):
@@ -25,29 +25,29 @@ class RenameBox(utils.QWidget):
         self.int_shift = int(self.shift_bar.text())
         self.new_position = self.position + self.int_shift
         self.update(self.new_position)
-        print("Filename: ",self.filename_to_check[self.position:len(self.filename_to_check)])
-        print("Current Filename: ",self.current_filename)
+        print("Filename: ", self.filename_to_check[self.position:len(self.filename_to_check)])
+        print("Current Filename: ", self.current_filename)
         print(self.position)
         inner_layout = utils.QGridLayout()
-        inner_layout.addWidget(utils.QLabel("Current output Filename:"),0,0)
-        inner_layout.addWidget(utils.QLabel(self.current_filename),0,1)
-        inner_layout.addWidget(utils.QLabel("      "),1,0)
-        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 001_C01.tif - 9999_C01.tif ?"),2,0)
-        inner_layout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3,0)
-        inner_layout.addWidget(self.shift_bar, 3,1)
-        inner_layout.addWidget(self.reject,3,2)
-        inner_layout.addWidget(utils.QLabel("      "),4,0)
-        inner_layout.addWidget(utils.QLabel("Does filename fit ?"),5,0)
-        inner_layout.addWidget(utils.QLabel("Press accept:"), 6,0)
-        inner_layout.addWidget(self.accept,6,1)
-        inner_layout.addWidget(utils.QLabel("      "),7,0)
-        inner_layout.addWidget(utils.QLabel("Doesn't the filename fit at all?"),8,0)
-        inner_layout.addWidget(utils.QLabel("Press Quit:"),9,0)
-        inner_layout.addWidget(self.quit_renaming,9,1)
+        inner_layout.addWidget(utils.QLabel("Current output Filename:"), 0, 0)
+        inner_layout.addWidget(utils.QLabel(self.current_filename), 0, 1)
+        inner_layout.addWidget(utils.QLabel("      "), 1, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 001_C01.tif - 9999_C01.tif ?"), 2, 0)
+        inner_layout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3, 0)
+        inner_layout.addWidget(self.shift_bar, 3, 1)
+        inner_layout.addWidget(self.reject, 3, 2)
+        inner_layout.addWidget(utils.QLabel("      "), 4, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename fit ?"), 5, 0)
+        inner_layout.addWidget(utils.QLabel("Press accept:"), 6, 0)
+        inner_layout.addWidget(self.accept, 6, 1)
+        inner_layout.addWidget(utils.QLabel("      "), 7, 0)
+        inner_layout.addWidget(utils.QLabel("Doesn't the filename fit at all?"), 8, 0)
+        inner_layout.addWidget(utils.QLabel("Press Quit:"), 9, 0)
+        inner_layout.addWidget(self.quit_renaming, 9, 1)
 
         self.delete_items_of_layout(self.layout)
 
-        self.layout.addLayout(inner_layout,0,0)
+        self.layout.addLayout(inner_layout, 0, 0)
         return self.layout
 
     def update(self,current_position):
@@ -55,7 +55,7 @@ class RenameBox(utils.QWidget):
         self.position = current_position
         self.current_filename = self.filename_to_check[self.position:len(self.filename_to_check)]
 
-    def delete_items_of_layout(self,layout):
+    def delete_items_of_layout(self, layout):
         """Deletion in filename"""
         if layout is not None:
             while layout.count():
@@ -77,11 +77,11 @@ class RenameBox(utils.QWidget):
                 old_name = file.stem + ".tif"
                 new_name = old_name[self.position:len(old_name)]
                 dir = file.parent
-                new_obj = utils.re.match(r'^[0-9]{3}_',new_name)
+                new_obj = utils.re.match(r'^[0-9]{3}_', new_name)
                 if new_obj:
                     new_name = "Z0" + new_name
                 else:
-                    new_obj = utils.re.match(r'[0-9]',new_name)
+                    new_obj = utils.re.match(r'[0-9]', new_name)
                     if new_obj:
                         new_name = "Z" + new_name
                 print(new_name)
@@ -95,7 +95,7 @@ class RenameBox(utils.QWidget):
 
 
 class InitWorkspace:
-    def init_workspace(self,path = '/home/cellfinder_data',channel = 0):
+    def init_workspace(self, path = '/home/cellfinder_data', channel = 0):
         """Constructor"""
         if channel == 1:
             channel_str = "C01"
@@ -119,7 +119,7 @@ class InitWorkspace:
 
         if utils.os.path.exists(my_working_directory):
             self.my_working_directory = my_working_directory
-            print("Working dir:",self.my_working_directory)
+            print("Working dir:", self.my_working_directory)
             print("Channel chosen:", self.channel_chosen)
             return my_working_directory
         else:
@@ -156,10 +156,10 @@ class RenameLayout:
                     size_bool = False
                     string_pos = 0
 
-                    self.rename_box = RenameBox(first_filename,size_bool,string_pos,i)
+                    self.rename_box = RenameBox(first_filename, size_bool, string_pos,i)
                     self.rename_box.show()
 
-                    #self.rename_box.reject.clicked.connect(lambda: self.rename_box.update(False,self.rename_box.new_position))
+                    #self.rename_box.reject.clicked.connect(lambda: self.rename_box.update(False, self.rename_box.new_position))
                     self.rename_box.reject.clicked.connect(self.rename_box.update_layout)
                     self.rename_box.reject.clicked.connect(self.rename_box.repaint)
 
@@ -182,9 +182,9 @@ class RenameLayout:
         ws_path = utils.QLabel("/home/cellfinder_data")
         choose_ws = utils.QPushButton("Choose sample")
         channel_button = utils.QComboBox()
-        channel_button.insertItem(0,"")
-        channel_button.insertItem(1,"C01")
-        channel_button.insertItem(2,"C02")
+        channel_button.insertItem(0, "")
+        channel_button.insertItem(1, "C01")
+        channel_button.insertItem(2, "C02")
         set_ws = utils.QPushButton("Set workspace")
         rename_button1 = utils.QPushButton("Rename files in Auto")
         rename_button2 = utils.QPushButton("Rename files in Signal")
@@ -197,18 +197,18 @@ class RenameLayout:
             else:
                 ws_path.setText("")
 
-        inner_layout.addWidget(utils.QLabel("<b>Set Workspace:</b>"),0,0)
-        inner_layout.addWidget(utils.QLabel("Input path of interest:"),1,0)
-        inner_layout.addWidget(ws_path,1,1)
-        #inner_layout.addWidget(channel_button,1,2)
-        inner_layout.addWidget(set_ws,1,3)
-        inner_layout.addWidget(rename_button1,1,4)
-        inner_layout.addWidget(rename_button2,1,5)
-        inner_layout.addWidget(choose_ws,2,1)
-        inner_layout.addWidget(utils.QLabel("      "),3,0)
+        inner_layout.addWidget(utils.QLabel("<b>Set Workspace:</b>"), 0, 0)
+        inner_layout.addWidget(utils.QLabel("Input path of interest:"), 1, 0)
+        inner_layout.addWidget(ws_path, 1, 1)
+        #inner_layout.addWidget(channel_button, 1, 2)
+        inner_layout.addWidget(set_ws, 1, 3)
+        inner_layout.addWidget(rename_button1, 1, 4)
+        inner_layout.addWidget(rename_button2, 1, 5)
+        inner_layout.addWidget(choose_ws, 2, 1)
+        inner_layout.addWidget(utils.QLabel("      "), 3, 0)
 
         choose_ws.clicked.connect(lambda: choose_sample())
-        set_ws.clicked.connect(lambda: self.init_workspace(ws_path.text(),0))
+        set_ws.clicked.connect(lambda: self.init_workspace(ws_path.text(), 0))
         rename_button1.clicked.connect(lambda: rename_files(_path = self.my_working_directory, extend='/Auto'))
         rename_button2.clicked.connect(lambda: rename_files(_path = self.my_working_directory, extend='/Signal/' + self.channel_chosen))
 
