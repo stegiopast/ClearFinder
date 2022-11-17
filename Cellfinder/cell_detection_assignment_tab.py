@@ -16,9 +16,7 @@ def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
         trackedlevels[i].append(temp_name)
         correspondingLevel[i].append(int(df_temp["st_level"]))
         if not df_temp.empty:
-            while (int(df_temp["st_level"]) >= 0):
-                if (int(df_temp["st_level"]) == 0):
-                    break
+            while (int(df_temp["st_level"]) > 0):
                 df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])]
                 temp_name = df_temp["name"]
                 trackedlevels[i].append(temp_name)
@@ -106,9 +104,7 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
         resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
         resultframe.loc[index_outerCount[0], "RegionCellCountSummedUp"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
         if not df_temp.empty:
-            while (int(df_temp["st_level"]) >= 0):
-                if (int(df_temp["st_level"]) == 0):
-                    break  # While loop breaks if root structure is reached in hierarchical tree
+            while (int(df_temp["st_level"]) > 0):
                 df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region
                 temp_name = df_temp["name"] #Update name of parent region
                 index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
@@ -177,10 +173,11 @@ class CellDetection:
         ##Basic comman for cellfinder
         if self.my_working_directory != "":
             basic_string = "cellfinder "
-            if self.channel_chosen != "":
-                filepath = self.my_working_directory + "/Signal/" + str(self.channel_chosen)
-            else:
-                filepath = self.my_working_directory + "/Signal"
+            # Not used
+            #if self.channel_chosen != "":
+            #    filepath = self.my_working_directory + "/Signal/" + str(self.channel_chosen)
+            #else:
+            #    filepath = self.my_working_directory + "/Signal"
 
             if utils.os.path.exists(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"):
 
@@ -284,7 +281,7 @@ class CellDetectionLayout:
         gaussian_filter = utils.QLineEdit("0.2")
 
         ### Widget for trained model
-        path = ""
+        # path = ""
         trained_model = utils.QLabel()
         choose_model_button = utils.QPushButton("Choose model")
 

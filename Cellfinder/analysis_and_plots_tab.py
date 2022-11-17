@@ -2,46 +2,46 @@ import utils
 
 ## Contains all features of the analysis and plots tab
 
-class PlotWindow(utils.QDialog):     
+class PlotWindow(utils.QDialog):
     def __init__(self, parent=None):
         super(PlotWindow, self).__init__(parent)
-  
+
         # a figure instance to plot on
         self.figure = utils.plt.figure()
-  
+
         # this is the Canvas Widget that
         # displays the 'figure'it takes the
         # 'figure' instance as a parameter to __init__
         self.canvas = utils.FigureCanvas(self.figure)
-  
+
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = utils.NavigationToolbar(self.canvas, self)
-  
+
         # Just some button connected to 'plot' method
         # self.button = QPushButton('Plot')
-          
+
         # adding action to the button
         # self.button.clicked.connect(self.plot)
-  
+
         # creating a Vertical Box layout
         layout = utils.QVBoxLayout()
-          
+
         # adding tool bar to the layout
         layout.addWidget(self.toolbar)
-          
+
         # adding canvas to the layout
         layout.addWidget(self.canvas)
-          
+
         # adding push button to the layout
         #layout.addWidget(self.button)
-          
+
         # setting layout to the main window
         self.setLayout(layout)
 
 class AnalysisAndPlots:
     """Organization of the Analysis and Plots functionality"""
-    def analysis_layout(self):        
+    def analysis_layout(self):
         tab = utils.QWidget()
 
         outer_layout = utils.QVBoxLayout()
@@ -51,7 +51,7 @@ class AnalysisAndPlots:
         inner_layout2 = utils.QVBoxLayout()
         inner_layout3 = utils.QVBoxLayout()
         inner_layout4 = utils.QVBoxLayout()
-        inner_layout5 = utils.QVBoxLayout()       
+        inner_layout5 = utils.QVBoxLayout()
         inner_layout6 = utils.QHBoxLayout()
 
         input_file = utils.QLineEdit("")
@@ -62,27 +62,17 @@ class AnalysisAndPlots:
 
         metadata_file = utils.QLineEdit("")
         choose_metadata_file = utils.QPushButton("Choose metadata file")
-       
+
         PWindow = PlotWindow()
-               
+
         self.input_csv = utils.pd.DataFrame()
         self.metadata_csv = utils.pd.DataFrame()
         self.information_csv = utils.pd.DataFrame()
 
         filter_level_ComboBox = utils.QComboBox()
         filter_level_ComboBox.insertItem(0,"None")
-        filter_level_ComboBox.insertItem(1,"1")
-        filter_level_ComboBox.insertItem(2,"2")
-        filter_level_ComboBox.insertItem(3,"3")
-        filter_level_ComboBox.insertItem(4,"4")
-        filter_level_ComboBox.insertItem(5,"5")
-        filter_level_ComboBox.insertItem(6,"6")
-        filter_level_ComboBox.insertItem(7,"7")
-        filter_level_ComboBox.insertItem(8,"8")
-        filter_level_ComboBox.insertItem(9,"9")
-        filter_level_ComboBox.insertItem(10,"10")
-        filter_level_ComboBox.insertItem(11,"11")
-        filter_level_ComboBox.insertItem(12,"12")
+        for i in range(1, 13):
+            filter_level_ComboBox.insertItem(i, str(i))
 
         filter_region_LineEdit = utils.QLineEdit("")
 
@@ -146,7 +136,7 @@ class AnalysisAndPlots:
         create_heatmap.pressed.connect(lambda:heatmap())
         create_boxplot.pressed.connect(lambda:boxplot())
         set_input.pressed.connect(lambda: set_input_and_metadata())
-        
+
         def select_input_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose input file of interest")
             input_file.setText(path[0])
@@ -158,7 +148,7 @@ class AnalysisAndPlots:
         def select_information_file():
             path = utils.QFileDialog.getOpenFileName(self,"Choose metadata file of interest")
             input_information_file.setText(path[0])
-        
+
         def set_input_and_metadata():
             self.input_csv = utils.pd.read_csv(input_file.text(),sep=";",header = 0,index_col = 0)
             self.metadata_csv = utils.pd.read_csv(metadata_file.text(),sep=";",header = 0,index_col = 0)
@@ -167,21 +157,21 @@ class AnalysisAndPlots:
             print(self.metadata_csv)
             print(self.information_csv)
 
-        def pca():          
+        def pca():
             input_csv = self.input_csv.copy()
             input_csv = input_csv.reset_index(drop = True)
             input_csv = input_csv.loc[:,input_csv.columns != "Region"]
             input_csv = input_csv.dropna()
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             print(input_csv)
-            
+
             sample_names = list(input_csv.columns)
             input_csv = utils.np.array(input_csv.transpose())
             print(input_csv)
-                     
+
             metadata_csv = self.metadata_csv.copy()
             print(sample_names)
-           
+
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/PCA_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
 
@@ -199,26 +189,26 @@ class AnalysisAndPlots:
                 for j,val in enumerate(metadata_csv["sample"]):
                     if str(i) == str(val):
                         condition_array.append(list(metadata_csv["condition"])[j])
-            pc_df["Condition"] = condition_array            
+            pc_df["Condition"] = condition_array
 
             var_df = utils.pd.DataFrame({'var':pca.explained_variance_ratio_, 'PC':['PC1','PC2']})
             fig = utils.sns.lmplot( x="PC1", y="PC2",data=pc_df,fit_reg=False,hue='Condition',legend=True,scatter_kws={"s": 80})
 
             for i,txt in enumerate(pc_df["Cluster"]):
                 utils.plt.annotate(txt,(list(pc_df["PC1"])[i],list(pc_df["PC2"])[i]), ha = "center", va = "bottom")
-            
+
             utils.plt.savefig(output_dir + output_name)
             utils.plt.close()
 
             def hue_regplot(data, x, y, hue, palette=None, **kwargs):
-                from matplotlib.cm import get_cmap   
-                regplots = []    
+                from matplotlib.cm import get_cmap
+                regplots = []
                 levels = data[hue].unique()
-    
+
                 if palette is None:
                     default_colors = get_cmap('tab10')
                     palette = {k: default_colors(i) for i, k in enumerate(levels)}
-    
+
                 for key in levels:
                     regplots.append(
                         utils.sns.regplot(
@@ -229,17 +219,17 @@ class AnalysisAndPlots:
                             **kwargs
                         )
                     )
-                
+
                 for i,txt in enumerate(data["Cluster"]):
                     utils.plt.annotate(txt,(list(data["PC1"])[i],list(data["PC2"])[i]), ha = "center", va = "bottom")
-    
+
                 return regplots
 
             PWindow.figure.clear()
             ax = PWindow.figure.add_subplot(111)
             hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', ax=ax)
             PWindow.canvas.draw()
-            
+
         def heatmap():
             """Plot Heatmap"""
             input_csv = self.input_csv.copy()
@@ -253,10 +243,10 @@ class AnalysisAndPlots:
                     index_list = []
                     for i,val in enumerate(information["TrackedWay"]):
                         if region in val:
-                            index_list.append(i)  
+                            index_list.append(i)
                     input_csv = input_csv.iloc[index_list,:]
                     information = information.iloc[index_list,:]
-                    
+
                 else:
                     alert = utils.QMessageBox()
                     alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
@@ -274,7 +264,7 @@ class AnalysisAndPlots:
                 input_csv = input_csv.iloc[index_list,:]
                 information = information.iloc[index_list,:]
                 brainregion = "level_" + str(level)
-            
+
             brainregion = brainregion + "_heatmap"
 
             if input_csv.empty:
@@ -290,7 +280,7 @@ class AnalysisAndPlots:
 
             regions = input_csv.index.to_numpy()
             input_csv = input_csv.reset_index(drop = True)
-            
+
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
 
@@ -298,28 +288,28 @@ class AnalysisAndPlots:
             utils.plt.title(brainregion)
             utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
             utils.plt.close()
-            
+
             PWindow.figure.clear()
-            
+
             ax = PWindow.figure.add_subplot(111)
-            
+
             utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
             utils.plt.close()
-            
+
             PWindow.canvas.draw()
-            
-            
+
+
         def boxplot():
             input_csv = self.input_csv.copy()
             print(input_csv)
-            information = self.information_csv.copy()
+            # information = self.information_csv.copy()
             if filter_specific_region_LineEdit.text() != "":
                 region = filter_specific_region_LineEdit.text()
                 if region in input_csv.index:
                     input_csv = input_csv[input_csv.index == region]
-            
+
                 conditions = self.metadata_csv["condition"].unique()
-                
+
                 sample_names = list(input_csv.columns)
                 for i in sample_names:
                     cpm_name = i + "_processed"
@@ -337,9 +327,9 @@ class AnalysisAndPlots:
                         array_of_condition_samples = []
                         for k in range(len(input_csv.iloc[0, :])):
                             print(input_csv.columns[k])
-                            print(list([str(i) + "_processed" for i in list(metadata_list_tmp["sample"])]))
-                            if input_csv.columns[k] in list(
-                                    [str(i) + "_processed" for i in list(metadata_list_tmp["sample"])]):
+                            processed_list = list([str(l) + "_processed" for l in list(metadata_list_tmp["sample"])])
+                            print(processed_list)
+                            if input_csv.columns[k] in processed_list:
                                 array_of_cpms.append(input_csv.iloc[j, k])
                                 array_of_condition_samples.append(input_csv.columns[k])
                         if len(array_of_cpms) < 2:
@@ -358,7 +348,7 @@ class AnalysisAndPlots:
                     input_csv[str(i) + "_stdd"] = array_of_stdd
                     input_csv[str(i) + "_med"] = array_of_medians
                     input_csv[str(i) + "_single_values"] = array_of_single_values
-                
+
                 print(input_csv)
                 array_for_boxplots = []
 
@@ -380,16 +370,16 @@ class AnalysisAndPlots:
                     fig, ax = utils.plt.subplots()
                     ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
                     ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
-                    
+
                     region_name = str(region_name).replace(" ", "")
                     region_name = str(region_name).replace("/", "")
                     utils.plt.title(region)
-                
+
                 output_dir = utils.os.path.dirname(input_file.text())
                 output_name = "/" + region + "_boxplot_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
                 utils.plt.savefig( output_dir + output_name, bbox_inches='tight')
                 utils.plt.close
-                
+
                 PWindow.figure.clear()
                 ax2 = PWindow.figure.add_subplot(111)
                 utils.sns.boxplot(x="condition", y=method, data=df_boxplot,ax = ax2)

@@ -10,13 +10,12 @@ class Preprocessing:
             filepath = self.my_working_directory;
             print(filepath)
             print(utils.os.path.exists(filepath))
-            filepath_auto = str(filepath + '/Auto/') 
+            filepath_auto = str(filepath + '/Auto/')
             print(filepath_auto)
-            if self.channel_chosen == "":
-                filepath_signal = str(filepath + '/Signal/')
-                print(filepath_signal)
-            else:
-                filepath_signal = str(filepath + '/Signal/' + self.channel_chosen + '/')
+            filepath_signal = str(filepath + '/Signal/')
+            if self.channel_chosen != "":
+                filepath_signal = filepath_signal + self.channel_chosen + '/'
+            print(filepath_signal)
 
             filenames_auto = []
             filenames_signal = []
@@ -28,7 +27,7 @@ class Preprocessing:
                 filenames_signal = files
 
             print(len(filenames_auto),len(filenames_signal))
-            
+
             filenames_auto = utils.natsorted(filenames_auto, reverse = False)
             filenames_signal = utils.natsorted(filenames_signal, reverse = False)
 
@@ -38,13 +37,13 @@ class Preprocessing:
                 difference = abs(len(filenames_auto) - len(filenames_signal))
                 if len(filenames_auto) > len(filenames_signal):
                     longer_array = filenames_auto
-                    shorter_array = filenames_signal
+                    # shorter_array = filenames_signal
                     longer_str = "/Auto"
                 else:
                     longer_array = filenames_signal
-                    shorter_array = filenames_auto
+                    # shorter_array = filenames_auto
                     longer_str = "/Signal"
-        
+
                 print(longer_array)
 
                 if (difference % 2) == 0:
@@ -53,9 +52,10 @@ class Preprocessing:
                 else:
                     front = difference // 2 + 1
                     back = difference // 2
-        
-                if not utils.os.path.exists(filepath + longer_str +"_moved"):
-                    utils.os.mkdir(filepath +  longer_str + "_moved")
+
+                moved_filepath = filepath + longer_str +"_moved"
+                if not utils.os.path.exists(moved_filepath):
+                    utils.os.mkdir(moved_filepath)
                 else:
                     print("File existed")
 
@@ -76,9 +76,9 @@ class Preprocessing:
             else:
                 print("Lengths are equal\n")
 
-            counter = 0
+            flag = True
             for i,j in zip(filenames_auto,filenames_signal):
-               
+
                 #im1 = img_as_uint(filepath_auto + i)
                 #im2 = img_as_uint(filepath_auto + j)
 
@@ -90,7 +90,7 @@ class Preprocessing:
 
                     pixel_growth_x_signal = im2.size[0] / 2050#im1.size[0]
                     pixel_growth_y_signal = im2.size[1] / 3500#im1.size[1]
-            
+
                     pixel_growth_x_auto = im1.size[0] / 2050
                     pixel_growth_y_auto = im1.size[1] / 3500
 
@@ -98,98 +98,73 @@ class Preprocessing:
                     print("Image2 size",im2.size)
                     #new_signal_size_x =  (im1.size[0] / im2.size[0]) * im2.size[0]
                     #new_signal_size_y = (im1.size[1] / im2.size[1]) * im2.size[1]
-            
+
                     new_size = (3500,2050)
-                        
+
                     im1 = utils.np.asarray(im1)
-                    im2 = utils.np.asarray(im2)             
-            
+                    im2 = utils.np.asarray(im2)
+
                     print("Image1 old shape: ", im1.shape)
                     print("Image2 old shape: ", im2.shape)
-            
+
                     im1 = utils.resize(im1,new_size)
-                    im2 = utils.resize(im2,new_size)   
-        
+                    im2 = utils.resize(im2,new_size)
+
                     print("Image 1 new shape: ", im1.shape)
                     print("Image 2 new shape: ", im2.shape)
 
                     im1 = utils.img_as_uint(im1)
                     im2 = utils.img_as_uint(im2)
-                        
+
                     im1 = utils.Image.fromarray(im1)
                     im2 = utils.Image.fromarray(im2)
-            
+
                     print("Image 1 new size",im1.size)
                     print("Image 2 new size",im2.size)
-            
+
                     im1.save(filepath_auto + i)
                     im2.save(filepath_signal + j)
-            
-                    if counter < 1:
-                        if not utils.os.path.exists(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"):
 
-                            utils.os.mkdir(self.my_working_directory + "/" + self.channel_chosen + "_voxel_size_signal")
-            
-                            voxel_filepath = self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"
+                if flag:
+                    voxel_filepath = self.my_working_directory + "/" + self.channel_chosen + "_voxel_size_signal"
+                    if not utils.os.path.exists(voxel_filepath):
+                        utils.os.mkdir(voxel_filepath)
+
+                        if im1.size != im2.size:
                             new_voxel_size_x = _voxel_size_signal_x * pixel_growth_x_signal
                             new_voxel_size_y = _voxel_size_signal_y * pixel_growth_y_signal
-                            new_voxel_size_z = _voxel_size_signal_z 
-
-                            with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
-                                file.write(str(new_voxel_size_x))
-                                file.write(",")
-                                file.write(str(new_voxel_size_y))
-                                file.write(",")
-                                file.write(str(new_voxel_size_z))
-                
-                        if not utils.os.path.exists(self.my_working_directory+"/voxel_size_auto"):
-                            utils.os.mkdir(self.my_working_directory + "/voxel_size_auto")
-            
-                            voxel_filepath = self.my_working_directory+ "/voxel_size_auto";
-                            new_voxel_size_x = _voxel_size_auto_x * pixel_growth_x_auto
-                            new_voxel_size_y = _voxel_size_auto_y * pixel_growth_y_auto
-                            new_voxel_size_z = _voxel_size_auto_z
-
-                            with open(voxel_filepath+"/voxel_sizes.txt", "w") as file:
-                                file.write(str(new_voxel_size_x))
-                                file.write(",")
-                                file.write(str(new_voxel_size_y))
-                                file.write(",")
-                                file.write(str(new_voxel_size_z))
-
-                else:
-                    if counter < 1:
-                        if not utils.os.path.exists(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"):
-                            utils.os.mkdir(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal")
-            
-                            voxel_filepath = self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal";
+                        else:
                             new_voxel_size_x = _voxel_size_signal_x
                             new_voxel_size_y = _voxel_size_signal_y
-                            new_voxel_size_z = _voxel_size_signal_z
+                        new_voxel_size_z = _voxel_size_signal_z
 
-                            with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
-                                file.write(str(new_voxel_size_x))
-                                file.write(",")
-                                file.write(str(new_voxel_size_y))
-                                file.write(",")
-                                file.write(str(new_voxel_size_z))
-                
-                        if not utils.os.path.exists(self.my_working_directory+"/voxel_size_auto"):
-                            utils.os.mkdir(self.my_working_directory + "/voxel_size_auto")
-            
-                            voxel_filepath = self.my_working_directory+"/voxel_size_auto";
+                        with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
+                            file.write(str(new_voxel_size_x))
+                            file.write(",")
+                            file.write(str(new_voxel_size_y))
+                            file.write(",")
+                            file.write(str(new_voxel_size_z))
+
+                    voxel_filepath = self.my_working_directory + "/voxel_size_auto"
+                    if not utils.os.path.exists(voxel_filepath):
+                        utils.os.mkdir(voxel_filepath)
+
+                        if im1.size != im2.size:
+                            new_voxel_size_x = _voxel_size_auto_x * pixel_growth_x_auto
+                            new_voxel_size_y = _voxel_size_auto_y * pixel_growth_y_auto
+                        else:
                             new_voxel_size_x = _voxel_size_auto_x
                             new_voxel_size_y = _voxel_size_auto_y
-                            new_voxel_size_z = _voxel_size_auto_z
+                        new_voxel_size_z = _voxel_size_auto_z
 
-                            with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
-                                file.write(str(new_voxel_size_x))
-                                file.write(",")
-                                file.write(str(new_voxel_size_y))
-                                file.write(",")
-                                file.write(str(new_voxel_size_z))
+                        with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
+                            file.write(str(new_voxel_size_x))
+                            file.write(",")
+                            file.write(str(new_voxel_size_y))
+                            file.write(",")
+                            file.write(str(new_voxel_size_z))
 
-                counter += 1
+                flag = False
                 print("Finished work!")
 
         else:
@@ -197,7 +172,7 @@ class Preprocessing:
 
 
 class PreprocessingLayout:
-    def preprocess_layout(self):            
+    def preprocess_layout(self):
         tab = utils.QWidget()
         outer_layout = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
@@ -214,34 +189,34 @@ class PreprocessingLayout:
 
         ### Visualization of Widgets for preprocessing tab on GUI
         inner_layout.addWidget(utils.QLabel("<b>Insert voxel sizes: <\b>"),0,0)
-        
+
         inner_layout.addWidget(utils.QLabel("Voxel size Signal X:"),1,0)
         inner_layout.addWidget(voxel_size_signal_x,1,1)
-        
+
         inner_layout.addWidget(utils.QLabel("Voxel size Signal Y:"),2,0)
         inner_layout.addWidget(voxel_size_signal_y,2,1)
-        
+
         inner_layout.addWidget(utils.QLabel("Voxel Size Signal Z:"),3,0)
         inner_layout.addWidget(voxel_size_signal_z,3,1)
 
         inner_layout.addWidget(utils.QLabel("Voxel size Auto X:"),4,0)
         inner_layout.addWidget(voxel_size_auto_x,4,1)
-        
+
         inner_layout.addWidget(utils.QLabel("Voxel size Auto Y:"),5,0)
         inner_layout.addWidget(voxel_size_auto_y,5,1)
-        
+
         inner_layout.addWidget(utils.QLabel("Voxel Size Auto Z:"),6,0)
         inner_layout.addWidget(voxel_size_auto_z,6,1)
 
-        
+
         inner_layout.addWidget(start_preprocess_button,7,0)
-   
-        ### Connection of button and preprocessing function 
+
+        ### Connection of button and preprocessing function
         start_preprocess_button.pressed.connect(lambda: self.resize_pictures(_voxel_size_signal_x = float(voxel_size_signal_x.text()),
                                                                              _voxel_size_signal_y = float(voxel_size_signal_y.text()),
                                                                              _voxel_size_signal_z = float(voxel_size_signal_z.text()),
                                                                              _voxel_size_auto_x = float(voxel_size_auto_x.text()),
-                                                                             _voxel_size_auto_y = float(voxel_size_auto_y.text()), 
+                                                                             _voxel_size_auto_y = float(voxel_size_auto_y.text()),
                                                                              _voxel_size_auto_z = float(voxel_size_auto_z.text())))
 
         outer_layout.addLayout(inner_layout)
