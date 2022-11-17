@@ -1,10 +1,10 @@
 import utils
 
-## Contains all features of the grouping and normalization tab
+# Contains all features of the grouping and normalization tab
 
 class Preprocessing:
-    def resize_pictures(self, _voxel_size_signal_x=5,_voxel_size_signal_y=2,_voxel_size_signal_z=2,
-                              _voxel_size_auto_x = 5,_voxel_size_auto_y = 2,_voxel_size_auto_z = 2):
+    def resize_pictures(self, _voxel_size_signal_x=5, _voxel_size_signal_y=2, _voxel_size_signal_z=2, 
+                              _voxel_size_auto_x=5, _voxel_size_auto_y=2, _voxel_size_auto_z=2):
 
         if self.my_working_directory != "":
             filepath = self.my_working_directory;
@@ -28,8 +28,8 @@ class Preprocessing:
 
             print(len(filenames_auto),len(filenames_signal))
 
-            filenames_auto = utils.natsorted(filenames_auto, reverse = False)
-            filenames_signal = utils.natsorted(filenames_signal, reverse = False)
+            filenames_auto = utils.natsorted(filenames_auto, reverse=False)
+            filenames_signal = utils.natsorted(filenames_signal, reverse=False)
 
             #print("Filenames Auto ",filenames_auto,"\nFilenames Signal:",filenames_signal)
 
@@ -94,8 +94,8 @@ class Preprocessing:
                     pixel_growth_x_auto = im1.size[0] / 2050
                     pixel_growth_y_auto = im1.size[1] / 3500
 
-                    print("Image 1 size",im1.size)
-                    print("Image2 size",im2.size)
+                    print("Image 1 size", im1.size)
+                    print("Image2 size", im2.size)
                     #new_signal_size_x =  (im1.size[0] / im2.size[0]) * im2.size[0]
                     #new_signal_size_y = (im1.size[1] / im2.size[1]) * im2.size[1]
 
@@ -119,8 +119,8 @@ class Preprocessing:
                     im1 = utils.Image.fromarray(im1)
                     im2 = utils.Image.fromarray(im2)
 
-                    print("Image 1 new size",im1.size)
-                    print("Image 2 new size",im2.size)
+                    print("Image 1 new size", im1.size)
+                    print("Image 2 new size", im2.size)
 
                     im1.save(filepath_auto + i)
                     im2.save(filepath_signal + j)
@@ -188,28 +188,28 @@ class PreprocessingLayout:
         start_preprocess_button = utils.QPushButton("Start Preprocessing")
 
         ### Visualization of Widgets for preprocessing tab on GUI
-        inner_layout.addWidget(utils.QLabel("<b>Insert voxel sizes: <\b>"),0,0)
+        inner_layout.addWidget(utils.QLabel("<b>Insert voxel sizes: <\b>"), 0, 0)
 
-        inner_layout.addWidget(utils.QLabel("Voxel size Signal X:"),1,0)
-        inner_layout.addWidget(voxel_size_signal_x,1,1)
+        inner_layout.addWidget(utils.QLabel("Voxel size Signal X:"), 1, 0)
+        inner_layout.addWidget(voxel_size_signal_x, 1, 1)
 
-        inner_layout.addWidget(utils.QLabel("Voxel size Signal Y:"),2,0)
-        inner_layout.addWidget(voxel_size_signal_y,2,1)
+        inner_layout.addWidget(utils.QLabel("Voxel size Signal Y:"), 2, 0)
+        inner_layout.addWidget(voxel_size_signal_y, 2, 1)
 
-        inner_layout.addWidget(utils.QLabel("Voxel Size Signal Z:"),3,0)
-        inner_layout.addWidget(voxel_size_signal_z,3,1)
+        inner_layout.addWidget(utils.QLabel("Voxel Size Signal Z:"), 3, 0)
+        inner_layout.addWidget(voxel_size_signal_z, 3, 1)
 
-        inner_layout.addWidget(utils.QLabel("Voxel size Auto X:"),4,0)
-        inner_layout.addWidget(voxel_size_auto_x,4,1)
+        inner_layout.addWidget(utils.QLabel("Voxel size Auto X:"), 4, 0)
+        inner_layout.addWidget(voxel_size_auto_x, 4, 1)
 
-        inner_layout.addWidget(utils.QLabel("Voxel size Auto Y:"),5,0)
-        inner_layout.addWidget(voxel_size_auto_y,5,1)
+        inner_layout.addWidget(utils.QLabel("Voxel size Auto Y:"), 5, 0)
+        inner_layout.addWidget(voxel_size_auto_y, 5, 1)
 
-        inner_layout.addWidget(utils.QLabel("Voxel Size Auto Z:"),6,0)
-        inner_layout.addWidget(voxel_size_auto_z,6,1)
+        inner_layout.addWidget(utils.QLabel("Voxel Size Auto Z:"), 6, 0)
+        inner_layout.addWidget(voxel_size_auto_z, 6, 1)
 
 
-        inner_layout.addWidget(start_preprocess_button,7,0)
+        inner_layout.addWidget(start_preprocess_button, 7, 0)
 
         ### Connection of button and preprocessing function
         start_preprocess_button.pressed.connect(lambda: self.resize_pictures(_voxel_size_signal_x = float(voxel_size_signal_x.text()),
