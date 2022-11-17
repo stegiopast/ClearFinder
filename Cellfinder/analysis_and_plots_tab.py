@@ -70,7 +70,7 @@ class AnalysisAndPlots:
         self.information_csv = utils.pd.DataFrame()
 
         filter_level_ComboBox = utils.QComboBox()
-        filter_level_ComboBox.insertItem(0,"None")
+        filter_level_ComboBox.insertItem(0, "None")
         for i in range(1, 13):
             filter_level_ComboBox.insertItem(i, str(i))
 
@@ -85,16 +85,16 @@ class AnalysisAndPlots:
         create_heatmap = utils.QPushButton("Heatmap")
         create_boxplot = utils.QPushButton("Boxplot")
 
-        inner_layout.addWidget(utils.QLabel("<b>Input file</b>"),0,0)
-        inner_layout.addWidget(input_file,0,1)
-        inner_layout.addWidget(choose_input_file,0,2)
-        inner_layout.addWidget(utils.QLabel("<b>Metadata file</b>"),1,0)
+        inner_layout.addWidget(utils.QLabel("<b>Input file</b>"), 0, 0)
+        inner_layout.addWidget(input_file, 0, 1)
+        inner_layout.addWidget(choose_input_file, 0, 2)
+        inner_layout.addWidget(utils.QLabel("<b>Metadata file</b>"), 1, 0)
         inner_layout.addWidget(metadata_file,1,1)
-        inner_layout.addWidget(choose_metadata_file,1,2)
-        inner_layout.addWidget(utils.QLabel("<b>Information file</b>"),2,0)
-        inner_layout.addWidget(input_information_file,2,1)
-        inner_layout.addWidget(choose_information_file,2,2)
-        inner_layout.addWidget(set_input,3,0)
+        inner_layout.addWidget(choose_metadata_file, 1, 2)
+        inner_layout.addWidget(utils.QLabel("<b>Information file</b>"), 2, 0)
+        inner_layout.addWidget(input_information_file, 2, 1)
+        inner_layout.addWidget(choose_information_file, 2, 2)
+        inner_layout.addWidget(set_input, 3, 0)
 
         inner_layout2.addWidget(utils.QLabel("<b>PCA</b>"))
         inner_layout2.addWidget(create_pca)
@@ -138,21 +138,21 @@ class AnalysisAndPlots:
         set_input.pressed.connect(lambda: set_input_and_metadata())
 
         def select_input_file():
-            path = utils.QFileDialog.getOpenFileName(self,"Choose input file of interest")
+            path = utils.QFileDialog.getOpenFileName(self, "Choose input file of interest")
             input_file.setText(path[0])
 
         def select_metadata_file():
-            path = utils.QFileDialog.getOpenFileName(self,"Choose metadata file of interest")
+            path = utils.QFileDialog.getOpenFileName(self, "Choose metadata file of interest")
             metadata_file.setText(path[0])
 
         def select_information_file():
-            path = utils.QFileDialog.getOpenFileName(self,"Choose metadata file of interest")
+            path = utils.QFileDialog.getOpenFileName(self, "Choose metadata file of interest")
             input_information_file.setText(path[0])
 
         def set_input_and_metadata():
-            self.input_csv = utils.pd.read_csv(input_file.text(),sep=";",header = 0,index_col = 0)
-            self.metadata_csv = utils.pd.read_csv(metadata_file.text(),sep=";",header = 0,index_col = 0)
-            self.information_csv = utils.pd.read_csv(input_information_file.text(),sep=";",header=0, index_col=0)
+            self.input_csv = utils.pd.read_csv(input_file.text(), sep=";", header = 0, index_col = 0)
+            self.metadata_csv = utils.pd.read_csv(metadata_file.text(), sep=";", header = 0, index_col = 0)
+            self.information_csv = utils.pd.read_csv(input_information_file.text(), sep=";", header=0, index_col=0)
             print(self.input_csv)
             print(self.metadata_csv)
             print(self.information_csv)
@@ -191,11 +191,11 @@ class AnalysisAndPlots:
                         condition_array.append(list(metadata_csv["condition"])[j])
             pc_df["Condition"] = condition_array
 
-            var_df = utils.pd.DataFrame({'var':pca.explained_variance_ratio_, 'PC':['PC1','PC2']})
-            fig = utils.sns.lmplot( x="PC1", y="PC2",data=pc_df,fit_reg=False,hue='Condition',legend=True,scatter_kws={"s": 80})
+            var_df = utils.pd.DataFrame({'var':pca.explained_variance_ratio_, 'PC':['PC1', 'PC2']})
+            fig = utils.sns.lmplot( x="PC1", y="PC2",data=pc_df,fit_reg=False, hue='Condition', legend=True,scatter_kws={"s": 80})
 
             for i,txt in enumerate(pc_df["Cluster"]):
-                utils.plt.annotate(txt,(list(pc_df["PC1"])[i],list(pc_df["PC2"])[i]), ha = "center", va = "bottom")
+                utils.plt.annotate(txt, (list(pc_df["PC1"])[i], list(pc_df["PC2"])[i]), ha = "center", va = "bottom")
 
             utils.plt.savefig(output_dir + output_name)
             utils.plt.close()
@@ -221,7 +221,7 @@ class AnalysisAndPlots:
                     )
 
                 for i,txt in enumerate(data["Cluster"]):
-                    utils.plt.annotate(txt,(list(data["PC1"])[i],list(data["PC2"])[i]), ha = "center", va = "bottom")
+                    utils.plt.annotate(txt, (list(data["PC1"])[i], list(data["PC2"])[i]), ha = "center", va = "bottom")
 
                 return regplots
 
@@ -261,8 +261,8 @@ class AnalysisAndPlots:
                     array = eval(val)
                     if level == array[0]:
                         index_list.append(i)
-                input_csv = input_csv.iloc[index_list,:]
-                information = information.iloc[index_list,:]
+                input_csv = input_csv.iloc[index_list, :]
+                information = information.iloc[index_list, :]
                 brainregion = "level_" + str(level)
 
             brainregion = brainregion + "_heatmap"
@@ -274,7 +274,7 @@ class AnalysisAndPlots:
                 return
 
             input_csv = input_csv.dropna()
-            input_csv = input_csv.loc[:,input_csv.columns != "Region"]
+            input_csv = input_csv.loc[:, input_csv.columns != "Region"]
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             input_csv = input_csv.loc[(input_csv!=0).any(axis=1)]
 
@@ -315,7 +315,6 @@ class AnalysisAndPlots:
                     cpm_name = i + "_processed"
                     input_csv[cpm_name] = input_csv[i]
 
-                # n³ !! danger danger
                 for i in conditions:
                     array_of_means = []
                     array_of_stdd = []
@@ -357,7 +356,7 @@ class AnalysisAndPlots:
 
                     data = utils.np.concatenate(spread)
                     array_for_boxplots.append(data)
-                print("Array for boxplots\n",array_for_boxplots)
+                print("Array for boxplots\n", array_for_boxplots)
 
                 df_boxplot = utils.pd.DataFrame()
 
@@ -377,12 +376,12 @@ class AnalysisAndPlots:
 
                 output_dir = utils.os.path.dirname(input_file.text())
                 output_name = "/" + region + "_boxplot_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
-                utils.plt.savefig( output_dir + output_name, bbox_inches='tight')
+                utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
                 utils.plt.close
 
                 PWindow.figure.clear()
                 ax2 = PWindow.figure.add_subplot(111)
-                utils.sns.boxplot(x="condition", y=method, data=df_boxplot,ax = ax2)
+                utils.sns.boxplot(x="condition", y=method, data=df_boxplot, ax = ax2)
                 utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax = ax2)
                 PWindow.canvas.draw()
         return tab
