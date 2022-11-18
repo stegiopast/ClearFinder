@@ -35,7 +35,7 @@ class Resampling_Alignment:
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=self.slicing,
                                                                                       orientation=(orientation_x, orientation_y, orientation_z),
                                                                                       overwrite=False,
-                                                                                      verbose=True);
+                                                                                      verbose=True)
 
         align_channels_affine_file = utils.io.join(resourcesDirectory, 'Alignment/align_affine.txt')
         align_reference_affine_file = utils.io.join(resourcesDirectory, 'Alignment/align_affine.txt')
@@ -44,10 +44,10 @@ class Resampling_Alignment:
         resample_parameter = {"source_resolution": (source_res_x, source_res_y, source_res_z),  # Resolution of your own files!
                               "sink_resolution": (sink_res_x, sink_res_y, sink_res_z),
                               "processes": 4,
-                              "verbose": True};
+                              "verbose": True}
 
-        source = self.ws.source('raw_' + self.chosenChannel);
-        sink = self.ws.filename('stitched_' + self.chosenChannel);
+        source = self.ws.source('raw_' + self.chosenChannel)
+        sink = self.ws.filename('stitched_' + self.chosenChannel)
         utils.io.convert(source, sink, verbose=True)
         
         utils.res.resample(self.ws.filename('stitched_' + self.chosenChannel),
@@ -56,7 +56,7 @@ class Resampling_Alignment:
         resample_parameter_auto = {"source_resolution": (auto_source_res_x, auto_source_res_y, auto_source_res_z),
                                    "sink_resolution": (auto_sink_res_x, auto_sink_res_y, auto_sink_res_z),
                                    "processes": 4,
-                                   "verbose": True};
+                                   "verbose": True}
 
         utils.res.resample(self.ws.filename('autofluorescence'),
                      sink=self.ws.filename('resampled_' + self.chosenChannel,postfix='autofluorescence'),
@@ -74,10 +74,10 @@ class Resampling_Alignment:
             # directory of the alig'/home/nicolas.renier/Documents/ClearMap_Ressources/Par0000affine.txt',nment result
             # "result_directory" :  "/raid/CellRegistration_Margaryta/ClearMap1_2/ClearMap2/elastix_resampled_to_auto"
             "result_directory": self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel
-        };
+        }
 
         # first alginment !
-        utils.elx.align(**align_channels_parameter);
+        utils.elx.align(**align_channels_parameter)
 
         align_reference_parameter = {
             # moving and reference images
@@ -89,8 +89,8 @@ class Resampling_Alignment:
             "bspline_parameter_file": align_reference_bspline_file,
             # directory of the alignment result
             "result_directory": self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel
-        };
-        utils.elx.align(**align_reference_parameter);
+        }
+        utils.elx.align(**align_reference_parameter)
         return
 
 

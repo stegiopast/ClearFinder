@@ -102,8 +102,8 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
         resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
         resultframe.loc[index_outerCount[0], "RegionCellCountSummedUp"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
         if not df_temp.empty:
-            while (int(df_temp["st_level"]) >= 0):
-                if (int(df_temp["st_level"]) == 0):
+            while int(df_temp["st_level"]) >= 0:
+                if int(df_temp["st_level"]) == 0:
                     break  # While loop breaks if root structure is reached in hierarchical tree
                 df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region
                 temp_name = df_temp["name"] #Update name of parent region
@@ -131,7 +131,7 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
         file.write('      <Type>1</Type>\n')
         for i in range(len(df.iloc[:, 0])):
             row_counter = row_counter + 1
-            if (row_counter % 10000 == 0):
+            if row_counter % 10000 == 0:
                 print(str(row_counter), "/", str(dfLength), " lines are processed")
             file.write('      <Marker>\n')
             file.write('        <MarkerX>' + str(df.iloc[i, :].x) + '</MarkerX>\n')
@@ -223,7 +223,7 @@ def processCellsCsv(myWorkingDirectory, chosenChannel):
 """
 #calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
 """
-# check from where workinDir and chosen channel is coming from 
+#check from where workinDir and chosen channel is coming from
 def embedOntology(myWorkingDirectory, chosenChannel):
     # Reads ontology file holding the reference region dictionairy
     reference_df = utils.pd.read_csv("ontology_mouse.csv",
@@ -347,7 +347,7 @@ class Cell_Detection:
         threshold_maxima_det = None
 
         # conversion of intensity detection values
-        measure_intensity_det = ['source', 'illumination', 'background', 'equalized', 'dog'];
+        measure_intensity_det = ['source', 'illumination', 'background', 'equalized', 'dog']
 
         if method_intensity_det == 0:
             method_intensity_det = 'mean'
@@ -356,7 +356,7 @@ class Cell_Detection:
 
         # Conversion of Shape detection values
         threshold_shape_det = int(threshold_shape_det)
-        cell_detection_parameter = utils.cells.default_cell_detection_parameter.copy();
+        cell_detection_parameter = utils.cells.default_cell_detection_parameter.copy()
 
         ## Options illumination_correction
         cell_detection_parameter['iullumination_correction']['flatfield'] = flatfield_illumination  # A default flatfield is provided // Array or str with flatfield estimate
@@ -390,16 +390,16 @@ class Cell_Detection:
                                                                  shape_maxima_det_z)  # Shape of the structural element. Near typical cell size. // tuple(int, int)
 
         ## Intensity_detection
-        cell_detection_parameter['intensity_detection']['measure'] = measure_intensity_det;  # we decided to measure all intensities
+        cell_detection_parameter['intensity_detection']['measure'] = measure_intensity_det  # we decided to measure all intensities
         cell_detection_parameter['intensity_detection']['method'] = method_intensity_det  # {'max'|'min','mean'|'sum'} # Use method to measure intensity of the cell
 
         ## Shape_detection
-        cell_detection_parameter['shape_detection']['threshold'] = threshold_shape_det;
+        cell_detection_parameter['shape_detection']['threshold'] = threshold_shape_det
 
         ## Self edited threshold
         #cell_detection_parameter['threshold'] = threshold_maxima_det
 
-        processing_parameter = utils.cells.default_cell_detection_processing_parameter.copy();
+        processing_parameter = utils.cells.default_cell_detection_processing_parameter.copy()
         processing_parameter.update(processes=amount_processes,  # 15, #20,
                                     #optimization = True,  #Todo: Why commented?
                                     size_max=size_maximum,  # 35 100
