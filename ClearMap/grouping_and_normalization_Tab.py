@@ -1,7 +1,7 @@
 import utils
 
 
-class _Preanalysis_and_Normalization:
+class Preanalysis_And_Normalization:
 
     def preanalysis_layout(self):
         tab = utils.QWidget()
@@ -19,17 +19,17 @@ class _Preanalysis_and_Normalization:
         make_analysis_data = utils.QPushButton("Create analysis data (absolute values)")
 
         #Widgets for inner Layout2
-        choose_log_transformation_ComboBox = utils.QComboBox()
-        choose_log_transformation_ComboBox.insertItem(0, "None")
-        choose_log_transformation_ComboBox.insertItem(1, "log_10")
-        choose_log_transformation_ComboBox.insertItem(2, "log_2")
+        choose_log_transformation_combobox = utils.QComboBox()
+        choose_log_transformation_combobox.insertItem(0, "None")
+        choose_log_transformation_combobox.insertItem(1, "log_10")
+        choose_log_transformation_combobox.insertItem(2, "log_2")
 
         # selecting ComboBox
-        choose_normalization_ComboBox = utils.QComboBox()
-        choose_normalization_ComboBox.insertItem(0,"None")
-        choose_normalization_ComboBox.insertItem(1,"Counts per million")
-        choose_normalization_ComboBox.insertItem(2,"Median of ratio")
-        #choose_normalization_ComboBox.insertItem(3,"Percentile normalization (0.05,0.95)")
+        choose_normalization_combobox = utils.QComboBox()
+        choose_normalization_combobox.insertItem(0,"None")
+        choose_normalization_combobox.insertItem(1,"Counts per million")
+        choose_normalization_combobox.insertItem(2,"Median of ratio")
+        #choose_normalization_combobox.insertItem(3,"Percentile normalization (0.05,0.95)")
 
         filter_normalization_button = utils.QPushButton("Log Transform | Normalize | Filter ")
 
@@ -55,9 +55,9 @@ class _Preanalysis_and_Normalization:
 
         inner_layout2.addWidget(utils.QLabel("<b>Normalization</b>"))
         inner_layout2.addWidget(utils.QLabel("Normalization"))
-        inner_layout2.addWidget(choose_normalization_ComboBox)
+        inner_layout2.addWidget(choose_normalization_combobox)
         inner_layout2.addWidget(utils.QLabel("Choose log transformation or None"))
-        inner_layout2.addWidget(choose_log_transformation_ComboBox)
+        inner_layout2.addWidget(choose_log_transformation_combobox)
 
         for _ in range(4):
             inner_layout2.addWidget(utils.QLabel("                                          "))
@@ -154,7 +154,7 @@ class _Preanalysis_and_Normalization:
                 df_abs_filename = "absolute_counts.csv"
                 df_hier_abs_filename = "hierarchical_absolute_counts.csv"
 
-                if choose_normalization_ComboBox.currentText() == "Counts per million":
+                if choose_normalization_combobox.currentText() == "Counts per million":
                     print("Running counts per million normalization")
 
                     sum_df_abs = df_abs.sum()
@@ -164,7 +164,7 @@ class _Preanalysis_and_Normalization:
                     df_abs_filename = "cpm_norm_" + df_abs_filename
                     df_hier_abs_filename = "cpm_norm_" + df_hier_abs_filename
 
-                elif choose_normalization_ComboBox.currentText() == "Median of ratio":
+                elif choose_normalization_combobox.currentText() == "Median of ratio":
                     print("Running Median of ratio normalization")
 
                     df_abs_rowmean = df_abs.mean(axis = 1)
@@ -189,7 +189,7 @@ class _Preanalysis_and_Normalization:
                     df_abs_filename = "mor_norm_" + df_abs_filename
                     df_hier_abs_filename = "mor_norm_" + df_hier_abs_filename
 
-                if choose_log_transformation_ComboBox.currentText() == "log_2":
+                if choose_log_transformation_combobox.currentText() == "log_2":
                     print("Running log2 transformation")
 
                     df_abs = utils.np.log2(df_abs)
@@ -198,7 +198,7 @@ class _Preanalysis_and_Normalization:
                     df_abs_filename = "log2_" + df_abs_filename
                     df_hier_abs_filename = "log2_" + df_hier_abs_filename
 
-                elif choose_log_transformation_ComboBox.currentText() == "log_10":
+                elif choose_log_transformation_combobox.currentText() == "log_10":
                     df_abs = utils.np.log10(df_abs)
                     df_hier_abs = utils.np.log10(df_hier_abs)
 

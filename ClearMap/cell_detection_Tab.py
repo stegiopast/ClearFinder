@@ -1,30 +1,30 @@
 import utils
 
 
-def createTrackingList(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
-    reference_df_ID = dataframe.set_index(dataframe["id"])
-    reference_df_Name = dataframe.set_index(dataframe["name"])
+def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
+    reference_df_id = dataframe.set_index(dataframe["id"])
+    reference_df_name = dataframe.set_index(dataframe["name"])
 
     trackedlevels = [[] for x in range(dataframe.shape[0])]
-    correspondingLevel = [[] for x in range(dataframe.shape[0])]
+    corresponding_level = [[] for x in range(dataframe.shape[0])]
 
     for i in range(len(dataframe)):
         name = dataframe.iloc[i, 4]  # iterate over all rows of "names'
-        df_temp = reference_df_Name.loc[name]
+        df_temp = reference_df_name.loc[name]
         temp_name = df_temp["name"]
 
         trackedlevels[i].append(temp_name)
-        correspondingLevel[i].append(int(df_temp["st_level"]))
+        corresponding_level[i].append(int(df_temp["st_level"]))
         if not df_temp.empty:
-            while (int(df_temp["st_level"]) >= 0):
-                if (int(df_temp["st_level"]) == 0):
+            while int(df_temp["st_level"]) >= 0:
+                if int(df_temp["st_level"]) == 0:
                     break
-                df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])]
+                df_temp = reference_df_id.loc[int(df_temp["parent_structure_id"])]
                 temp_name = df_temp["name"]
                 trackedlevels[i].append(temp_name)
-                correspondingLevel[i].append(int(df_temp["st_level"]))
+                corresponding_level[i].append(int(df_temp["st_level"]))
 
-    df = utils.np.array([trackedlevels, correspondingLevel], dtype=object)
+    df = utils.np.array([trackedlevels, corresponding_level], dtype=object)
 
     df = utils.np.transpose(df)
 
@@ -34,16 +34,16 @@ def createTrackingList(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
     return df
 
 """
-#Input: pd.Dataframe (mouse_ontology.csv) , trackedList (pd.Dataframe from createTrackingList), and the length of the pd.Dataframe
+#Input: pd.Dataframe (mouse_ontology.csv) , tracked_list (pd.Dataframe from create_tracking_list), and the length of the pd.Dataframe
 #Creates a Template-Resultframe, which can be used for every sample
 #Cols: Region, trackedWay, CorrespondingLevel, RegionCellCount, RegionCellCountSummedUp
 """
-def createResultframe(df, trackedList):
+def create_resultframe(df, tracked_list):
     resultframe = utils.np.array([list(df["name"]),  # Takes all important Brain Regions in first Col
-                            trackedList["TrackedWay"],
-                            trackedList["CorrespondingLevel"],
-                            [0 for x in range(trackedList.shape[0])],  # Sets the count of each Brain Region to 0
-                            [0 for x in range(trackedList.shape[0])]])  # Creates a column for normalized Values
+                            tracked_list["TrackedWay"],
+                            tracked_list["CorrespondingLevel"],
+                            [0 for x in range(tracked_list.shape[0])],  # Sets the count of each Brain Region to 0
+                            [0 for x in range(tracked_list.shape[0])]])  # Creates a column for normalized Values
     resultframe = utils.np.transpose(resultframe)
 
     resultframe = utils.pd.DataFrame(data=resultframe,
@@ -61,21 +61,21 @@ def createResultframe(df, trackedList):
 """
 #df = summarized_counts
 #reference = mouse_ontology.csv as pd.Dataframe
-#trackedLevels = pd.Dataframe of the tracked regions and corresponding Levels
+#tracked_levels = pd.Dataframe of the tracked regions and corresponding Levels
 
-#Output: The Template-Resultframe from (createResultframe) but filled with values of the cellcount of each region
+#Output: The Template-Resultframe from (create_resultframe) but filled with values of the cellcount of each region
 """
-def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, trackedLevels: list, myWorkingDirectory: str) -> utils.pd.DataFrame:
+def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked_levels: list, my_working_directory: str) -> utils.pd.DataFrame:
     total_cellcount = int(df["total_cells"].sum())  # get total cellcount for reference
     df["name"] = df["structure_name"]
 
     #Reference_df_ID becomes copied twice to allow O(1) access to "id" or "name" as index of reference_frame
-    reference_df_ID = reference_df.set_index(reference_df["id"])
-    reference_df_Name = reference_df.set_index(reference_df["name"])
+    reference_df_id = reference_df.set_index(reference_df["id"])
+    reference_df_name = reference_df.set_index(reference_df["name"])
 
-    #Creation of a template resultframe including all regions and a fusion of ontology_csv and trackedLevels mask,
+    #Creation of a template resultframe including all regions and a fusion of ontology_csv and tracked_levels mask,
     # all entries in RegionCellCount and RegionCellCountSummedUp are initialized as 0
-    resultframe = createResultframe(reference_df, trackedLevels)
+    resultframe = create_resultframe(reference_df, tracked_levels)
 
     # Loop Iterates over all entries in summary.csv and tries to embed them into resultframe
     # For each entry in summary.csv the parent_id will iteratively indentify the parent structure of this entry
@@ -86,39 +86,39 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
 
         # Structures like "No label" and "universe" are not part of ontology.csv and therefore will be removed with this try nd except function
         try:
-            df_temp = reference_df_Name.loc[name]
+            df_temp = reference_df_name.loc[name]
         except KeyError:
-            samplename = utils.os.path.basename(myWorkingDirectory)
-            filename = myWorkingDirectory + "/" + samplename + "_unmapped_regions.csv"
+            samplename = utils.os.path.basename(my_working_directory)
+            filename = my_working_directory + "/" + samplename + "_unmapped_regions.csv"
 
-            with open(filename, "a+") as KeyError_file:
-                KeyError_file.write(str(name) + ";" + str(df.iloc[i]["total_cells"]) + "\n")
+            with open(filename, "a+") as key_error_file:
+                key_error_file.write(str(name) + ";" + str(df.iloc[i]["total_cells"]) + "\n")
             continue
 
         temp_name = df_temp["name"] #Name of current region
-        index_outerCount = resultframe.index[resultframe["Region"] == temp_name] # Find index in resultframe where current region occurs
-        cellcountRegion = df[df["structure_name"] == resultframe["Region"][index_outerCount[0]]][
+        index_outer_count = resultframe.index[resultframe["Region"] == temp_name] # Find index in resultframe where current region occurs
+        cell_count_region = df[df["structure_name"] == resultframe["Region"][index_outer_count[0]]][
             "total_cells"].sum()  # Cell counts in current region become saved as integer
-        resultframe.loc[index_outerCount[0], "RegionCellCount"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
-        resultframe.loc[index_outerCount[0], "RegionCellCountSummedUp"] += cellcountRegion #Cell count for structure in current iteration is written into resultframe
+        resultframe.loc[index_outer_count[0], "RegionCellCount"] += cell_count_region #Cell count for structure in current iteration is written into resultframe
+        resultframe.loc[index_outer_count[0], "RegionCellCountSummedUp"] += cell_count_region #Cell count for structure in current iteration is written into resultframe
         if not df_temp.empty:
             while int(df_temp["st_level"]) >= 0:
                 if int(df_temp["st_level"]) == 0:
                     break  # While loop breaks if root structure is reached in hierarchical tree
-                df_temp = reference_df_ID.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region
+                df_temp = reference_df_id.loc[int(df_temp["parent_structure_id"])] # Temporary dataframe of parent region
                 temp_name = df_temp["name"] #Update name of parent region
-                index_innerCount = resultframe.index[resultframe["Region"] == temp_name]
-                resultframe.loc[index_innerCount[0], "RegionCellCountSummedUp"] += cellcountRegion # Add cell count of leaf structure to parent structure
+                index_inner_count = resultframe.index[resultframe["Region"] == temp_name]
+                resultframe.loc[index_inner_count[0], "RegionCellCountSummedUp"] += cell_count_region # Add cell count of leaf structure to parent structure
     return resultframe
 
 """
 #Converts a CSV to a XML File, for visualization in napari
 """
-def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
+def write_xml(df:utils.pd.DataFrame, pathname:str, filename:str):
     df = utils.pd.DataFrame(df)
     filename = filename[0:-3] + "xml"
     row_counter = 1
-    dfLength = len(df)
+    df_length = len(df)
     with open(pathname+filename, "w") as file:
         file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         file.write('<CellCounter_Marker_File>\n')
@@ -132,7 +132,7 @@ def writeXml(df:utils.pd.DataFrame, pathname:str, filename:str):
         for i in range(len(df.iloc[:, 0])):
             row_counter = row_counter + 1
             if row_counter % 10000 == 0:
-                print(str(row_counter), "/", str(dfLength), " lines are processed")
+                print(str(row_counter), "/", str(df_length), " lines are processed")
             file.write('      <Marker>\n')
             file.write('        <MarkerX>' + str(df.iloc[i, :].x) + '</MarkerX>\n')
             file.write('        <MarkerY>' + str(df.iloc[i, :].y) + '</MarkerY>\n')
@@ -156,7 +156,7 @@ def write_transformed_xml(dataframe: utils.pd.DataFrame, pathname:str, filename:
         file.write('    <Current_Type>1</Current_Type>\n')
         file.write('    <Marker_Type>\n')
         file.write('      <Type>1</Type>\n')
-        for i in (range(len(df.iloc[:, 0]))):
+        for i in range(len(df.iloc[:, 0])):
             file.write('      <Marker>\n')
             file.write('        <MarkerX>' + str(df.iloc[i, :].xt) + '</MarkerX>\n')
             file.write('        <MarkerY>' + str(df.iloc[i, :].yt) + '</MarkerY>\n')
@@ -169,41 +169,41 @@ def write_transformed_xml(dataframe: utils.pd.DataFrame, pathname:str, filename:
 """
 #Calls the writeXML-Function to actually transfer certain CSV Files to XML
 """
-def processCellsCsv(myWorkingDirectory, chosenChannel):
-    pathname2xmlfolder = myWorkingDirectory + "/" + chosenChannel + "xmlFiles"
+def process_cells_csv(my_working_directory, chosen_channel):
+    pathname2xmlfolder = my_working_directory + "/" + chosen_channel + "xmlFiles"
     if not utils.os.path.exists(pathname2xmlfolder):
-        utils.os.makedirs(myWorkingDirectory + "/" + chosenChannel + "xmlFiles")
+        utils.os.makedirs(my_working_directory + "/" + chosen_channel + "xmlFiles")
 
-    df_filename = "/cells_" + chosenChannel + ".csv"
-    df_name = myWorkingDirectory + df_filename
+    df_filename = "/cells_" + chosen_channel + ".csv"
+    df_name = my_working_directory + df_filename
     df = utils.pd.read_csv(df_name, header=0, sep=";")
 
-    df_no_label_filename = "/cells_" + chosenChannel + "_no_label.csv"
-    df_no_label_name = myWorkingDirectory + df_no_label_filename
+    df_no_label_filename = "/cells_" + chosen_channel + "_no_label.csv"
+    df_no_label_name = my_working_directory + df_no_label_filename
     df_no_label = df[df["name"] == "No label"]
     df_no_label.to_csv(df_no_label_name, sep=";")
 
-    df_universe_filename = "/cells_" + chosenChannel + "_universe.csv"
-    df_universe_name = myWorkingDirectory + df_universe_filename
+    df_universe_filename = "/cells_" + chosen_channel + "_universe.csv"
+    df_universe_name = my_working_directory + df_universe_filename
     df_universe = df[df["name"] == "universe"]
     df_universe.to_csv(df_universe_name, sep=";")
 
-    df_final_filename = "/cells_" + chosenChannel + "_final.csv"
-    df_final_name = myWorkingDirectory + df_final_filename
+    df_final_filename = "/cells_" + chosen_channel + "_final.csv"
+    df_final_name = my_working_directory + df_final_filename
     df_final = df[df["name"] != "universe"]
     df_final = df_final[df_final["name"] != "No label"]
     df_final.to_csv(df_final_name, sep=";")
 
-    df_final_transformed_filename = "/cells_" + chosenChannel + "_transformed_final.csv"
+    df_final_transformed_filename = "/cells_" + chosen_channel + "_transformed_final.csv"
 
     # Multiprocessing the convertion from CSV to XML
-    p1 = utils.Process(target=writeXml, args=(df, pathname2xmlfolder, df_filename))
+    p1 = utils.Process(target=write_xml, args=(df, pathname2xmlfolder, df_filename))
     p1.start()
-    p2 = utils.Process(target=writeXml, args=(df_no_label, pathname2xmlfolder, df_no_label_filename))
+    p2 = utils.Process(target=write_xml, args=(df_no_label, pathname2xmlfolder, df_no_label_filename))
     p2.start()
-    p3 = utils.Process(target=writeXml, args=(df_universe, pathname2xmlfolder, df_universe_filename))
+    p3 = utils.Process(target=write_xml, args=(df_universe, pathname2xmlfolder, df_universe_filename))
     p3.start()
-    p4 = utils.Process(target=writeXml, args=(df_final, pathname2xmlfolder, df_final_filename))
+    p4 = utils.Process(target=write_xml, args=(df_final, pathname2xmlfolder, df_final_filename))
     p4.start()
     p5 = utils.Process(target=write_transformed_xml, args=(df_final, pathname2xmlfolder, df_final_transformed_filename))
     p5.start()
@@ -218,13 +218,13 @@ def processCellsCsv(myWorkingDirectory, chosenChannel):
 
     #Writes a final csv with single cell counts
     df_final.rename(columns={"name": "total_cells"}, inplace=True)
-    df_final.to_csv(myWorkingDirectory + "/cells_" + chosenChannel + "_summarized_counts.csv", sep=";")
+    df_final.to_csv(my_working_directory + "/cells_" + chosen_channel + "_summarized_counts.csv", sep=";")
 
 """
 #calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
 """
 #check from where workinDir and chosen channel is coming from
-def embedOntology(myWorkingDirectory, chosenChannel):
+def embed_ontology(my_working_directory, chosen_channel):
     # Reads ontology file holding the reference region dictionairy
     reference_df = utils.pd.read_csv("ontology_mouse.csv",
                                # Current Refernce Dataframe for mapping
@@ -235,19 +235,19 @@ def embedOntology(myWorkingDirectory, chosenChannel):
 
     #Creates a mask table with all regions abundant in the ontology file for comparibility
     # Additionally allt the structural abundancies between regions of different hierarchy become recorded in form of id- and structurename arrays
-    trackedLevels = createTrackingList(reference_df)
+    tracked_levels = create_tracking_list(reference_df)
 
     #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
-    df = utils.pd.read_csv(myWorkingDirectory + "/cells_" + chosenChannel + "_summarized_counts.csv", header=0, sep=";")
+    df = utils.pd.read_csv(my_working_directory + "/cells_" + chosen_channel + "_summarized_counts.csv", header=0, sep=";")
 
-    samplename = utils.os.path.basename(myWorkingDirectory)
-    new_df = analyse_csv(df,reference_df, trackedLevels, myWorkingDirectory)
-    new_df_name = myWorkingDirectory + "/" + samplename + "_" + chosenChannel + "_embedded_ontology.csv"
+    samplename = utils.os.path.basename(my_working_directory)
+    new_df = analyse_csv(df,reference_df, tracked_levels, my_working_directory)
+    new_df_name = my_working_directory + "/" + samplename + "_" + chosen_channel + "_embedded_ontology.csv"
     new_df.to_csv(new_df_name, sep=";", index=0)
     return
 
 
-class Cell_Detection:
+class CellDetection:
     def cell_detection(self,    # Defaul Parameter of CellDetectionTab
                        flatfield_illumination=None,
                        scaling_illumination="max",
@@ -275,16 +275,15 @@ class Cell_Detection:
                        shape_maxima_det_x=6,
                        shape_maxima_det_y=6,
                        shape_maxima_det_z=11,
-                       #threshold_maxima_det=297.380,
                        measure_intensity_det="Source",
                        method_intensity_det="mean",
-                       threshold_shape_det=200,             # Todo: Change Default to 200? If yes see also belonging QWidget
+                       threshold_shape_det=200,
                        save_shape_det=True,
                        amount_processes=10,
                        size_maximum=20,
                        size_minimum=11,
                        area_of_overlap=10,
-                       ): # cells kommt von ClearMap
+                       ): 
 
         # Coversion of illumination_correction integers to dictionairy entries of ClearMap
         if flatfield_illumination == 0:
@@ -407,8 +406,8 @@ class Cell_Detection:
                                     overlap=area_of_overlap,  # 10 30
                                     verbose=True)  # Set True if process needs to be investigated // Lead to the print of process checkpoints
 
-        utils.cells.detect_cells(self.ws.filename('stitched_' + self.chosenChannel),
-                           self.ws.filename('cells', postfix='raw_' + self.chosenChannel),
+        utils.cells.detect_cells(self.ws.filename('stitched_' + self.chosen_channel),
+                           self.ws.filename('cells', postfix='raw_' + self.chosen_channel),
                            cell_detection_parameter=cell_detection_parameter,
                            processing_parameter=processing_parameter)
 
@@ -416,26 +415,26 @@ class Cell_Detection:
     def filter_cells(self, filt_size=20):
 
         thresholds = {'source': None, 'size': (filt_size, None)}
-        utils.cells.filter_cells(self.ws.filename('cells', postfix='raw_' + self.chosenChannel),
-                           self.ws.filename('cells', postfix='filtered_' + self.chosenChannel),
+        utils.cells.filter_cells(self.ws.filename('cells', postfix='raw_' + self.chosen_channel),
+                           self.ws.filename('cells', postfix='filtered_' + self.chosen_channel),
                            thresholds=thresholds)
 
 
     """
     #ClearMap-Code +
     #ProcessCellsCsv +
-    #embedOntology
+    #embed_ontology
     """
     def atlas_assignment(self):
         # sink_maxima = self.ws.filename('cells_', postfix = 'raw_'+self.channel_chosen)
-        source = self.ws.filename('stitched_' + self.chosenChannel)
-        sink_raw = self.ws.source('cells', postfix='raw_' + self.chosenChannel)
+        source = self.ws.filename('stitched_' + self.chosen_channel)
+        sink_raw = self.ws.source('cells', postfix='raw_' + self.chosen_channel)
 
         self.filter_cells()
 
         # Assignment of the cells with filtered maxima
         # Filtered cell maxima are used to execute the alignment to the atlas
-        source = self.ws.source('cells', postfix='filtered_' + self.chosenChannel)
+        source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
 
         # Didn't understand the functions so far. Seems like coordinates become transformed by each function and reassigned.
         print("Transfromation\n")
@@ -444,18 +443,18 @@ class Cell_Detection:
             coordinates = utils.res.resample_points(coordinates,
                                               sink=None,
                                               orientation=None,
-                                              source_shape=utils.io.shape(self.ws.filename('stitched_' + self.chosenChannel)),
-                                              sink_shape=utils.io.shape(self.ws.filename('resampled_' + self.chosenChannel)))
+                                              source_shape=utils.io.shape(self.ws.filename('stitched_' + self.chosen_channel)),
+                                              sink_shape=utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel)))
 
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
-                                               transform_directory=self.myWorkingDirectory + '/elastix_resampled_to_auto_' + self.chosenChannel,
+                                               transform_directory=self.my_working_directory + '/elastix_resampled_to_auto_' + self.chosen_channel,
                                                binary=True,
                                                indices=False)
 
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
-                                               transform_directory=self.myWorkingDirectory + '/elastix_auto_to_reference_' + self.chosenChannel,
+                                               transform_directory=self.my_working_directory + '/elastix_auto_to_reference_' + self.chosen_channel,
                                                binary=True,
                                                indices=False)
             return coordinates
@@ -463,7 +462,7 @@ class Cell_Detection:
         # These are the initial coordinates originating in the file cells_filtered.npy containing the coordinates of the filtered maxima.
         # Each coordinate of 3 dimensional space x,y,z  is written into a new numpy array. [[x1,y1,z1],[x2,y2,3],...,[x_last,y_last,z_last]]
         coordinates = utils.np.array([source[c] for c in 'xyz']).T
-        source = self.ws.source('cells', postfix='filtered_' + self.chosenChannel)
+        source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
 
         # Coordinates become transformed by the above defined transformation function
         coordinates_transformed = transformation(coordinates)
@@ -480,7 +479,7 @@ class Cell_Detection:
 
         # Save results
         coordinates_transformed.dtype = [(t, float) for t in ('xt', 'yt', 'zt')]
-        nparray_label = utils.np.array(label, dtype=[('order', int)]);
+        nparray_label = utils.np.array(label, dtype=[('order', int)])
         nparray_names = utils.np.array(names, dtype=[('name', 'S256')])
 
         import numpy.lib.recfunctions as rfn
@@ -488,12 +487,12 @@ class Cell_Detection:
                                       flatten=True,
                                       usemask=False)
 
-        utils.io.write(self.ws.filename('cells', postfix=self.chosenChannel), cells_data)
+        utils.io.write(self.ws.filename('cells', postfix=self.chosen_channel), cells_data)
         print("Cells data: \n", cells_data)
 
         # CSV export
         # Pandas was installed via pip, since np.savetxt had
-        csv_source = self.ws.source('cells', postfix=self.chosenChannel)
+        csv_source = self.ws.source('cells', postfix=self.chosen_channel)
 
         # Define headers for pandas.Dataframe for csv export
         header = ', '.join([h for h in csv_source.dtype.names])
@@ -506,22 +505,22 @@ class Cell_Detection:
 
         # export CSV
         print("Exporting Cells to csv\n")
-        cells_data_df.to_csv(self.ws.filename('cells', postfix=self.chosenChannel, extension='csv'), sep=';');
+        cells_data_df.to_csv(self.ws.filename('cells', postfix=self.chosen_channel, extension='csv'), sep=';')
 
         # ClearMap1.0 export
         # Export is not working so far: Error is "the magic string is not correct; expected b'\x93NUMPY, got b';x;y;z
-        ClearMap1_source = self.ws.source('cells', postfix=self.chosenChannel)
+        ClearMap1_source = self.ws.source('cells', postfix=self.chosen_channel)
         Clearmap1_format = {'points': ['x', 'y', 'z'],
                             'intensities': ['source', 'dog', 'background', 'size'],
                             'points_transformed': ['xt', 'yt', 'zt']}
 
         for filename, names in Clearmap1_format.items():
-            sink = self.ws.filename('cells', postfix=[self.chosenChannel, '_', 'ClearMap1', filename])
+            sink = self.ws.filename('cells', postfix=[self.chosen_channel, '_', 'ClearMap1', filename])
             data = utils.np.array([ClearMap1_source[name] if name in ClearMap1_source.dtype.names else utils.np.full(ClearMap1_source.shape[0], utils.np.nan) for name in names])
             utils.io.write(sink, data)
 
-        processCellsCsv(self.myWorkingDirectory,self.chosenChannel)
-        embedOntology(self.myWorkingDirectory,self.chosenChannel)
+        process_cells_csv(self.my_working_directory,self.chosen_channel)
+        embed_ontology(self.my_working_directory,self.chosen_channel)
         return
 
 
@@ -532,7 +531,7 @@ class Cell_Detection:
                                                                                       orientation=(1, -2, 3),
                                                                                       overwrite=False,
                                                                                       verbose=True)
-        source = self.ws.source('cells', postfix=self.chosenChannel)
+        source = self.ws.source('cells', postfix=self.chosen_channel)
         coordinates = utils.np.array([source[n] for n in ['xt', 'yt', 'zt']]).T
         intensities = source['source']
 
@@ -547,7 +546,7 @@ class Cell_Detection:
                                       verbose=True)
 
         utils.vox.voxelize(coordinates,
-                     sink=self.ws.filename('density', postfix='counts_' + self.chosenChannel),
+                     sink=self.ws.filename('density', postfix='counts_' + self.chosen_channel),
                      **voxelization_parameter)
 
 

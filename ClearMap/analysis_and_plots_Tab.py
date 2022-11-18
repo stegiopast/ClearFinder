@@ -1,10 +1,10 @@
 import utils
 
 
-class Plot_Window(utils.QDialog):
+class PlotWindow(utils.QDialog):
     """constructor"""
     def __init__(self, parent=None):
-        super(Plot_Window, self).__init__(parent)
+        super(PlotWindow, self).__init__(parent)
 
         # a figure instance to plot on
         self.figure = utils.plt.figure()
@@ -31,7 +31,7 @@ class Plot_Window(utils.QDialog):
         self.setLayout(layout)
 
 
-class _Analysis_and_Plots_Layout:
+class Analysis_And_Plots_Layout:
     """Layout of related tab"""
     def analysis_layout(self):
         tab = utils.QWidget()
@@ -56,20 +56,20 @@ class _Analysis_and_Plots_Layout:
         metadata_file = utils.QLineEdit("")
         choose_metadata_file = utils.QPushButton("Choose metadata file")
 
-        plot_window = Plot_Window()
+        plot_window = PlotWindow()
 
         self.input_csv = utils.pd.DataFrame()
         self.metadata_csv = utils.pd.DataFrame()
         self.information_csv = utils.pd.DataFrame()
 
-        filter_level_ComboBox = utils.QComboBox()
-        filter_level_ComboBox.insertItem(0,"None")
+        filter_level_combobox = utils.QComboBox()
+        filter_level_combobox.insertItem(0,"None")
         for i in range (1, 13):
-            filter_level_ComboBox.insertItem(i, str(i))
+            filter_level_combobox.insertItem(i, str(i))
 
-        filter_region_LineEdit = utils.QLineEdit("")
+        filter_region_lineedit = utils.QLineEdit("")
 
-        filter_specific_region_LineEdit = utils.QLineEdit("")
+        filter_specific_region_lineedit = utils.QLineEdit("")
 
         set_input = utils.QPushButton("Set input and metadata")
 
@@ -97,15 +97,15 @@ class _Analysis_and_Plots_Layout:
 
         inner_layout4.addWidget(utils.QLabel("<b>Heatmap</b>"))
         inner_layout4.addWidget(utils.QLabel("Select a structure level to filter for"))
-        inner_layout4.addWidget(filter_level_ComboBox)
+        inner_layout4.addWidget(filter_level_combobox)
         inner_layout4.addWidget(utils.QLabel("Name a region to filter for ist subregions"))
-        inner_layout4.addWidget(filter_region_LineEdit)
+        inner_layout4.addWidget(filter_region_lineedit)
         inner_layout4.addWidget(create_heatmap)
         inner_layout4.addStretch()
 
         inner_layout5.addWidget(utils.QLabel("<b>Boxplot</b>"))
         inner_layout5.addWidget(utils.QLabel("Please name specific region"))
-        inner_layout5.addWidget(filter_specific_region_LineEdit)
+        inner_layout5.addWidget(filter_specific_region_lineedit)
         inner_layout5.addWidget(create_boxplot)
         inner_layout5.addStretch()
 
@@ -224,8 +224,8 @@ class _Analysis_and_Plots_Layout:
                 return regplots
 
             plot_window.figure.clear()
-            ax = plot_window.figure.add_subplot(111)
-            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', ax=ax)
+            variable_ax = plot_window.figure.add_subplot(111)
+            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', variable_ax=variable_ax)
             plot_window.canvas.draw()
 
 
@@ -234,8 +234,8 @@ class _Analysis_and_Plots_Layout:
             print(input_csv.head())
             information = self.information_csv.copy()
 
-            if filter_region_LineEdit.text() != "":
-                region = filter_region_LineEdit.text()
+            if filter_region_lineedit.text() != "":
+                region = filter_region_lineedit.text()
                 print(information["TrackedWay"])
                 if region in information["TrackedWay"]:
                     index_list = []
@@ -252,8 +252,8 @@ class _Analysis_and_Plots_Layout:
                     return
                 brainregion = "region_" + region
 
-            if filter_level_ComboBox.currentText() != "None":
-                level = int(filter_level_ComboBox.currentText())
+            if filter_level_combobox.currentText() != "None":
+                level = int(filter_level_combobox.currentText())
                 index_list = []
                 for i,val in enumerate(information["CorrespondingLevel"]):
                     array = eval(val)
@@ -300,9 +300,9 @@ class _Analysis_and_Plots_Layout:
 
                 plot_window.figure.clear()
 
-                ax = plot_window.figure.add_subplot(111)
+                variable_ax = plot_window.figure.add_subplot(111)
 
-                utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
+                utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, variable_ax = variable_ax)
                 utils.plt.close()
 
                 plot_window.canvas.draw()
@@ -312,8 +312,8 @@ class _Analysis_and_Plots_Layout:
             input_csv = self.input_csv.copy()
             print(input_csv)
             information = self.information_csv.copy()
-            if filter_specific_region_LineEdit.text() != "":
-                region = filter_specific_region_LineEdit.text()
+            if filter_specific_region_lineedit.text() != "":
+                region = filter_specific_region_lineedit.text()
                 if region in input_csv.index:
                     input_csv = input_csv[input_csv.index == region]
 
@@ -375,9 +375,9 @@ class _Analysis_and_Plots_Layout:
                     df_tmp = utils.pd.DataFrame({method: array_for_boxplots[val]})
                     df_tmp["condition"] = i
                     df_boxplot = utils.pd.concat([df_boxplot, df_tmp])
-                    fig, ax = utils.plt.subplots()
-                    ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
-                    ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
+                    fig, variable_ax = utils.plt.subplots()
+                    variable_ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
+                    variable_ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
 
                     region_name = str(region_name).replace(" ", "")
                     region_name = str(region_name).replace("/", "")
@@ -390,14 +390,14 @@ class _Analysis_and_Plots_Layout:
 
                 plot_window.figure.clear()
                 ax2 = plot_window.figure.add_subplot(111)
-                utils.sns.boxplot(x="condition", y=method, data=df_boxplot,ax = ax2)
-                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax = ax2)
+                utils.sns.boxplot(x="condition", y=method, data=df_boxplot,variable_ax = ax2)
+                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", variable_ax = ax2)
                 plot_window.canvas.draw()
 
         return tab
 
 
-    def createHeatmap(path2file: str):
+    def create_heatmap(path2file: str):
         dataframe = utils.pd.read_csv(path2file, header=0, sep=";")
         dataframe = dataframe.iloc[:, 1:]
         if not utils.os.path.exists(utils.result_dir.text() + "/AnalysisOutput"):
@@ -446,7 +446,7 @@ class _Analysis_and_Plots_Layout:
         print("FERTIG!")
 
 
-    def createHeatmapZScores(path2file: str):
+    def create_heatmap_z_scores(path2file: str):
         df = utils.pd.read_csv(path2file, header=0, sep=";")
         df = df.iloc[:, 1:]
         if not utils.os.path.exists(utils.result_dir.text() + "/AnalysisOutput"):
@@ -524,7 +524,7 @@ class _Analysis_and_Plots_Layout:
         return
 
 
-    def createBoxplot(path2file: str):
+    def create_boxplot(path2file: str):
         dataframe = utils.pd.read_csv(path2file, header=0, sep=";")
         dataframe = dataframe.iloc[:, 1:]
 
@@ -590,9 +590,9 @@ class _Analysis_and_Plots_Layout:
             df_tmp = utils.pd.DataFrame({method: array_for_boxplots[val]})
             df_tmp["condition"] = i
             df_boxplot = utils.pd.concat([df_boxplot, df_tmp])
-            fig, ax = utils.plt.subplots()
-            ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
-            ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
+            fig, variable_ax = utils.plt.subplots()
+            variable_ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
+            variable_ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
             region_name = str(region_name).replace(" ", "")
             region_name = str(region_name).replace("/", "")
             utils.plt.title(utils.brainregion.text())
@@ -671,8 +671,8 @@ class _Analysis_and_Plots_Layout:
 
         dataframe["to_label"] = marking_array
 
-        fig, ax = utils.plt.subplots()
-        ax.scatter(utils.np.log2(dataframe["Change"]), -utils.np.log10(dataframe["Change_pvalue"]),
+        fig, variable_ax = utils.plt.subplots()
+        variable_ax.scatter(utils.np.log2(dataframe["Change"]), -utils.np.log10(dataframe["Change_pvalue"]),
                     c=dataframe["Change_pvalue_significant"],
                     cmap="jet")
 
@@ -688,7 +688,7 @@ class _Analysis_and_Plots_Layout:
                 regions.append("")
 
         for i, txt in enumerate(regions):
-            ax.annotate(txt, (x[i], y[i]), ha="center", va="bottom", size="6")
+            variable_ax.annotate(txt, (x[i], y[i]), ha="center", va="bottom", size="6")
 
         utils.plt.xlim((-3, 3))
         utils.plt.title()

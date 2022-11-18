@@ -6,55 +6,55 @@ Initialize Workspace, WorkingDirectory and Channel of Analysis
 class RenameBox(utils.QWidget):
 
     def __init__(self,
-                 filenameToCheck: str,
+                 filename_to_check: str,
                  position: int,
                  _path: str):
         super().__init__()
         self.path = _path
         self.position = position
-        self.renameBox = None
+        self.rename_box = None
         self.setWindowTitle("ClearMap2 GUI")
-        self.filenameToCheck = filenameToCheck
-        self.chosenChannel = "C01"
-        self.isFirstUpdate = True
-        self.shiftBar = utils.QLineEdit("0")
+        self.filename_to_check = filename_to_check
+        self.chosen_channel = "C01"
+        self.is_first_update = True
+        self.shift_bar = utils.QLineEdit("0")
         self.accept = utils.QPushButton("Accept")
         self.reject = utils.QPushButton("Reject and shift")
-        self.quitRenaming = utils.QPushButton("Quit Renaming")
+        self.quit_renaming = utils.QPushButton("Quit Renaming")
         self.layout = utils.QGridLayout()
-        self.updateLayout()
+        self.update_layout()
         self.setLayout(self.layout)
 
 
-    def updateLayout(self) -> utils.QGridLayout:
-        self.intShift = int(self.shiftBar.text())
-        self.newPosition = self.position + self.intShift
-        if self.newPosition < 0:
-            self.newPosition = 0
-        self.update_rename_box(self.newPosition)
-        print("Filename: ", self.filenameToCheck[self.position:len(self.filenameToCheck)])
-        print("Current Filename: ", self.currentFilename)
+    def update_layout(self) -> utils.QGridLayout:
+        self.int_shift = int(self.shift_bar.text())
+        self.new_position = self.position + self.int_shift
+        if self.new_position < 0:
+            self.new_position = 0
+        self.update_rename_box(self.new_position)
+        print("Filename: ", self.filename_to_check[self.position:len(self.filename_to_check)])
+        print("Current Filename: ", self.current_filename)
         print(self.position)
-        innerLayout = utils.QGridLayout()
-        innerLayout.addWidget(utils.QLabel("Current output Filename:"), 0, 0)
-        innerLayout.addWidget(utils.QLabel(self.currentFilename), 0, 1)
-        innerLayout.addWidget(utils.QLabel("      "), 1, 0)
-        innerLayout.addWidget(utils.QLabel("Does filename not fit to template 0001_C01.tif - 9999_C01.tif ?"), 2, 0)
-        innerLayout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3, 0)
-        innerLayout.addWidget(self.shiftBar, 3, 1)
-        innerLayout.addWidget(self.reject, 3, 2)
-        innerLayout.addWidget(utils.QLabel("      "), 4, 0)
-        innerLayout.addWidget(utils.QLabel("Does filename fit ?"), 5, 0)
-        innerLayout.addWidget(utils.QLabel("Press accept:"), 6, 0)
-        innerLayout.addWidget(self.accept, 6, 1)
-        innerLayout.addWidget(utils.QLabel("      "), 7, 0)
-        innerLayout.addWidget(utils.QLabel("Doesn't the filename fit at all?"), 8, 0)
-        innerLayout.addWidget(utils.QLabel("Press Quit:"), 9, 0)
-        innerLayout.addWidget(self.quitRenaming, 9, 1)
+        inner_layout = utils.QGridLayout()
+        inner_layout.addWidget(utils.QLabel("Current output Filename:"), 0, 0)
+        inner_layout.addWidget(utils.QLabel(self.current_filename), 0, 1)
+        inner_layout.addWidget(utils.QLabel("      "), 1, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 0001_C01.tif - 9999_C01.tif ?"), 2, 0)
+        inner_layout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3, 0)
+        inner_layout.addWidget(self.shift_bar, 3, 1)
+        inner_layout.addWidget(self.reject, 3, 2)
+        inner_layout.addWidget(utils.QLabel("      "), 4, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename fit ?"), 5, 0)
+        inner_layout.addWidget(utils.QLabel("Press accept:"), 6, 0)
+        inner_layout.addWidget(self.accept, 6, 1)
+        inner_layout.addWidget(utils.QLabel("      "), 7, 0)
+        inner_layout.addWidget(utils.QLabel("Doesn't the filename fit at all?"), 8, 0)
+        inner_layout.addWidget(utils.QLabel("Press Quit:"), 9, 0)
+        inner_layout.addWidget(self.quit_renaming, 9, 1)
 
-        self.deleteItemsOfLayout(self.layout)
+        self.delete_items_of_layout(self.layout)
 
-        self.layout.addLayout(innerLayout, 0, 0)
+        self.layout.addLayout(inner_layout, 0, 0)
 
         return self.layout
 
@@ -62,24 +62,24 @@ class RenameBox(utils.QWidget):
     #Finds the position of Z{3|4}_C0X.tif in every filename provided by the user
     #It is mandatory to include the pattern at the end of each filename to use this application
     #Search is automatized but the user has the opportunity to change the desired position if algorithm is not precise
-    def update_rename_box(self, currentPosition: int) -> str:
-        self.position = currentPosition
-        if self.isFirstUpdate:
-            if (utils.re.search(r'Z[0-9]{4}_C0+', self.filenameToCheck)):
-                findPattern = utils.re.search(r'Z[0-9]{4}_C0+', self.filenameToCheck)
-                self.position = findPattern.span()[0] + 1
+    def update_rename_box(self, current_position: int) -> str:
+        self.position = current_position
+        if self.is_first_update:
+            if utils.re.search(r'Z[0-9]{4}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{4}_C0+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
 
-            elif (utils.re.search(r'Z[0-9]{3}_C0+', self.filenameToCheck)):
-                findPattern = utils.re.search(r'Z[0-9]{3}_C0+', self.filenameToCheck)
-                self.position = findPattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{3}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{3}_C0+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
 
-            self.isFirstUpdate = False
+            self.is_first_update = False
 
-        self.currentFilename = self.filenameToCheck[self.position:]
+        self.current_filename = self.filename_to_check[self.position:]
 
 
     #Function for refreshing the visualization of rename window
-    def deleteItemsOfLayout(self, layout):
+    def delete_items_of_layout(self, layout):
         if layout is not None:
             while layout.count():
                 item = layout.takeAt(0)
@@ -87,7 +87,7 @@ class RenameBox(utils.QWidget):
                 if widget is not None:
                     widget.setParent(None)
                 else:
-                    self.deleteItemsOfLayout(item.layout())
+                    self.delete_items_of_layout(item.layout())
 
 
     def perform_cut(self):  # Performs the final renaming of the files
@@ -110,25 +110,25 @@ class RenameBox(utils.QWidget):
 
 
 # initalize working directory
-class _init_Workspace():
+class InitWorkspace():
 
-    def initWorkspace(self, path='/home/cellfinder_data', channel=0, choice="Hemisphere"):
+    def init_workspace(self, path='/home/cellfinder_data', channel=0, choice="Hemisphere"):
         if channel == 0:
-            channelStr = "C01"
+            channel_str = "C01"
         elif channel == 1:
-            channelStr = "C02"
-        self.chosenChannel = channelStr
-        myWorkingDirectory = path
+            channel_str = "C02"
+        self.chosen_channel = channel_str
+        my_working_directory = path
         if choice == "Hemisphere":
             self.slicing = (slice(None),slice(None),slice(0,256))
         else:
             self.slicing = (slice(None),slice(None),slice(None))
         print(self.slicing, "Self Slicing as ", choice, "\n")
-        if utils.os.path.exists(myWorkingDirectory):
-            #myWorkingDirectory is the base directory <- alles relativ dazu
-            expression_raw = 'Signal/' + channelStr + '/Z<Z,4>_' + channelStr + '.tif'  # applies for example : "Z0001_C01.tif, Z0023..."
+        if utils.os.path.exists(my_working_directory):
+            #my_working_directory is the base directory <- alles relativ dazu
+            expression_raw = 'Signal/' + channel_str + '/Z<Z,4>_' + channel_str + '.tif'  # applies for example : "Z0001_C01.tif, Z0023..."
             expression_auto = 'Auto/Z<Z,4>_' + 'C01' + '.tif'
-            ws = utils.wsp.Workspace('CellMap', directory=myWorkingDirectory);
+            ws = utils.wsp.Workspace('CellMap', directory=my_working_directory)
 
             #This update is necessary to evoke usage of more than one channel
             ws.update(raw_C01='Signal/C01/Z<Z,4>_C01.tif',
@@ -137,38 +137,38 @@ class _init_Workspace():
                       stitched_C02='stitched_C02.npy',
                       resampled_C01='resampled_C01.tif',
                       resampled_C02='resampled_C02.tif')
-            if self.chosenChannel == "C01":
+            if self.chosen_channel == "C01":
                 ws.update(raw_C01=expression_raw, autofluorescence=expression_auto)
-            if self.chosenChannel == "C02":
+            if self.chosen_channel == "C02":
                 ws.update(raw_C02=expression_raw, autofluorescence=expression_auto)
 
-            if utils.os.path.exists(myWorkingDirectory + '/stitched_' + self.chosenChannel + '.tif'):
-                expressionStitched = 'stitched_' + self.chosenChannel + '.npy'
-                if self.chosenChannel == "C01":
-                    ws.update(stitched_C01=expressionStitched)
-                if self.chosenChannel == "C02":
-                    ws.upate(stitched_C02=expressionStitched)
+            if utils.os.path.exists(my_working_directory + '/stitched_' + self.chosen_channel + '.tif'):
+                expression_stitched = 'stitched_' + self.chosen_channel + '.npy'
+                if self.chosen_channel == "C01":
+                    ws.update(stitched_C01=expression_stitched)
+                if self.chosen_channel == "C02":
+                    ws.upate(stitched_C02=expression_stitched)
 
-            if utils.os.path.exists(myWorkingDirectory + '/resampled_' + self.chosenChannel + '.tif'):
-                expression_resampled = 'resampled_' + self.chosenChannel + '.tif'
-                if self.chosenChannel == "C01":
+            if utils.os.path.exists(my_working_directory + '/resampled_' + self.chosen_channel + '.tif'):
+                expression_resampled = 'resampled_' + self.chosen_channel + '.tif'
+                if self.chosen_channel == "C01":
                     ws.update(resampled_C01=expression_resampled)
-                if self.chosenChannel == "C02":
+                if self.chosen_channel == "C02":
                     ws.update(resampled_C02=expression_resampled)
             ws.info()
             print(ws.filename('cells', postfix='raw_C01'))
             self.ws = ws
-            self.myWorkingDirectory = myWorkingDirectory
+            self.my_working_directory = my_working_directory
 
             print("Worksapce: ", self.ws)
-            print("Working dir:", self.myWorkingDirectory)
-            print("Channel chosen:", self.chosenChannel)
-            return [ws, myWorkingDirectory]
+            print("Working dir:", self.my_working_directory)
+            print("Channel chosen:", self.chosen_channel)
+            return [ws, my_working_directory]
         else:
             print("Path does not exist!")
 
 
-class _rename_Layout:
+class RenameLayout:
     def rename_layout(self):
 
 
@@ -212,7 +212,7 @@ class _rename_Layout:
                     self.rename_box.show()
 
 
-                    self.rename_box.reject.clicked.connect(self.rename_box.updateLayout)
+                    self.rename_box.reject.clicked.connect(self.rename_box.update_layout)
                     self.rename_box.reject.clicked.connect(self.rename_box.repaint)
 
 
@@ -221,7 +221,7 @@ class _rename_Layout:
 
                     # Next line is implemented to quit the application in case a renaming is not possible.
                     # self.rename_box.quit_renaming.clicked.connect(lambda: self.rename_box.update(False,4000000))
-                    self.rename_box.quitRenaming.clicked.connect(self.rename_box.close)
+                    self.rename_box.quit_renaming.clicked.connect(self.rename_box.close)
 
             else:
                 alert = utils.QMessageBox()
@@ -272,10 +272,10 @@ class _rename_Layout:
         inner_layout.addWidget(debug_button, 5, 0, 5, 4)
 
         choose_workspacedir_button.clicked.connect(lambda: choose_sample())
-        set_ws.clicked.connect(lambda: self.initWorkspace(ws_path.text(), channel_button.currentIndex(),hemisphere_whole_brain.currentText()))
-        rename_button1.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Auto'))
-        rename_button2.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Signal/C01'))
-        rename_button3.clicked.connect(lambda: rename_files(_path=self.myWorkingDirectory, extend='/Signal/C02'))
+        set_ws.clicked.connect(lambda: self.init_workspace(ws_path.text(), channel_button.currentIndex(),hemisphere_whole_brain.currentText()))
+        rename_button1.clicked.connect(lambda: rename_files(_path=self.my_working_directory, extend='/Auto'))
+        rename_button2.clicked.connect(lambda: rename_files(_path=self.my_working_directory, extend='/Signal/C01'))
+        rename_button3.clicked.connect(lambda: rename_files(_path=self.my_working_directory, extend='/Signal/C02'))
         make_testdata.clicked.connect(lambda: self.createTestdata(index=testdata.currentIndex()))
 
 
