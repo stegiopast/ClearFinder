@@ -7,14 +7,14 @@ import analysis_and_plots_Tab
 
 
 class Main_Window(utils.QWidget,
-                  determine_path_rename_path_Tab._init_Workspace,
-                  determine_path_rename_path_Tab._rename_Layout,
-                  resampling_alignment_Tab.Resampling_Alignment,
+                  determine_path_rename_path_Tab.InitWorkspace,
+                  determine_path_rename_path_Tab.RenameLayout,
+                  resampling_alignment_Tab.ResamplingAlignment,
                   resampling_alignment_Tab.Resampling_Alignment_Layout,
-                  cell_detection_Tab.Cell_Detection,
+                  cell_detection_Tab.CellDetection,
                   cell_detection_Tab.Cell_Detection_Layout,
-                  grouping_and_normalization_Tab._Preanalysis_and_Normalization,
-                  analysis_and_plots_Tab._Analysis_and_Plots_Layout,
+                  grouping_and_normalization_Tab.Preanalysis_And_Normalization,
+                  analysis_and_plots_Tab.Analysis_And_Plots_Layout,
                   ):
 
     def __init__(self):

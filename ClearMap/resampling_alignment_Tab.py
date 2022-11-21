@@ -1,10 +1,9 @@
 import utils
 
 
-class Resampling_Alignment:
-    """Resampling"""
+class ResamplingAlignment:
     # Default values of resolution
-    def initReference(self, 
+    def init_reference(self, 
                       source_res_x=3.02,
                       source_res_y=3.02,
                       source_res_z=3,
@@ -21,15 +20,15 @@ class Resampling_Alignment:
                       orientation_y=2,
                       orientation_z=3):
 
-        if not utils.os.path.exists(self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel):
-            utils.os.mkdir(self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel)
+        if not utils.os.path.exists(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel):
+            utils.os.mkdir(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel)
         else:
-            print(self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel + " already exists\n")
+            print(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel + " already exists\n")
 
-        if not utils.os.path.exists(self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel):
-            utils.os.mkdir(self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel)
+        if not utils.os.path.exists(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel):
+            utils.os.mkdir(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel)
         else:
-            print(self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel + " already exists\n")
+            print(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel + " already exists\n")
 
         resourcesDirectory = utils.settings.resources_path
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=self.slicing,
@@ -46,12 +45,12 @@ class Resampling_Alignment:
                               "processes": 4,
                               "verbose": True}
 
-        source = self.ws.source('raw_' + self.chosenChannel)
-        sink = self.ws.filename('stitched_' + self.chosenChannel)
+        source = self.ws.source('raw_' + self.chosen_channel)
+        sink = self.ws.filename('stitched_' + self.chosen_channel)
         utils.io.convert(source, sink, verbose=True)
-        
-        utils.res.resample(self.ws.filename('stitched_' + self.chosenChannel),
-                     sink=self.ws.filename('resampled_' + self.chosenChannel), **resample_parameter)
+
+        utils.res.resample(self.ws.filename('stitched_' + self.chosen_channel),
+                     sink=self.ws.filename('resampled_' + self.chosen_channel), **resample_parameter)
 
         resample_parameter_auto = {"source_resolution": (auto_source_res_x, auto_source_res_y, auto_source_res_z),
                                    "sink_resolution": (auto_sink_res_x, auto_sink_res_y, auto_sink_res_z),
@@ -59,13 +58,13 @@ class Resampling_Alignment:
                                    "verbose": True}
 
         utils.res.resample(self.ws.filename('autofluorescence'),
-                     sink=self.ws.filename('resampled_' + self.chosenChannel,postfix='autofluorescence'),
+                     sink=self.ws.filename('resampled_' + self.chosen_channel,postfix='autofluorescence'),
                      **resample_parameter_auto)
 
         align_channels_parameter = {
             # moving and reference images
-            "moving_image": self.ws.filename('resampled_' + self.chosenChannel, postfix='autofluorescence'),
-            "fixed_image": self.ws.filename('resampled_' + self.chosenChannel),
+            "moving_image": self.ws.filename('resampled_' + self.chosen_channel, postfix='autofluorescence'),
+            "fixed_image": self.ws.filename('resampled_' + self.chosen_channel),
 
             # elastix parameter files for alignment
             "affine_parameter_file": align_channels_affine_file,
@@ -73,7 +72,7 @@ class Resampling_Alignment:
 
             # directory of the alig'/home/nicolas.renier/Documents/ClearMap_Ressources/Par0000affine.txt',nment result
             # "result_directory" :  "/raid/CellRegistration_Margaryta/ClearMap1_2/ClearMap2/elastix_resampled_to_auto"
-            "result_directory": self.myWorkingDirectory + "/elastix_resampled_to_auto_" + self.chosenChannel
+            "result_directory": self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel
         }
 
         # first alginment !
@@ -82,13 +81,13 @@ class Resampling_Alignment:
         align_reference_parameter = {
             # moving and reference images
             "moving_image": reference_file,
-            "fixed_image": self.ws.filename('resampled_' + self.chosenChannel, postfix='autofluorescence'),
+            "fixed_image": self.ws.filename('resampled_' + self.chosen_channel, postfix='autofluorescence'),
 
             # elastix parameter files for alignment
             "affine_parameter_file": align_reference_affine_file,
             "bspline_parameter_file": align_reference_bspline_file,
             # directory of the alignment result
-            "result_directory": self.myWorkingDirectory + "/elastix_auto_to_reference_" + self.chosenChannel
+            "result_directory": self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel
         }
         utils.elx.align(**align_reference_parameter)
         return
@@ -257,7 +256,7 @@ class Resampling_Alignment_Layout:
         load_config_button.pressed.connect(lambda: load_config(load_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
         save_config_button.pressed.connect(lambda: save_config(save_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
         
-        start_resampling_button.clicked.connect(lambda: self.initReference(source_res_x=float(source_res_x.text()),
+        start_resampling_button.clicked.connect(lambda: self.init_reference(source_res_x=float(source_res_x.text()),
                                                                            source_res_y=float(source_res_y.text()),
                                                                            source_res_z=float(source_res_z.text()),
                                                                            sink_res_x=float(sink_res_x.text()),
