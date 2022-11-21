@@ -46,6 +46,7 @@ conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 pip install cellfinder
 conda install pyqt
+conda install pathlib
 conda deactivate
 ```
 
