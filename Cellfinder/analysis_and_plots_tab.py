@@ -278,8 +278,21 @@ class AnalysisAndPlots:
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             input_csv = input_csv.loc[(input_csv!=0).any(axis=1)]
 
+            print("Input csv shape:  ",input_csv.shape )
+            if input_csv.shape[0] > 25:
+                alert = utils.QMessageBox()
+                alert.setText("After filtering the region the dataframe has to many entries fo a heatmap, please filter more specifically - Try other filters")
+                alert.exec()
+                return
+
             regions = input_csv.index.to_numpy()
             input_csv = input_csv.reset_index(drop = True)
+
+            if input_csv.empty:
+                alert = utils.QMessageBox()
+                alert.setText("After filtering the region the dataframe it is empty! - Try other filters")
+                alert.exec()
+                return
 
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
