@@ -61,22 +61,35 @@ class AnalysisAndPlots:
         choose_information_file = utils.QPushButton("Choose List information file (information.csv)")
 
         metadata_file = utils.QLineEdit("")
-        choose_metadata_file = utils.QPushButton("Choose metadata file")
+        choose_metadata_file = utils.QPushButton("Choose metadata file") 
 
-        PWindow = PlotWindow()
+
+        ontology_table = ontology_mouse_overview()
+        ontology_headers = list(ontology_table)
+        ontology_mouse_table = utils.QTableWidget()
+        ontology_mouse_table.setRowCount(ontology_table.shape[0])
+        ontology_mouse_table.setColumnCount(ontology_table.shape[1])
+        ontology_mouse_table.setHorizontalHeaderLabels(ontology_headers)
+
+        ontology_table_array = ontology_table.values
+        for row in range(ontology_table.shape[0]):
+            for col in range(ontology_table.shape[1]):
+                ontology_table.setItem(row, col, utils.QTableWidgetItem(str(ontology_table_array[row,col]))) 
+
+        plot_window = PlotWindow()
 
         self.input_csv = utils.pd.DataFrame()
         self.metadata_csv = utils.pd.DataFrame()
         self.information_csv = utils.pd.DataFrame()
 
-        filter_level_ComboBox = utils.QComboBox()
-        filter_level_ComboBox.insertItem(0, "None")
+        filter_level_combobox = utils.QComboBox()
+        filter_level_combobox.insertItem(0, "None")
         for i in range(1, 13):
-            filter_level_ComboBox.insertItem(i, str(i))
+            filter_level_combobox.insertItem(i, str(i))
 
-        filter_region_LineEdit = utils.QLineEdit("")
+        filter_region_lineedit = utils.QLineEdit("")
 
-        filter_specific_region_LineEdit = utils.QLineEdit("")
+        filter_specific_region_lineedit = utils.QLineEdit("")
 
         set_input = utils.QPushButton("Set input and metadata")
 
@@ -96,6 +109,10 @@ class AnalysisAndPlots:
         inner_layout.addWidget(choose_information_file, 2, 2)
         inner_layout.addWidget(set_input, 3, 0)
 
+
+        inner_layout.addWidget(utils.QLabel("<b>Ontology Mouse Overview"))
+        inner_layout.addWidget(ontology_mouse_table,3,1)
+
         inner_layout2.addWidget(utils.QLabel("<b>PCA</b>"))
         inner_layout2.addWidget(create_pca)
         inner_layout2.addStretch()
@@ -105,19 +122,21 @@ class AnalysisAndPlots:
 
         inner_layout4.addWidget(utils.QLabel("<b>Heatmap</b>"))
         inner_layout4.addWidget(utils.QLabel("Select a structure level to filter for"))
-        inner_layout4.addWidget(filter_level_ComboBox)
+        inner_layout4.addWidget(filter_level_combobox)
         inner_layout4.addWidget(utils.QLabel("Name a region to filter for ist subregions"))
-        inner_layout4.addWidget(filter_region_LineEdit)
+        inner_layout4.addWidget(filter_region_lineedit)
         inner_layout4.addWidget(create_heatmap)
         inner_layout4.addStretch()
 
+       
+
         inner_layout5.addWidget(utils.QLabel("<b>Boxplot</b>"))
         inner_layout5.addWidget(utils.QLabel("Please name specific region"))
-        inner_layout5.addWidget(filter_specific_region_LineEdit)
+        inner_layout5.addWidget(filter_specific_region_lineedit)
         inner_layout5.addWidget(create_boxplot)
         inner_layout5.addStretch()
 
-        inner_layout6.addWidget(PWindow)
+        inner_layout6.addWidget(plot_window)
 
         intermediate_layout.addLayout(inner_layout2)
         intermediate_layout.addLayout(inner_layout3)
@@ -133,6 +152,10 @@ class AnalysisAndPlots:
         choose_metadata_file.pressed.connect(lambda: select_metadata_file())
         choose_information_file.pressed.connect(lambda: select_information_file())
         create_pca.pressed.connect(lambda: pca())
+        
+
+        # QTabelWidget
+        
         create_heatmap.pressed.connect(lambda:heatmap())
         create_boxplot.pressed.connect(lambda:boxplot())
         set_input.pressed.connect(lambda: set_input_and_metadata())
@@ -225,10 +248,23 @@ class AnalysisAndPlots:
 
                 return regplots
 
-            PWindow.figure.clear()
-            ax = PWindow.figure.add_subplot(111)
-            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', ax=ax)
-            PWindow.canvas.draw()
+            plot_window.figure.clear()
+            variable_ax = plot_window.figure.add_subplot(111)
+            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', variable_ax=variable_ax)
+            plot_window.canvas.draw()
+
+
+        def ontology_mouse_overview():
+            """Creating an overview for the user to select a specific region (*name*) and st_level"""
+            df_selected_table = utils.pd.read_csv("./ontology_mouse.csv")
+            selected_columns = ["st_level", "name"]
+            print(df_selected_table[selected_columns])
+
+            # first sorting the st_levels and afterwards the region names alphabeticaly
+            selected_and_sorted_table = df_selected_table.sort_values(["st_level", "name"], axis=0, ascending=[True, True], inplace=True)
+            return selected_and_sorted_table
+            
+
 
         def heatmap():
             """Plot Heatmap"""
@@ -236,8 +272,8 @@ class AnalysisAndPlots:
             print(input_csv)
             information = self.information_csv.copy()
 
-            if filter_region_LineEdit.text() != "":
-                region = filter_region_LineEdit.text()
+            if filter_region_lineedit.text() != "":
+                region = filter_region_lineedit.text()
                 print(information["TrackedWay"])
                 if region in information["TrackedWay"]:
                     index_list = []
@@ -254,8 +290,8 @@ class AnalysisAndPlots:
                     return
                 brainregion = "region_" + region
 
-            if filter_level_ComboBox.currentText() != "None":
-                level = int(filter_level_ComboBox.currentText())
+            if filter_level_combobox.currentText() != "None":
+                level = int(filter_level_combobox.currentText())
                 index_list = []
                 for i,val in enumerate(information["CorrespondingLevel"]):
                     array = eval(val)
@@ -278,21 +314,8 @@ class AnalysisAndPlots:
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             input_csv = input_csv.loc[(input_csv!=0).any(axis=1)]
 
-            print("Input csv shape:  ",input_csv.shape )
-            if input_csv.shape[0] > 25:
-                alert = utils.QMessageBox()
-                alert.setText("After filtering the region the dataframe has to many entries fo a heatmap, please filter more specifically - Try other filters")
-                alert.exec()
-                return
-
             regions = input_csv.index.to_numpy()
             input_csv = input_csv.reset_index(drop = True)
-
-            if input_csv.empty:
-                alert = utils.QMessageBox()
-                alert.setText("After filtering the region the dataframe it is empty! - Try other filters")
-                alert.exec()
-                return
 
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
@@ -302,22 +325,22 @@ class AnalysisAndPlots:
             utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
             utils.plt.close()
 
-            PWindow.figure.clear()
+            plot_window.figure.clear()
 
-            ax = PWindow.figure.add_subplot(111)
+            variable_ax = plot_window.figure.add_subplot(111)
 
-            utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, ax = ax)
+            utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, variable_ax = variable_ax)
             utils.plt.close()
 
-            PWindow.canvas.draw()
+            plot_window.canvas.draw()
 
 
         def boxplot():
             input_csv = self.input_csv.copy()
             print(input_csv)
             # information = self.information_csv.copy()
-            if filter_specific_region_LineEdit.text() != "":
-                region = filter_specific_region_LineEdit.text()
+            if filter_specific_region_lineedit.text() != "":
+                region = filter_specific_region_lineedit.text()
                 if region in input_csv.index:
                     input_csv = input_csv[input_csv.index == region]
 
@@ -379,9 +402,9 @@ class AnalysisAndPlots:
                     df_tmp = utils.pd.DataFrame({method: array_for_boxplots[val]})
                     df_tmp["condition"] = i
                     df_boxplot = utils.pd.concat([df_boxplot, df_tmp])
-                    fig, ax = utils.plt.subplots()
-                    ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
-                    ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
+                    fig, variable_ax = utils.plt.subplots()
+                    variable_ax = utils.sns.boxplot(x="condition", y=method, data=df_boxplot)
+                    variable_ax = utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25")
 
                     region_name = str(region_name).replace(" ", "")
                     region_name = str(region_name).replace("/", "")
@@ -392,9 +415,9 @@ class AnalysisAndPlots:
                 utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
                 utils.plt.close
 
-                PWindow.figure.clear()
-                ax2 = PWindow.figure.add_subplot(111)
-                utils.sns.boxplot(x="condition", y=method, data=df_boxplot, ax = ax2)
-                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax = ax2)
-                PWindow.canvas.draw()
+                plot_window.figure.clear()
+                ax2 = plot_window.figure.add_subplot(111)
+                utils.sns.boxplot(x="condition", y=method, data=df_boxplot, variable_ax = ax2)
+                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", variable_ax = ax2)
+                plot_window.canvas.draw()
         return tab
