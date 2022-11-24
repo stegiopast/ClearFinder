@@ -72,6 +72,7 @@ Napari_env
 ```bash
 conda create -y -n Napari_env napari -c conda-forge
 conda activate Napari_env
+conda update napari
 conda deactivate
 ```
 
@@ -333,6 +334,42 @@ You can search for the existence of regions in the table on the right side of th
 The application is designed to produce similar output data from Cellfinder and ClearMap to enable the comparison of both software packages. The grouping and normalization step can therefore be performed together with samples of one or the other processing tool. Be aware that we do not guarantee the scientific relevance of your findings. Be aware the statistical meaningfulness of the experiment still lies on the users responsibility. Be careful which data you use or combine and how you normalize it.
 
 
-### Visualizazion with napari
+### Visualisation with napari
+
+Defore starting with the visualization you will need to install two plugins. For that please open napari and click on Plugins -> Install/Uninstall Plugins.
+A new window will pop up. Please type cellfinder-napari in the filter section at the top of the new window. Click on the blue install button.  
+After that please type brainglobe-napari-io in the filter section. Click on the blue install button. Please restart napari to complete the installation of both plugins. 
+
+
+In order to visualize images of signal and autofluorscent channels, one can click on:  File -> Open folder -> Signal_folder (In dialogue window)
+
+The detected maxima can be visualized with the output files of Cellfinder and Clearmap in xml format. These files can be found in the following folders:
+
+Cellfinder 
+```
+Sample_folder
+│
+│
+│
+└───points
+    |   cell_classification.xml
+
+```
+
+
+ClearMap
+
+```
+Sample_folder
+│
+│
+│
+└───C0XxmlFiles
+    |  cells_C0X.xml 
+
+```
+
+The ouput xml files can be opened in napari after the plugin installation. Click File -> Open File(s) -> *.xml 
+
 
 
