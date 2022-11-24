@@ -41,6 +41,13 @@ Please follow the instructions of the nextflow installation guide
 
 Cellfinder_env
 
+Please install all drivers of your graphics device on the computer to make sure your GPU is working. 
+You can find help with your GPU Setup on:
+
+https://docs.brainglobe.info/cellfinder/installation/using-gpu
+https://www.nvidia.com/download/index.aspx
+
+
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
@@ -324,3 +331,8 @@ You can search for the existence of regions in the table on the right side of th
 ### Processing of ClearMap and Cellfinder after Atlas alignment
 
 The application is designed to produce similar output data from Cellfinder and ClearMap to enable the comparison of both software packages. The grouping and normalization step can therefore be performed together with samples of one or the other processing tool. Be aware that we do not guarantee the scientific relevance of your findings. Be aware the statistical meaningfulness of the experiment still lies on the users responsibility. Be careful which data you use or combine and how you normalize it.
+
+
+### Visualizazion with napari
+
+
