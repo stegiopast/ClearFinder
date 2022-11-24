@@ -10,7 +10,7 @@ from multiprocessing import Process
 # Qt
 from PyQt5.QtGui import QWindow
 from PyQt5.QtWidgets import QDialog, QApplication, QWidget, QPushButton, QVBoxLayout, QTabWidget, QGridLayout
-from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QCheckBox, QHBoxLayout, QListWidget, QTableWidget, QFileDialog
+from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QCheckBox, QHBoxLayout, QListWidget, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import Qt
 
 import pandas as pd
