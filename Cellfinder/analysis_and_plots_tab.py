@@ -44,7 +44,9 @@ class AnalysisAndPlots:
     def analysis_layout(self):
         tab = utils.QWidget()
 
+        outer_layout_hor = utils.QHBoxLayout()
         outer_layout = utils.QVBoxLayout()
+        outer_layout2 = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
         intermediate_layout = utils.QHBoxLayout()
 
@@ -53,6 +55,7 @@ class AnalysisAndPlots:
         inner_layout4 = utils.QVBoxLayout()
         inner_layout5 = utils.QVBoxLayout()
         inner_layout6 = utils.QHBoxLayout()
+        
 
         input_file = utils.QLineEdit("")
         choose_input_file = utils.QPushButton("Choose input file")
@@ -62,6 +65,20 @@ class AnalysisAndPlots:
 
         metadata_file = utils.QLineEdit("")
         choose_metadata_file = utils.QPushButton("Choose metadata file") 
+
+
+        def ontology_mouse_overview():
+            """Creating an overview for the user to select a specific region (*name*) and st_level"""
+            df_selected_table = utils.pd.read_csv("./ontology_mouse.csv", sep=";",header=0)
+            selected_columns = ["st_level", "name"]
+            df_selected_table = df_selected_table[selected_columns]
+            print(df_selected_table[selected_columns])
+
+            # first sorting the st_levels and afterwards the region names alphabeticaly
+            selected_and_sorted_table = df_selected_table.sort_values(["st_level", "name"],ascending=[True, True])
+            print(selected_and_sorted_table)
+            return selected_and_sorted_table
+            
 
 
         ontology_table = ontology_mouse_overview()
@@ -74,7 +91,7 @@ class AnalysisAndPlots:
         ontology_table_array = ontology_table.values
         for row in range(ontology_table.shape[0]):
             for col in range(ontology_table.shape[1]):
-                ontology_table.setItem(row, col, utils.QTableWidgetItem(str(ontology_table_array[row,col]))) 
+                ontology_mouse_table.setItem(row, col, utils.QTableWidgetItem(str(ontology_table_array[row,col]))) 
 
         plot_window = PlotWindow()
 
@@ -110,8 +127,6 @@ class AnalysisAndPlots:
         inner_layout.addWidget(set_input, 3, 0)
 
 
-        inner_layout.addWidget(utils.QLabel("<b>Ontology Mouse Overview"))
-        inner_layout.addWidget(ontology_mouse_table,3,1)
 
         inner_layout2.addWidget(utils.QLabel("<b>PCA</b>"))
         inner_layout2.addWidget(create_pca)
@@ -146,7 +161,15 @@ class AnalysisAndPlots:
         outer_layout.addLayout(inner_layout)
         outer_layout.addLayout(intermediate_layout)
         outer_layout.addLayout(inner_layout6)
-        tab.setLayout(outer_layout)
+
+        
+        outer_layout2.addWidget(utils.QLabel("<b>Ontology Mouse Overview"))
+        outer_layout2.addWidget(ontology_mouse_table)
+        
+        outer_layout_hor.addLayout(outer_layout)
+        outer_layout_hor.addLayout(outer_layout2)
+        
+        tab.setLayout(outer_layout_hor)
 
         choose_input_file.pressed.connect(lambda: select_input_file())
         choose_metadata_file.pressed.connect(lambda: select_metadata_file())
@@ -220,7 +243,7 @@ class AnalysisAndPlots:
             for i,txt in enumerate(pc_df["Cluster"]):
                 utils.plt.annotate(txt, (list(pc_df["PC1"])[i], list(pc_df["PC2"])[i]), ha = "center", va = "bottom")
 
-            utils.plt.savefig(output_dir + output_name)
+            #utils.plt.savefig(output_dir + output_name)
             utils.plt.close()
 
             def hue_regplot(data, x, y, hue, palette=None, **kwargs):
@@ -250,20 +273,10 @@ class AnalysisAndPlots:
 
             plot_window.figure.clear()
             variable_ax = plot_window.figure.add_subplot(111)
-            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', variable_ax=variable_ax)
+            hue_regplot(data=pc_df, x='PC1', y='PC2', hue='Condition', ax=variable_ax)
+            plot_window.figure.tight_layout()
             plot_window.canvas.draw()
 
-
-        def ontology_mouse_overview():
-            """Creating an overview for the user to select a specific region (*name*) and st_level"""
-            df_selected_table = utils.pd.read_csv("./ontology_mouse.csv")
-            selected_columns = ["st_level", "name"]
-            print(df_selected_table[selected_columns])
-
-            # first sorting the st_levels and afterwards the region names alphabeticaly
-            selected_and_sorted_table = df_selected_table.sort_values(["st_level", "name"], axis=0, ascending=[True, True], inplace=True)
-            return selected_and_sorted_table
-            
 
 
         def heatmap():
@@ -272,6 +285,7 @@ class AnalysisAndPlots:
             print(input_csv)
             information = self.information_csv.copy()
 
+            brainregion= ""
             if filter_region_lineedit.text() != "":
                 region = filter_region_lineedit.text()
                 print(information["TrackedWay"])
@@ -314,32 +328,62 @@ class AnalysisAndPlots:
             input_csv = input_csv[utils.np.isfinite(input_csv).all(1)]
             input_csv = input_csv.loc[(input_csv!=0).any(axis=1)]
 
+            print("Input csv shape:  ",input_csv.shape )
+            if input_csv.shape[0] > 50:
+                alert = utils.QMessageBox()
+                alert.setText("After filtering the region the dataframe has to many entries fo a heatmap, please filter more specifically - Try other filters")
+                alert.exec()
+                return
+
             regions = input_csv.index.to_numpy()
             input_csv = input_csv.reset_index(drop = True)
+
+
+            if input_csv.empty:
+                alert = utils.QMessageBox()
+                alert.setText("After filtering the region the dataframe it is empty! - Try other filters")
+                alert.exec()
+                return
 
             output_dir = utils.os.path.dirname(input_file.text())
             output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
 
-            utils.sns.heatmap(input_csv, yticklabels=regions, annot=False)
-            utils.plt.title(brainregion)
-            utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
+            #utils.sns.heatmap(input_csv, yticklabels=regions, annot=False)
+            #utils.plt.title(brainregion)
+            #utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
             utils.plt.close()
 
             plot_window.figure.clear()
 
             variable_ax = plot_window.figure.add_subplot(111)
 
-            utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, variable_ax = variable_ax)
+            utils.sns.heatmap(input_csv, yticklabels=regions, annot=False, ax=variable_ax)
+            utils.plt.title(brainregion)
             utils.plt.close()
 
+            plot_window.figure.tight_layout()
             plot_window.canvas.draw()
 
 
+
         def boxplot():
+
             input_csv = self.input_csv.copy()
             print(input_csv)
             # information = self.information_csv.copy()
+
+            # new
+            information = self.information_csv.copy()
+            brainregion = ""
             if filter_specific_region_lineedit.text() != "":
+                region = filter_specific_region_lineedit.text()
+                print(information["TrackedWay"])
+                if region not in information["TrackedWay"]:
+                    alert = utils.QMessageBox()
+                    alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
+                    alert.exec()
+                    return
+
                 region = filter_specific_region_lineedit.text()
                 if region in input_csv.index:
                     input_csv = input_csv[input_csv.index == region]
@@ -412,12 +456,14 @@ class AnalysisAndPlots:
 
                 output_dir = utils.os.path.dirname(input_file.text())
                 output_name = "/" + region + "_boxplot_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
-                utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
+                #utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
                 utils.plt.close
 
                 plot_window.figure.clear()
                 ax2 = plot_window.figure.add_subplot(111)
-                utils.sns.boxplot(x="condition", y=method, data=df_boxplot, variable_ax = ax2)
-                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", variable_ax = ax2)
+                utils.sns.boxplot(x="condition", y=method, data=df_boxplot, ax = ax2)
+                utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax=ax2)
+                plot_window.figure.tight_layout()
                 plot_window.canvas.draw()
+               
         return tab
