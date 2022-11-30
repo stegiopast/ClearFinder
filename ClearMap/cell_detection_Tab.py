@@ -131,7 +131,7 @@ def write_xml(df_non_cells:utils.pd.DataFrame,df_cells: utils.pd.DataFrame, path
         file.write('  <Marker_Data>\n')
         file.write('    <Current_Type>1</Current_Type>\n')
         file.write('    <Marker_Type>\n')
-        file.write('      <Type>2</Type>\n')
+        file.write('      <Type>1</Type>\n')
         for i in range(len(df_non_cells.iloc[:, 0])):
             row_counter = row_counter + 1
             if row_counter % 10000 == 0:
@@ -143,7 +143,7 @@ def write_xml(df_non_cells:utils.pd.DataFrame,df_cells: utils.pd.DataFrame, path
             file.write('      </Marker>\n')
         file.write('    </Marker_Type>\n')
         file.write('    <Marker_Type>\n')
-        file.write('      <Type>1</Type>\n')
+        file.write('      <Type>2</Type>\n')
         for i in range(len(df_cells.iloc[:, 0])):
             row_counter2 = row_counter2 + 1
             if row_counter2 % 10000 == 0:
@@ -176,7 +176,7 @@ def write_transformed_xml(df_non_cells: utils.pd.DataFrame,df_cells: utils.pd.Da
         file.write('  <Marker_Data>\n')
         file.write('    <Current_Type>1</Current_Type>\n')
         file.write('    <Marker_Type>\n')
-        file.write('      <Type>2</Type>\n')
+        file.write('      <Type>1</Type>\n')
         for i in range(len(df_non_cells.iloc[:, 0])):
             row_counter = row_counter + 1
             if row_counter % 10000 == 0:
@@ -188,7 +188,7 @@ def write_transformed_xml(df_non_cells: utils.pd.DataFrame,df_cells: utils.pd.Da
             file.write('      </Marker>\n')
         file.write('    </Marker_Type>\n')
         file.write('    <Marker_Type>\n')
-        file.write('      <Type>1</Type>\n')
+        file.write('      <Type>2</Type>\n')
         for i in range(len(df_cells.iloc[:, 0])):
             row_counter2 = row_counter2 + 1
             if row_counter2 % 10000 == 0:
@@ -215,28 +215,26 @@ def process_cells_csv(my_working_directory, chosen_channel):
     df = utils.pd.read_csv(df_name, header=0, sep=";")
 
     df_no_label_filename = "/cells_" + chosen_channel + "_no_label.csv"
-    df_no_label_name = my_working_directory + df_no_label_filename
     df_no_label = df[df["name"] == "No label"]
-    #df_no_label.to_csv(df_no_label_name, sep=";")
+
 
     df_universe_filename = "/cells_" + chosen_channel + "_universe.csv"
-    df_universe_name = my_working_directory + df_universe_filename
     df_universe = df[df["name"] == "universe"]
-    #df_universe.to_csv(df_universe_name, sep=";")
+
 
     df_universe_plus_no_label_filename = "/non_cells_" + chosen_channel + ".csv"
     df_universe_plus_no_label_name = my_working_directory + df_universe_plus_no_label_filename
     df_universe_plus_no_label = utils.pd.concat([df_no_label,df_universe], axis=0)
     df_universe_plus_no_label.to_csv(df_universe_plus_no_label_name)
 
-
-    df_final_filename = "/cell_classification_" + chosen_channel + ".csv"
-    df_final_name = my_working_directory + df_filename
+    
     df_final = df[df["name"] != "universe"]
     df_final = df_final[df_final["name"] != "No label"]
-    df_final.to_csv(df_filename, sep=";")
 
+
+    df_final_filename = "/cell_classification_" + chosen_channel + ".csv"
     df_final_transformed_filename = "/cell_classification_" + chosen_channel + "_transformed.csv"
+
 
     # Multiprocessing the convertion from CSV to XML
     p1 = utils.Process(target=write_xml, args=(df_universe_plus_no_label, df_final, pathname2xmlfolder, df_final_filename))
