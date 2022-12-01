@@ -106,9 +106,9 @@ class Preanalysis_And_Normalization:
             else:
                 try:
                     utils.os.makedirs(final_output_directory.text())
-                except (ValueError,NameError):
+                except (ValueError,NameError,FileNotFoundError):
                     alert = utils.QMessageBox()
-                    alert.setText("Directory  is not creatable!\n Make sure the parent path to the new directory exists.")
+                    alert.setText("Directory is not creatable!\n Make sure the parent path to the new directory exists.")
                     alert.exec()
                     return
 
@@ -120,6 +120,17 @@ class Preanalysis_And_Normalization:
                     metadata_list.append([metadata_table.cellWidget(i,j).text() for j in range(metadata_table.columnCount())])
                 else:
                     pass
+            if metadata_list == []:
+                alert = utils.QMessageBox()
+                alert.setText("Please insert metadata in table above.")
+                alert.exec()
+                return
+            if final_output_directory.text() == "":
+                alert = utils.QMessageBox()
+                alert.setText("Please chosse a final output directory to write the metadata.csv.")
+                alert.exec()
+                return
+
             metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list),columns = ["sample","condition"])
             metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep = ";")
             print(metadata_list)
@@ -131,6 +142,12 @@ class Preanalysis_And_Normalization:
             print(files_to_analyse)
             for i in files_to_analyse:
                 df_list.append(utils.pd.read_csv(i, header=0, sep=";"))
+            
+            if df_list == []:
+                alert = utils.QMessageBox()
+                alert.setText("Please add analysis files!")
+                alert.exec()
+                return
 
             new_df = utils.pd.DataFrame(df_list[0]["Region"])
             new_df2 = utils.pd.DataFrame(df_list[0]["Region"])
@@ -209,7 +226,7 @@ class Preanalysis_And_Normalization:
                 df_hier_abs.to_csv(final_output_directory.text() + "/" + df_hier_abs_filename, sep = ";")
             else:
                 alert = utils.QMessageBox()
-                alert.setText("Directory input does not exist!\n Maike sure that the path to the new directory exists.")
+                alert.setText("Directory input does not exist!\n Make sure that the path to the new directory exists.")
                 alert.exec()
                 return
         return tab
