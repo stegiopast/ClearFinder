@@ -165,7 +165,9 @@ class InitWorkspace():
             print("Channel chosen:", self.chosen_channel)
             return [ws, my_working_directory]
         else:
-            print("Path does not exist!")
+            alert = utils.QMessageBox()
+            alert.setText("Path does not exist!")
+            alert.exec()
 
 
 class RenameLayout:
@@ -181,7 +183,7 @@ class RenameLayout:
 
 
         def rename_files(_path, extend):
-            if utils.os.path.exists(_path):
+            if utils.os.path.exists(_path + extend):
                 pathlist = [_path + extend]
                 ## Remove all the tabs in the filenames
                 ## Iteration over each file in Auto and Signal directories
@@ -225,7 +227,7 @@ class RenameLayout:
 
             else:
                 alert = utils.QMessageBox()
-                alert.setText("Path does not exist!")
+                alert.setText("Path does not exist! Please check github documentation to select the workspace correctly.")
                 alert.exec()
 
 

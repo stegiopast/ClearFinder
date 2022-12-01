@@ -19,6 +19,17 @@ class ResamplingAlignment:
                       orientation_x=1,
                       orientation_y=2,
                       orientation_z=3):
+        if not utils.os.path.exists(self.my_working_directory):
+            alert = utils.QMessageBox()
+            alert.setText("Path to your working directory does not exist! Please check if your workspace was set correctly.")
+            alert.exec()
+            return
+        elif not utils.os.path.exists(self.my_working_directory + "/Signal") or not utils.os.path.exists(self.my_working_directory + "/Auto"):
+            alert = utils.QMessageBox()
+            alert.setText("Path to your working directory does not contain a Signal or Auto folder! Please choose another path and check documentation about the folder structure.")
+            alert.exec()
+            return
+
 
         if not utils.os.path.exists(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel):
             utils.os.mkdir(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel)
