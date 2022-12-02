@@ -127,7 +127,7 @@ class Preanalysis_And_Normalization:
                 return
             if final_output_directory.text() == "":
                 alert = utils.QMessageBox()
-                alert.setText("Please chosse a final output directory to write the metadata.csv.")
+                alert.setText("Please choose a final output directory to write the metadata.csv.")
                 alert.exec()
                 return
 
@@ -158,6 +158,11 @@ class Preanalysis_And_Normalization:
                 new_df[file_base_name] = val["RegionCellCount"]
                 new_df2[file_base_name] = val["RegionCellCountSummedUp"]
 
+            if not utils.os.path.exists(final_output_directory.text()):
+                alert = utils.QMessageBox()
+                alert.setText("Please set output directory first.")
+                alert.exec()
+                return
             new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";",index=False)
             new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv",sep=";",index=False)
             new_df3.to_csv(final_output_directory.text() + "/list_information.csv", sep = ";", index=False)

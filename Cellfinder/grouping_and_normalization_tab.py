@@ -112,6 +112,18 @@ class GroupingAndNormalization:
                     metadata_list.append([metadata_table.cellWidget(i,j).text() for j in range(metadata_table.columnCount())])
                 else:
                     pass
+
+            if metadata_list == []:
+                alert = utils.QMessageBox()
+                alert.setText("Please insert metadata in table above.")
+                alert.exec()
+                return
+            if final_output_directory.text() == "":
+                alert = utils.QMessageBox()
+                alert.setText("Please choose a final output directory to write the metadata.csv.")
+                alert.exec()
+                return
+
             metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list), columns=["sample","condition"])
             metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep=";")
             print(metadata_list)
@@ -123,6 +135,12 @@ class GroupingAndNormalization:
             for i in files_to_analyse:
                 df_list.append(utils.pd.read_csv(i, header=0, sep=";"))
 
+            if df_list == []:
+                alert = utils.QMessageBox()
+                alert.setText("Please add analysis files!")
+                alert.exec()
+                return
+
             new_df = utils.pd.DataFrame(df_list[0]["Region"])
             new_df2 = utils.pd.DataFrame(df_list[0]["Region"])
             new_df3 = utils.pd.DataFrame(df_list[0][["Region","TrackedWay","CorrespondingLevel"]])
@@ -132,9 +150,17 @@ class GroupingAndNormalization:
                 new_df[file_basename] = val["RegionCellCount"]
                 new_df2[file_basename] = val["RegionCellCountSummedUp"]
 
+            if not utils.os.path.exists(final_output_directory.text()):
+                alert = utils.QMessageBox()
+                alert.setText("Please set output directory first.")
+                alert.exec()
+                return
+
             new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";", index=False)
             new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep=";", index=False)
             new_df3.to_csv(final_output_directory.text() + "/list_information.csv", sep = ";", index=False)
+
+
 
         def logtransform_normalize_filter():
             if utils.os.path.exists(final_output_directory.text()):

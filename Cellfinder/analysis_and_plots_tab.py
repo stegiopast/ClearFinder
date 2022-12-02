@@ -196,14 +196,25 @@ class AnalysisAndPlots:
             input_information_file.setText(path[0])
 
         def set_input_and_metadata():
-            self.input_csv = utils.pd.read_csv(input_file.text(), sep=";", header = 0, index_col = 0)
-            self.metadata_csv = utils.pd.read_csv(metadata_file.text(), sep=";", header = 0, index_col = 0)
-            self.information_csv = utils.pd.read_csv(input_information_file.text(), sep=";", header=0, index_col=0)
-            print(self.input_csv)
-            print(self.metadata_csv)
-            print(self.information_csv)
+            if utils.os.path.exists(input_file.text()) and utils.os.path.exists(metadata_file.text()) and utils.os.path.exists(input_information_file.text()):
+                self.input_csv = utils.pd.read_csv(input_file.text(), sep=";", header = 0, index_col = 0)
+                self.metadata_csv = utils.pd.read_csv(metadata_file.text(), sep=";", header = 0, index_col = 0)
+                self.information_csv = utils.pd.read_csv(input_information_file.text(), sep=";", header=0, index_col=0)
+                print(self.input_csv)
+                print(self.metadata_csv)
+                print(self.information_csv)
+            else:
+                alert = utils.QMessageBox()
+                alert.setText("Some of the input files do not exist!")
+                alert.exec()
+                return
 
         def pca():
+            if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
+                alert = utils.QMessageBox()
+                alert.setText("Some of the input files do not exist!")
+                alert.exec()
+                return
             input_csv = self.input_csv.copy()
             input_csv = input_csv.reset_index(drop = True)
             input_csv = input_csv.loc[:,input_csv.columns != "Region"]
@@ -280,6 +291,11 @@ class AnalysisAndPlots:
 
 
         def heatmap():
+            if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
+                alert = utils.QMessageBox()
+                alert.setText("Some of the input files do not exist!")
+                alert.exec()
+                return
             """Plot Heatmap"""
             input_csv = self.input_csv.copy()
             print(input_csv)
@@ -331,7 +347,7 @@ class AnalysisAndPlots:
             print("Input csv shape:  ",input_csv.shape )
             if input_csv.shape[0] > 50:
                 alert = utils.QMessageBox()
-                alert.setText("After filtering the region the dataframe has to many entries fo a heatmap, please filter more specifically - Try other filters")
+                alert.setText("After filtering the region the dataframe has too many entries for a heatmap, please filter more specifically - Try other filters")
                 alert.exec()
                 return
 
@@ -367,7 +383,11 @@ class AnalysisAndPlots:
 
 
         def boxplot():
-
+            if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
+                alert = utils.QMessageBox()
+                alert.setText("Some of the input files do not exist!")
+                alert.exec()
+                return
             input_csv = self.input_csv.copy()
             print(input_csv)
             # information = self.information_csv.copy()
