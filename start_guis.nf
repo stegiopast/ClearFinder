@@ -57,9 +57,11 @@ process start_cellfinder(){
     input:
     val done from cellfinder_prep
     """
+    #!/usr/bin/bash
     source activate ${params.Cellfinder_env}
     #echo "" > ${params.run_dir}/cellfinder_log.log
-    #python ${params.run_dir}/Cellfinder/gui.py >> ${params.run_dir}/cellfinder_log.log
+    cd ${params.run_dir}/Cellfinder/
+    python gui.py 
     """
 }
 
@@ -68,9 +70,11 @@ process start_clearmap(){
     input:
     val done from clearmap_prep
     """
+    #!/usr/bin/bash
     source activate ${params.Clearmap_env}
     #echo "" > ${params.run_dir}/clearmap_log.log
-    #python ${params.run_dir}/ClearMap/gui.py >> ${params.run_dir}/clearmap_log.log
+    cd ${params.run_dir}/ClearMap/
+    python gui.py 
     """
 }
 
@@ -78,8 +82,9 @@ process start_napari(){
     input:
     val done from napari_prep
     """
+    #!/usr/bin/bash
     source activate ${params.Napari_env}
+    napari
     #echo "" > ${params.run_dir}/napari_log.log
-    #napari >> ${params.run_dir}/napari_log.log
     """
 }
