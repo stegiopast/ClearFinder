@@ -159,9 +159,15 @@ def assignment(choice, wd):
         return
     elif not utils.os.path.exists(wd):
         alert = utils.QMessageBox()
-        alert.setText("You did not chosse a sample yet!")
+        alert.setText("You did not choose a sample yet!")
         alert.exec()
         return
+    elif not utils.os.path.exists(wd + "/analysis/summary.csv"):
+        alert = utils.QMessageBox()
+        alert.setText("You did not run the cell detection yet!")
+        alert.exec()
+        return
+    
     process_cells_csv(wd)
     embeded_ontology(choice,wd)
     return
