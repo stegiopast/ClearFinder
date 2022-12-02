@@ -152,6 +152,16 @@ def embeded_ontology(choice, my_working_directory):
     return
 
 def assignment(choice, wd):
+    if wd == "":
+        alert = utils.QMessageBox()
+        alert.setText("You did not chosse a sample yet!")
+        alert.exec()
+        return
+    elif not utils.os.path.exists(wd):
+        alert = utils.QMessageBox()
+        alert.setText("You did not chosse a sample yet!")
+        alert.exec()
+        return
     process_cells_csv(wd)
     embeded_ontology(choice,wd)
     return
