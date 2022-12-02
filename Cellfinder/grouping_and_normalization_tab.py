@@ -99,7 +99,7 @@ class GroupingAndNormalization:
             if not utils.os.path.exists(final_output_directory.text()):
                 try:
                     utils.os.makedirs(final_output_directory.text())
-                except (ValueError,NameError):
+                except (ValueError,NameError,FileNotFoundError):
                     alert = utils.QMessageBox()
                     alert.setText("Directory  is not creatable!\n Make sure the parent path to the new directory exists.")
                     alert.exec()
