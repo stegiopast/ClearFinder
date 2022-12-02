@@ -440,6 +440,13 @@ class CellDetection:
                                     overlap=area_of_overlap,  # 10 30
                                     verbose=True)  # Set True if process needs to be investigated // Lead to the print of process checkpoints
 
+        if self.ws == None:
+            alert = utils.QMessageBox()
+            alert.setText("You did not choose a workspace yet!")
+            alert.exec()
+            return
+
+
         utils.cells.detect_cells(self.ws.filename('stitched_' + self.chosen_channel),
                            self.ws.filename('cells', postfix='raw_' + self.chosen_channel),
                            cell_detection_parameter=cell_detection_parameter,
@@ -460,6 +467,11 @@ class CellDetection:
     #embed_ontology
     """
     def atlas_assignment(self):
+        if self.ws == None:
+            alert = utils.QMessageBox()
+            alert.setText("You did not choose a workspace yet!")
+            alert.exec()
+            return
         # sink_maxima = self.ws.filename('cells_', postfix = 'raw_'+self.channel_chosen)
         source = self.ws.filename('stitched_' + self.chosen_channel)
         sink_raw = self.ws.source('cells', postfix='raw_' + self.chosen_channel)
@@ -559,6 +571,13 @@ class CellDetection:
 
 
     def voxelization(self):
+        
+        if self.ws == None:
+            alert = utils.QMessageBox()
+            alert.setText("You did not choose a workspace yet!")
+            alert.exec()
+            return
+
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=(slice(None),
                                                                                                slice(None),
                                                                                                slice(0, 256)),
