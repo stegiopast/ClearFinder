@@ -128,6 +128,12 @@ class InitWorkspace:
 class RenameLayout:
     def rename_layout(self):
         def rename_files(_path, extend):
+            if not utils.os.path.exists(_path + extend):
+                alert2 = utils.QMessageBox()
+                alert2.setText("In this folder there is no Signal or Auto folder existent! Please choose different sample!")
+                alert2.exec()
+                return
+
             if utils.os.path.exists(_path):
                 pathlist = [_path + extend]
 
