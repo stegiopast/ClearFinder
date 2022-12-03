@@ -1,6 +1,6 @@
 # General information
 
-ClearFinder GUI is designed to assist working with ClearMap and Cell Finder, two tools for cell counting and atlas annotation of intact volumes of mouse brains. The data required for the applications is generated on a light-sheet microscope. The samples are whole mouse brains or hemispheres subjected to iDISCO+ tissue immunostaining and clearing protocol. Every sample requires an autofluorescence (Auto) and a signal datasets. The Auto is imaged in 488nm channel, therefore it's reccomended to avoid the secondary antibodies coupled to fluorophores in this range for immunostaining. To result in good signal to noise ratio, it is reccomended to use secondaries in red and far-red part of the spectrum. The quality of your analysis highly depends on the quality of the data: sample preparation, data acquisition and data preprocessing are steps that need to be optimized before starting with CellFinder.
+ClearFinder GUI is designed to assist working with ClearMap and Cell Finder, two tools for cell counting and atlas annotation of intact volumes of mouse brains. The data required for the applications is generated on a light-sheet microscope. The samples are whole mouse brains or hemispheres subjected to iDISCO+ tissue immunostaining and clearing protocol. Every sample requires an autofluorescence (Auto) and a signal datasets. The Auto is imaged in 488nm channel, therefore it's recommended to avoid the secondary antibodies coupled to fluorophores in this range for immunostaining. To result in good signal to noise ratio, it is recommended to use secondaries in red and far-red part of the spectrum. The quality of your analysis highly depends on the quality of the data: sample preparation, data acquisition and data preprocessing are steps that need to be optimized before starting with CellFinder.
 
 # ClearFinder
 ## Installation
@@ -41,12 +41,11 @@ Please follow the instructions of the nextflow installation guide
 
 Cellfinder_env
 
-Please install all drivers of your graphics device on the computer to make sure your GPU is working. 
+Please install all drivers of your graphics device on the computer to make sure your GPU is working.
 You can find help with your GPU Setup on:
 
-https://docs.brainglobe.info/cellfinder/installation/using-gpu
-https://www.nvidia.com/download/index.aspx
-
+<https://docs.brainglobe.info/cellfinder/installation/using-gpu>
+<https://www.nvidia.com/download/index.aspx>
 
 ```bash
 conda create -n Cellfinder_env python=3.9
@@ -88,7 +87,6 @@ python -m pip install "napari[all]" --upgrade
 napari
 conda deactivate
 ```
-
 
 ### 5.Start the application
 
@@ -254,6 +252,7 @@ You can search for the existence of regions in the table on the right side of th
 
 
  -> Additionally we follow a strict folder structure:
+
 ```
 Sample_folder
 │
@@ -265,7 +264,6 @@ Sample_folder
 │
 └───Signal
     |   *ZXXXX_C01.tif
-
 ```
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
@@ -333,7 +331,7 @@ In this tab data of samples from different conditions can be created. The proces
 
 All the datasets you need for the following step should be located in the output_folder you defined in the last step
 
-1. Choose an input count file by clicking the "Choose input file button". You can load eather hierarchical or non-hierarchical counts.
+1. Choose an input count file by clicking the "Choose input file button". You can load either hierarchical or non-hierarchical counts.
 2. Similarly to step 1, choose the metadata.csv file.
 3. Similarly to step 1, choose the list_information.csv file.
 4. After the selection of the 3 files please press "Set input and metadata" to confirm your choice.
@@ -350,16 +348,16 @@ The application is designed to produce similar output data from Cellfinder and C
 
 ### Visualisation with napari
 
-Defore starting with the visualization you will need to install two plugins. For that please open napari and click on Plugins -> Install/Uninstall Plugins.
-A new window will pop up. Please type cellfinder-napari in the filter section at the top of the new window. Click on the blue install button.  
-After that please type brainglobe-napari-io in the filter section. Click on the blue install button. Please restart napari to complete the installation of both plugins. 
+Before starting with the visualization you will need to install two plugins. For that please open napari and click on Plugins -> Install/Uninstall Plugins.
+A new window will pop up. Please type cellfinder-napari in the filter section at the top of the new window. Click on the blue install button.
+After that please type brainglobe-napari-io in the filter section. Click on the blue install button. Please restart napari to complete the installation of both plugins.
 
 
 In order to visualize images of signal and autofluorscent channels, one can click on:  File -> Open folder -> Signal_folder (In dialogue window)
 
 The detected maxima can be visualized with the output files of Cellfinder and Clearmap in xml format. These files can be found in the following folders:
 
-Cellfinder 
+Cellfinder
 ```
 Sample_folder
 │
@@ -379,11 +377,11 @@ Sample_folder
 │
 │
 └───C0XxmlFiles
-    |  cells_C0X.xml 
+    |  cells_C0X.xml
 
 ```
 
-The ouput xml files can be opened in napari after the plugin installation. Click File -> Open File(s) -> *.xml 
+The output xml files can be opened in napari after the plugin installation. Click File -> Open File(s) -> *.xml
 
 
 
