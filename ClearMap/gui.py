@@ -20,6 +20,7 @@ class Main_Window(utils.QWidget,
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ClearMap2 GUI")
+        self.setWindowIcon(utils.QIcon('./ClearMap_icon.png'))
         layout = utils.QVBoxLayout()
         self.setLayout(layout)
         tabs = utils.QTabWidget()
@@ -39,4 +40,5 @@ if __name__ == "__main__":
     app = utils.QApplication([])
     main_window = Main_Window()
     main_window.show()
+    app.setStyleSheet(utils.Path('ClearMap.css').read_text())
     app.exec()

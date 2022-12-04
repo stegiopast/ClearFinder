@@ -29,6 +29,8 @@ class MainWindow(utils.QWidget,
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Cellfinder GUI")
+        self.setWindowIcon(utils.QIcon('./Cellfinder_Icon.png'))
+
         self.resize(1600,800)
         layout = utils.QVBoxLayout()
         self.setLayout(layout)
@@ -52,4 +54,5 @@ if __name__ == "__main__":
     app = utils.QApplication([])
     MainWindow = MainWindow()
     MainWindow.show()
+    app.setStyleSheet(utils.Path('./Cellfinder.css').read_text())
     app.exec()
