@@ -1,5 +1,5 @@
 QWidget {
-    background-color: #242329;
+    background-color: #343e48;
     color: #f1ededef;
     font-weight:600;
   }
@@ -9,6 +9,10 @@ QLabel {
     font-weight: 600;
 
   }
+
+QIcon {
+    border-radius: 50%;
+}
 
 QLineEdit {
     border-radius: 8px;
@@ -29,7 +33,7 @@ QLabel{
 }
 
 QPushButton {
-    background-color: #242329;
+    background-color: #343e48;
     color: #f1ededef;
     font-weight: 600;
     border-radius: 8px;
@@ -46,7 +50,7 @@ QPushButton:focus {
   }
 
 QComboBox {
-    background-color: #242329;
+    background-color: #343e48;
     color: #f1ededef;
     font-weight: 600;
     border-radius: 8px;
