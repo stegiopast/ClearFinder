@@ -39,7 +39,7 @@ Please follow the instructions of the nextflow installation guide
 
 ### 4. install different environments
 
-Cellfinder_env
+#### Cellfinder_env
 
 Please install all drivers of your graphics device on the computer to make sure your GPU is working.
 You can find help with your GPU Setup on:
@@ -78,7 +78,7 @@ conda deactivate
 
 
 
-Clearmap_env
+#### Clearmap_env
 
 ```bash
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
@@ -88,7 +88,7 @@ python ClearMap2/compile.py
 conda deactivate
 ```
 
-Napari_env
+#### Napari_env
 
 ```bash
 conda create -y -n Napari_env napari -c conda-forge
