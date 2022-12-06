@@ -53,9 +53,30 @@ conda activate Cellfinder_env
 pip install cellfinder
 conda install pyqt
 conda install pathlib
-conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 conda deactivate
 ```
+
+Please check if the GPU is available for tensorflow.
+
+```bash
+conda activate Cellfinder_env
+python
+```
+
+
+```python
+import tensorflow as tf
+tf.test.is_gpu_available()
+quit()
+```
+
+The GPU is available if the function output shows True in the final row.
+
+```bash
+conda deactivate
+```
+
+
 
 Clearmap_env
 
