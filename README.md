@@ -53,6 +53,7 @@ conda activate Cellfinder_env
 pip install cellfinder
 conda install pyqt
 conda install pathlib
+conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 conda deactivate
 ```
 
