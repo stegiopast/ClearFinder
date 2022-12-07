@@ -50,7 +50,7 @@ You can find help with your GPU Setup on:
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
-pip install cellfinder
+python -m pip install cellfinder
 conda install pyqt
 conda install pathlib
 conda deactivate
