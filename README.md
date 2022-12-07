@@ -265,7 +265,7 @@ You can search for the existence of regions in the table on the right side of th
 
 ### Copyright
 
-The following copyright and disclaimers have to be mentioned:
+The following copyright and disclaimers have to be mentioned in order to publish code related to Cellfinder:
 
 Copyright (c) 2020, University College London
 All rights reserved.
