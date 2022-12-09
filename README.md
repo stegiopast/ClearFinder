@@ -39,7 +39,7 @@ Please follow the instructions of the nextflow installation guide
 
 ### 4. install different environments
 
-Cellfinder_env
+#### Cellfinder_env
 
 Please install all drivers of your graphics device on the computer to make sure your GPU is working.
 You can find help with your GPU Setup on:
@@ -48,15 +48,37 @@ You can find help with your GPU Setup on:
 <https://www.nvidia.com/download/index.aspx>
 
 ```bash
-conda create -n Cellfinder_env python=3.9
+conda create -n Cellfinder_env python=3.10
 conda activate Cellfinder_env
-pip install cellfinder
+python -m pip install cellfinder
 conda install pyqt
 conda install pathlib
 conda deactivate
 ```
 
-Clearmap_env
+Please check if the GPU is available for tensorflow.
+
+```bash
+conda activate Cellfinder_env
+python
+```
+
+
+```python
+import tensorflow as tf
+tf.test.is_gpu_available()
+quit()
+```
+
+The GPU is available if the function output shows True in the final row.
+
+```bash
+conda deactivate
+```
+
+
+
+#### Clearmap_env
 
 ```bash
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
@@ -66,7 +88,7 @@ python ClearMap2/compile.py
 conda deactivate
 ```
 
-Napari_env
+#### Napari_env
 
 ```bash
 conda create -y -n Napari_env napari -c conda-forge
@@ -382,6 +404,54 @@ Sample_folder
 ```
 
 The output xml files can be opened in napari after the plugin installation. Click File -> Open File(s) -> *.xml
+
+
+## Copyright
+
+### Cellfinder
+
+The following copyright and disclaimers have to be mentioned in order to publish code related to Cellfinder:
+
+Copyright (c) 2020, University College London
+All rights reserved.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### Napari
+
+The following copyright and disclaimers have to be mentioned in order to publish code related to Napari:
+
+Copyright (c) 2018, Napari
+All rights reserved.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## Reference
+
+A pre-print of this tool is under review.
+
+
+## Contact
+
+Please open an issue if you encounter any issues/troubles. However, please go over the previous issues (including closed issues) before opening a new issue, as your same exact question might have been already answered previously. Thank you!
 
 
 
