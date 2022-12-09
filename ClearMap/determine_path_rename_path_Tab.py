@@ -39,7 +39,7 @@ class RenameBox(utils.QWidget):
         inner_layout.addWidget(utils.QLabel("Current output Filename:"), 0, 0)
         inner_layout.addWidget(utils.QLabel(self.current_filename), 0, 1)
         inner_layout.addWidget(utils.QLabel("      "), 1, 0)
-        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 0001_C01.tif - 9999_C01.tif ?"), 2, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 1_C01.tif - 99999_C01.tif ?"), 2, 0)
         inner_layout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3, 0)
         inner_layout.addWidget(self.shift_bar, 3, 1)
         inner_layout.addWidget(self.reject, 3, 2)
@@ -65,12 +65,20 @@ class RenameBox(utils.QWidget):
     def update_rename_box(self, current_position: int) -> str:
         self.position = current_position
         if self.is_first_update:
-            if utils.re.search(r'Z[0-9]{4}_C0+', self.filename_to_check):
+            if utils.re.search(r'Z[0-9]{5}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{5}_C0+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{4}_C0+', self.filename_to_check):
                 find_pattern = utils.re.search(r'Z[0-9]{4}_C0+', self.filename_to_check)
                 self.position = find_pattern.span()[0] + 1
-
             elif utils.re.search(r'Z[0-9]{3}_C0+', self.filename_to_check):
                 find_pattern = utils.re.search(r'Z[0-9]{3}_C0+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{2}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{2}_C0+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{1}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{1}_C0+', self.filename_to_check)
                 self.position = find_pattern.span()[0] + 1
 
             self.is_first_update = False
@@ -97,16 +105,30 @@ class RenameBox(utils.QWidget):
                 old_name = file.stem + ".tif"
                 new_name = old_name[self.position:]
                 dir = file.parent
-
-                newObj = utils.re.match(r'^[0-9]{3}_', new_name)
-                if newObj:
-                    new_name = "Z0" + new_name
+                new_obj1 = utils.re.match(r'^[0-9]{5}_C', new_name)
+                new_obj2 = utils.re.match(r'^[0-9]{4}_C', new_name)
+                new_obj3 = utils.re.match(r'^[0-9]{3}_C', new_name)
+                new_obj4 = utils.re.match(r'^[0-9]{2}_C', new_name)
+                new_obj5 = utils.re.match(r'^[0-9]{1}_C', new_name)
+                if new_obj1 != None:
+                    changed_name = "Z" + new_name
+                elif new_obj2 != None:
+                    changed_name = "Z0" + new_name
+                elif new_obj3 != None:
+                    changed_name = "Z00" + new_name
+                elif new_obj4 != None:
+                    changed_name = "Z000" + new_name
+                elif new_obj5 != None:
+                    changed_name = "Z0000" + new_name
                 else:
-                    newObj = utils.re.match(r'[0-9]', new_name)
-                    if newObj:
-                        new_name = "Z" + new_name
-                print(new_name)
-                file.rename(utils.pathlib.Path(dir, new_name))
+                    changed_name = None
+                    alert = utils.QMessageBox()
+                    alert.setText("Your files are not named in the correct way!")
+                    alert.exec()
+
+                print(changed_name)
+                if changed_name != None:
+                    file.rename(utils.Path(dir, changed_name))
 
 
 # initalize working directory
@@ -126,13 +148,13 @@ class InitWorkspace():
         print(self.slicing, "Self Slicing as ", choice, "\n")
         if utils.os.path.exists(my_working_directory):
             #my_working_directory is the base directory <- alles relativ dazu
-            expression_raw = 'Signal/' + channel_str + '/Z<Z,4>_' + channel_str + '.tif'  # applies for example : "Z0001_C01.tif, Z0023..."
-            expression_auto = 'Auto/Z<Z,4>_' + 'C01' + '.tif'
+            expression_raw = 'Signal/' + channel_str + '/Z<Z,5>_' + channel_str + '.tif'  # applies for example : "Z0001_C01.tif, Z0023..."
+            expression_auto = 'Auto/Z<Z,5>_' + 'C01' + '.tif'
             ws = utils.wsp.Workspace('CellMap', directory=my_working_directory)
 
             #This update is necessary to evoke usage of more than one channel
-            ws.update(raw_C01='Signal/C01/Z<Z,4>_C01.tif',
-                      raw_C02='Signal/C02/Z<Z,4>_C02.tif',
+            ws.update(raw_C01='Signal/C01/Z<Z,5>_C01.tif',
+                      raw_C02='Signal/C02/Z<Z,5>_C02.tif',
                       stitched_C01='stitched_C01.npy',
                       stitched_C02='stitched_C02.npy',
                       resampled_C01='resampled_C01.tif',

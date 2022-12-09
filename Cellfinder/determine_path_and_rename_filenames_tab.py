@@ -12,6 +12,7 @@ class RenameBox(utils.QWidget):
         self.setWindowTitle("Cellfinder GUI")
         self.filename_to_check = filename_to_check
         self.channel_chosen = "C01"
+        self.is_first_update = True
         self.shift_bar = utils.QLineEdit("0")
         self.accept = utils.QPushButton("Accept")
         self.reject = utils.QPushButton("Reject and shift")
@@ -32,7 +33,7 @@ class RenameBox(utils.QWidget):
         inner_layout.addWidget(utils.QLabel("Current output Filename:"), 0, 0)
         inner_layout.addWidget(utils.QLabel(self.current_filename), 0, 1)
         inner_layout.addWidget(utils.QLabel("      "), 1, 0)
-        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 001_C01.tif - 9999_C01.tif ?"), 2, 0)
+        inner_layout.addWidget(utils.QLabel("Does filename not fit to template 1_C01.tif - 99999_C01.tif ?"), 2, 0)
         inner_layout.addWidget(utils.QLabel("Provide shift (+ and - allowed) and Reject:"), 3, 0)
         inner_layout.addWidget(self.shift_bar, 3, 1)
         inner_layout.addWidget(self.reject, 3, 2)
@@ -53,7 +54,26 @@ class RenameBox(utils.QWidget):
     def update(self,current_position):
         """Start of standartize the filenames"""
         self.position = current_position
-        self.current_filename = self.filename_to_check[self.position:len(self.filename_to_check)]
+        if self.is_first_update:
+            if utils.re.search(r'Z[0-9]{5}_C+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{5}_C+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{4}_C+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{4}_C+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{3}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{3}_C+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{2}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{2}_C+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            elif utils.re.search(r'Z[0-9]{1}_C0+', self.filename_to_check):
+                find_pattern = utils.re.search(r'Z[0-9]{1}_C+', self.filename_to_check)
+                self.position = find_pattern.span()[0] + 1
+            
+            self.is_first_update = False
+
+        self.current_filename = self.filename_to_check[self.position:]
 
     def delete_items_of_layout(self, layout):
         """Deletion in filename"""
@@ -77,15 +97,30 @@ class RenameBox(utils.QWidget):
                 old_name = file.stem + ".tif"
                 new_name = old_name[self.position:len(old_name)]
                 dir = file.parent
-                new_obj = utils.re.match(r'^[0-9]{3}_', new_name)
-                if new_obj:
-                    new_name = "Z0" + new_name
+                new_obj1 = utils.re.match(r'^[0-9]{5}_C', new_name)
+                new_obj2 = utils.re.match(r'^[0-9]{4}_C', new_name)
+                new_obj3 = utils.re.match(r'^[0-9]{3}_C', new_name)
+                new_obj4 = utils.re.match(r'^[0-9]{2}_C', new_name)
+                new_obj5 = utils.re.match(r'^[0-9]{1}_C', new_name)
+                if new_obj1 != None:
+                    changed_name = "Z" + new_name
+                elif new_obj2 != None:
+                    changed_name = "Z0" + new_name
+                elif new_obj3 != None:
+                    changed_name = "Z00" + new_name
+                elif new_obj4 != None:
+                    changed_name = "Z000" + new_name
+                elif new_obj5 != None:
+                    changed_name = "Z0000" + new_name
                 else:
-                    new_obj = utils.re.match(r'[0-9]', new_name)
-                    if new_obj:
-                        new_name = "Z" + new_name
-                print(new_name)
-                file.rename(utils.Path(dir, new_name))
+                    changed_name = None
+                    alert = utils.QMessageBox()
+                    alert.setText("Your files are not named in the correct way!")
+                    alert.exec()
+                    flag = False
+                print(changed_name)
+                if changed_name != None:
+                    file.rename(utils.Path(dir, changed_name))
 
             elif flag:
                 alert = utils.QMessageBox()

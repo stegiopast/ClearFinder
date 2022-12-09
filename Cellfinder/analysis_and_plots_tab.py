@@ -17,6 +17,7 @@ class PlotWindow(utils.QDialog):
         # this is the Navigation widget
         # it takes the Canvas widget and a parent
         self.toolbar = utils.NavigationToolbar(self.canvas, self)
+    
 
         # Just some button connected to 'plot' method
         # self.button = QPushButton('Plot')
