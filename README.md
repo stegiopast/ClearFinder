@@ -48,8 +48,9 @@ You can find help with your GPU Setup on:
 <https://www.nvidia.com/download/index.aspx>
 
 ```bash
-conda create -n Cellfinder_env python=3.10
+conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
+conda install tensorflow-gpu
 python -m pip install cellfinder
 conda install pyqt
 conda install pathlib
