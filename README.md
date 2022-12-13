@@ -87,8 +87,10 @@ conda deactivate
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
 conda activate Clearmap_env
 cp ~/ClearFinder/ClearMap/compile.py ~/ClearFinder/ClearMap/ClearMap2/compile.py
+cd ~/ClearFinder/ClearMap/
 python ClearMap2/compile.py
 conda deactivate
+cd ~
 ```
 
 #### Napari_env
