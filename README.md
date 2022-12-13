@@ -52,10 +52,7 @@ You can find help with your GPU Setup on:
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
-mamba install -c conda-forge cudatoolkit=11.3.1 cudnn=8.1.0.77
 python -m pip install cellfinder
-mamba install tensorflow
-mamba install tensorflow-gpu
 mamba install pyqt
 mamba install pathlib
 conda deactivate
