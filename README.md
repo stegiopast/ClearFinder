@@ -54,6 +54,7 @@ conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 python -m pip install cellfinder
 mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+mamba install tensorflow-gpu
 mamba install pyqt
 mamba install pathlib
 conda deactivate
