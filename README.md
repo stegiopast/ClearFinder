@@ -52,12 +52,12 @@ You can find help with your GPU Setup on:
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
+mamba install pyqt
+mamba install pathlib
 python -m pip install cellfinder
 pip install brainreg==0.3.3 #Temporary bugfix
 mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 mamba install tensorflow-gpu
-mamba install pyqt
-mamba install pathlib
 conda deactivate
 ```
 
