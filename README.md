@@ -53,7 +53,7 @@ You can find help with your GPU Setup on:
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 python -m pip install cellfinder
-pip install brainreg==0.3.3 #Temporary bugfix
+pip install brainreg==0.3.3
 conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 python3 -m pip install tensorflow
