@@ -55,7 +55,7 @@ conda activate Cellfinder_env
 python -m pip install cellfinder
 pip install brainreg==0.3.3 #Temporary bugfix
 mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
-mamba install tensorflow-gpu
+mamba install -c conda-forge tensorflow-gpu
 mamba install pyqt
 mamba install pathlib
 conda deactivate
