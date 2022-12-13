@@ -51,8 +51,8 @@ You can find help with your GPU Setup on:
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 conda install -c conda-forge cudatoolkit=11.3.1 cudnn=8.1.0.77
-conda install tensorflow-gpu
 python -m pip install cellfinder
+pip install tensorflow-gpu
 conda install pyqt
 conda install pathlib
 conda deactivate
