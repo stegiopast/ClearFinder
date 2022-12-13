@@ -32,7 +32,8 @@ Please follow the instructions of the conda installation guide
 ### 3. install nextflow
 
 ```bash
-conda install -c bioconda nextflow
+conda install -c conda-forge mamba
+mamba install -c bioconda nextflow
 ```
 
 Please follow the instructions of the nextflow installation guide
@@ -50,12 +51,12 @@ You can find help with your GPU Setup on:
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
-conda install -c conda-forge cudatoolkit=11.3.1 cudnn=8.1.0.77
+mamba install -c conda-forge cudatoolkit=11.3.1 cudnn=8.1.0.77
 python -m pip install cellfinder
-conda install tensorflow
-conda install tensorflow-gpu
-conda install pyqt
-conda install pathlib
+mamba install tensorflow
+mamba install tensorflow-gpu
+mamba install pyqt
+mamba install pathlib
 conda deactivate
 ```
 
