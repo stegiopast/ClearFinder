@@ -247,6 +247,7 @@ class CellDetection:
 
                 ###Batch size
                 batch_size_string = "--batch-size " + str(_batch_size) + " "
+              
 
                 ###Output
                 output_string = "-o " + self.my_working_directory + " "

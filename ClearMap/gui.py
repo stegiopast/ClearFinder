@@ -20,7 +20,7 @@ class Main_Window(utils.QWidget,
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ClearMap2")
-        self.setWindowIcon(utils.QIcon('./ClearMap_icon.png'))
+        self.setWindowIcon(utils.QIcon('./ClearMap_icon2.png'))
         layout = utils.QVBoxLayout()
         self.setLayout(layout)
         tabs = utils.QTabWidget()
