@@ -99,17 +99,6 @@ cd ~
 #### Napari_env
 
 ```bash
-conda create -y -n Napari_env napari -c conda-forge
-conda activate Napari_env
-conda update napari
-napari #Starts the application
-conda deactivate
-```
-
-I the upper version does not start napari correctly please remove the environment and try to install napari in the following way:
-
-```bash
-conda env remove -n Napari_env
 conda create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
 python -m pip install "napari[all]"
