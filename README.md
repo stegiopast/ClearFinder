@@ -98,6 +98,9 @@ cd ~
 
 #### Napari_env
 
+Once you start napari be aware to download the "cellfinder-napari" and "brainglobe-napari-io" plugins in the tab menu under Plugin -> Install/ Uninstall plugins.
+Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
+
 ```bash
 conda create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
@@ -114,8 +117,6 @@ cd ~/ClearFinder
 nextflow run start_guis.nf
 ```
 
-Once you start napari be aware to download the "cellfinder-napari" and "brainglobe-napari-io" plugins in the tab menu under Plugin -> Install/ Uninstall plugins.
-Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
 
 ### 6.Alternative start
 
