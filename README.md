@@ -52,7 +52,7 @@ You can find help with your GPU Setup on:
 ```bash
 conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
-python -m pip install cellfinder
+python -m pip install cellfinder==0.4.20
 pip install brainreg==0.3.3
 mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
