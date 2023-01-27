@@ -548,14 +548,14 @@ class CellDetection:
                 coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
                 coordinates = coordinates_new
             
-            elif permutation == (3,2,-1):
+            elif permutation == (3,-2,1):
                 shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
                 shape_new = [shape[2],shape[1],shape[0]]
                 shape = shape_new
                 coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
                 coordinates = coordinates_new
                 for i in coordinates:
-                    i[0] = -i[0]
+                    i[1] = -i[1]
                 #for i in coordinates:
                 #    i[0] = i[0] + shape[0]
             print(coordinates)
