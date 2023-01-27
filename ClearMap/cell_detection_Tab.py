@@ -466,15 +466,15 @@ class CellDetection:
     #ProcessCellsCsv +
     #embed_ontology
     """
-    def atlas_assignment(self):
+    def atlas_assignment(self, orientation_x = 3, orientation_y = 2, orientation_z = 1):
         if self.ws == None:
             alert = utils.QMessageBox()
             alert.setText("You did not choose a workspace yet!")
             alert.exec()
             return
         # sink_maxima = self.ws.filename('cells_', postfix = 'raw_'+self.channel_chosen)
-        source = self.ws.filename('stitched_' + self.chosen_channel)
-        sink_raw = self.ws.source('cells', postfix='raw_' + self.chosen_channel)
+        source = self.ws.source('cells', postfix = 'raw_' + self.chosen_channel)
+        #sink_raw = self.ws.source('cells', postfix='raw_' + self.chosen_channel)
 
         self.filter_cells()
 
@@ -483,35 +483,181 @@ class CellDetection:
         source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
 
         # Didn't understand the functions so far. Seems like coordinates become transformed by each function and reassigned.
-        print("Transfromation\n")
+        print("Transformation\n")
 
-        def transformation(coordinates):
+
+        def transformation(coordinates, permutation = None):
+            print(coordinates)
             coordinates = utils.res.resample_points(coordinates,
                                               sink=None,
                                               orientation=None,
+                                              resample_source=None,
                                               source_shape=utils.io.shape(self.ws.filename('stitched_' + self.chosen_channel)),
                                               sink_shape=utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel)))
-
+            print(coordinates)
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
                                                transform_directory=self.my_working_directory + '/elastix_resampled_to_auto_' + self.chosen_channel,
                                                binary=True,
                                                indices=False)
-
+            print(coordinates)
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
                                                transform_directory=self.my_working_directory + '/elastix_auto_to_reference_' + self.chosen_channel,
                                                binary=True,
                                                indices=False)
-            return coordinates
+            print(coordinates)
+            
+            if permutation == (1,2,3):
+                return coordinates
+            
+            elif permutation == (1,-2,3):
+                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
+                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
+                coordinates = coordinates_new   
+                for i in coordinates: 
+                    i[1] = -i[1]
+                #for i in coordinates:
+                #    i[1] = i[1] + shape[1]
 
+
+            elif permutation == (-1,2,3): #Left up and rostral in front
+                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
+                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
+                coordinates = coordinates_new
+                for i in coordinates:
+                    i[0] = -i[0]
+                #for i in coordinates:
+                #    i[0] = i[0] + shape[0]
+
+
+            elif permutation == (-1,-2,3): #Left up and rostral in back
+                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
+                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
+                coordinates = coordinates_new
+                for i in coordinates:
+                    i[0] = -i[0]
+                #for i in coordinates:
+                #    i[0] = i[0] + shape[0]
+                for i in coordinates:
+                    i[1] = -i[1]
+                #for i in coordinates:
+                #    i[1] = i[1] + shape[1]
+            
+            elif permutation == (3,2,1):
+                coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
+                coordinates = coordinates_new
+            
+            elif permutation == (3,2,-1):
+                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
+                shape_new = [shape[2],shape[1],shape[0]]
+                shape = shape_new
+                coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
+                coordinates = coordinates_new
+                for i in coordinates:
+                    i[0] = -i[0]
+                #for i in coordinates:
+                #    i[0] = i[0] + shape[0]
+            print(coordinates)
+            return coordinates
+            '''
+            max_x = 0
+            max_y = 0
+            max_z = 0
+            min_x = 1000000
+            min_y = 1000000
+            min_z = 1000000
+            for i in coordinates:
+                if i[0] > max_x:
+                    max_x = i[0]
+                if i[1] > max_y:
+                    max_y = i[1]
+                if i[2] > max_z:
+                    max_z = i[2]
+                if i[0] < min_x:
+                    min_x = i[0]
+                if i[1] < min_y:
+                    min_y = i[1]
+                if i[2] < min_z:
+                    min_z = i[2]
+            print("Maxima in coordinates:\n", (max_x,max_y,max_z), "\n")
+            print("Minima in coordinates:\n", (min_x,min_y,min_z), "\n")
+            return coordinates
+        '''
         # These are the initial coordinates originating in the file cells_filtered.npy containing the coordinates of the filtered maxima.
         # Each coordinate of 3 dimensional space x,y,z  is written into a new numpy array. [[x1,y1,z1],[x2,y2,3],...,[x_last,y_last,z_last]]
         coordinates = utils.np.array([source[c] for c in 'xyz']).T
-        source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
+        
+        permutation = (orientation_x,orientation_y,orientation_z)
+        margins = [0,0,0]
+        array_of_files = utils.os.listdir(self.my_working_directory + "/Signal" + "/" + self.chosen_channel)
+        print(array_of_files)
+        margins[2] = len(array_of_files)
+        first_signal_image = utils.imread(self.my_working_directory + "/Signal" + "/" + self.chosen_channel + "/" + array_of_files[0])
+        margins[0] = first_signal_image.shape[1]
+        margins[1] = first_signal_image.shape[2]
+        print(margins)
 
+        '''
+        if orientation == (1,2,3) or orientation == None: #Right up and rostral in front
+            coordinates = utils.np.array([source[c] for c in 'xyz']).T
+        
+        elif orientation == (1,-2,3): #Right up and rostral in back
+            t_margins = margins
+            coordinates = utils.np.array([source[c] for c in 'xyz']).T
+        
+            for i in coordinates: 
+                i[1] = -i[1]
+                if i[1] <= min:
+                    min = i[1]
+            for i in coordinates:
+                i[1] = i[1] + t_margins[1]
+
+
+        elif orientation == (-1,2,3): #Left up and rostral in front
+            t_margins = margins
+            coordinates = utils.np.array([source[c] for c in 'xyz']).T
+            for i in coordinates:
+                i[0] = -i[0]
+            for i in coordinates:
+                i[0] = i[0] + t_margins[0]
+
+        elif orientation == (-1,-2,3): #Left up and rostral in back
+            t_margins = margins
+            for i in coordinates:
+                i[0] = -i[0]
+            for i in coordinates:
+                i[0] = i[0] + t_margins[0]
+            min = 0
+            for i in coordinates:
+                i[1] = -i[1]
+                if i[1] <= min:
+                    min = i[1]
+            for i in coordinates:
+                i[1] = i[1] + t_margins[1]
+        
+        if orientation == (3,2,1): #Ventral up and rostrals in front
+            t_margins = [margins[0],margins[1],margins[2]]
+            coordinates = utils.np.array([source[c] for c in 'xyz']).T
+            for i in coordinates:
+                i[2] = -i[2]
+            for i in coordinates:
+                i[2] = i[2] + t_margins[2]
+
+        elif orientation == (3,2,-1):
+            t_margins = [margins[2],margins[1],margins[0]]
+            coordinates = utils.np.array([source[c] for c in 'zyx']).T
+            for i in coordinates:
+                i[0] = -i[0]
+            for i in coordinates:
+                i[0] = i[0] + t_margins[0]
+        '''
+        #else:
+        #    coordinates = utils.np.array([source[c] for c in 'zyx']).T
+        #source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
+    
         # Coordinates become transformed by the above defined transformation function
-        coordinates_transformed = transformation(coordinates)
+        coordinates_transformed = transformation(coordinates, permutation)
 
         # Cell annotation
         # Transformed coordinates are used as input to annotate cells by comparing with brain atlas
@@ -526,7 +672,7 @@ class CellDetection:
         # Save results
         coordinates_transformed.dtype = [(t, float) for t in ('xt', 'yt', 'zt')]
         nparray_label = utils.np.array(label, dtype=[('order', int)])
-        nparray_names = utils.np.array(names, dtype=[('name', 'S256')])
+        nparray_names = utils.np.array(names, dtype=[('name', 'a256')])
 
         import numpy.lib.recfunctions as rfn
         cells_data = rfn.merge_arrays([source[:], coordinates_transformed,nparray_label, nparray_names],
@@ -581,7 +727,7 @@ class CellDetection:
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=(slice(None),
                                                                                                slice(None),
                                                                                                slice(0, 256)),
-                                                                                      orientation=(1, -2, 3),
+                                                                                      orientation=(3, 2, 1),
                                                                                       overwrite=False,
                                                                                       verbose=True)
         source = self.ws.source('cells', postfix=self.chosen_channel)
@@ -679,6 +825,11 @@ class Cell_Detection_Layout:
         size_max = utils.QLineEdit('20')
         size_min = utils.QLineEdit('11')
         overlap = utils.QLineEdit('10')
+
+        # Orientation of the sample
+        orientation_x = utils.QLineEdit("1")
+        orientation_y = utils.QLineEdit("2")
+        orientation_z = utils.QLineEdit("3")
 
 
         def save_config(save_path):
@@ -893,6 +1044,13 @@ class Cell_Detection_Layout:
         inner_layout8.addWidget(size_min, 1, 4)
         inner_layout8.addWidget(utils.QLabel("Overlap:"), 1, 5)
         inner_layout8.addWidget(overlap, 1, 6)
+        inner_layout8.addWidget(utils.QLabel("Orientation:"), 2, 0)
+        inner_layout8.addWidget(utils.QLabel("X"), 2, 1)
+        inner_layout8.addWidget(orientation_x, 2, 2)
+        inner_layout8.addWidget(utils.QLabel("Y"), 2, 3)
+        inner_layout8.addWidget(orientation_y, 2, 4)
+        inner_layout8.addWidget(utils.QLabel("Z"), 2, 5)
+        inner_layout8.addWidget(orientation_z, 2, 6)
 
         # visualization of loading,saving and detection functions
         inner_layout9 = utils.QHBoxLayout()
@@ -942,7 +1100,7 @@ class Cell_Detection_Layout:
                                         size_maximum=int(size_max.text()), size_minimum=int(size_min.text()),
                                         area_of_overlap=int(overlap.text())))
 
-        atlas_assignment_button.clicked.connect(lambda: self.atlas_assignment())
+        atlas_assignment_button.clicked.connect(lambda: self.atlas_assignment(int(orientation_x.text()),int(orientation_y.text()),int(orientation_z.text())))
         voxelization_button.clicked.connect(lambda: self.voxelization())
 
         outer_layout.addLayout(inner_layout1)
