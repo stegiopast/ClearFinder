@@ -104,7 +104,7 @@ Type napari-cellfinder in the search bar and install the plugin. Restart napari 
 ```bash
 conda create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
-python -m pip install "napari[all]"
+python -m pip install "napari[all]" --force-reinstall
 python -m pip install "napari[all]" --upgrade
 napari
 conda deactivate
