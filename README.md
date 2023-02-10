@@ -100,8 +100,18 @@ cd ~
 
 Once you start napari be aware to download the "cellfinder-napari" and "brainglobe-napari-io" plugins in the tab menu under Plugin -> Install/ Uninstall plugins.
 Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
+There are two possible ways of installing napari.
+```bash
+conda create -y -n Napari_env -c conda-forge python=3.9
+mamba install -c conda-forge napari 
+napari
+conda deactivate
+```
+
+If the installation did not succeed, try:
 
 ```bash
+conda env remove -n Napari_env
 conda create -y -n Napari_env -c conda-forge python=3.9
 conda activate Napari_env
 python -m pip install "napari[all]" --force-reinstall
@@ -109,6 +119,8 @@ python -m pip install "napari[all]" --upgrade
 napari
 conda deactivate
 ```
+
+
 
 ### 5.Start the application
 
