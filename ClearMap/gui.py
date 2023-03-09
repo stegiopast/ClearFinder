@@ -26,6 +26,7 @@ class Main_Window(utils.QWidget,
         tabs = utils.QTabWidget()
         self.my_working_directory = "not_selected"
         self.ws = None
+        self.orientation = None
 
         #Initialize Workspace, WorkingDirectory and Channel of Analysis
         tabs.addTab(self.rename_layout(), "Determine Path | Rename Path")

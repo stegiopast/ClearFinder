@@ -597,64 +597,6 @@ class CellDetection:
         margins[0] = first_signal_image.shape[1]
         margins[1] = first_signal_image.shape[2]
         print(margins)
-
-        '''
-        if orientation == (1,2,3) or orientation == None: #Right up and rostral in front
-            coordinates = utils.np.array([source[c] for c in 'xyz']).T
-        
-        elif orientation == (1,-2,3): #Right up and rostral in back
-            t_margins = margins
-            coordinates = utils.np.array([source[c] for c in 'xyz']).T
-        
-            for i in coordinates: 
-                i[1] = -i[1]
-                if i[1] <= min:
-                    min = i[1]
-            for i in coordinates:
-                i[1] = i[1] + t_margins[1]
-
-
-        elif orientation == (-1,2,3): #Left up and rostral in front
-            t_margins = margins
-            coordinates = utils.np.array([source[c] for c in 'xyz']).T
-            for i in coordinates:
-                i[0] = -i[0]
-            for i in coordinates:
-                i[0] = i[0] + t_margins[0]
-
-        elif orientation == (-1,-2,3): #Left up and rostral in back
-            t_margins = margins
-            for i in coordinates:
-                i[0] = -i[0]
-            for i in coordinates:
-                i[0] = i[0] + t_margins[0]
-            min = 0
-            for i in coordinates:
-                i[1] = -i[1]
-                if i[1] <= min:
-                    min = i[1]
-            for i in coordinates:
-                i[1] = i[1] + t_margins[1]
-        
-        if orientation == (3,2,1): #Ventral up and rostrals in front
-            t_margins = [margins[0],margins[1],margins[2]]
-            coordinates = utils.np.array([source[c] for c in 'xyz']).T
-            for i in coordinates:
-                i[2] = -i[2]
-            for i in coordinates:
-                i[2] = i[2] + t_margins[2]
-
-        elif orientation == (3,2,-1):
-            t_margins = [margins[2],margins[1],margins[0]]
-            coordinates = utils.np.array([source[c] for c in 'zyx']).T
-            for i in coordinates:
-                i[0] = -i[0]
-            for i in coordinates:
-                i[0] = i[0] + t_margins[0]
-        '''
-        #else:
-        #    coordinates = utils.np.array([source[c] for c in 'zyx']).T
-        #source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
     
         # Coordinates become transformed by the above defined transformation function
         coordinates_transformed = transformation(coordinates, permutation)

@@ -58,6 +58,7 @@ class ResamplingAlignment:
 
         source = self.ws.source('raw_' + self.chosen_channel)
         sink = self.ws.filename('stitched_' + self.chosen_channel)
+        self.orientation = (orientation_x,orientation_y,orientation_z)
         utils.io.convert(source, sink, verbose=True)
 
         utils.res.resample(self.ws.filename('stitched_' + self.chosen_channel),
