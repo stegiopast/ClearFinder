@@ -124,47 +124,44 @@ class Preprocessing:
 
                     im1.save(filepath_auto + i)
                     im2.save(filepath_signal + j)
+                
+                else:
+                    pixel_growth_x_signal = 1
+                    pixel_growth_y_signal = 1
 
-                if flag:
-                    voxel_filepath = self.my_working_directory + "/" + self.channel_chosen + "_voxel_size_signal"
-                    if not utils.os.path.exists(voxel_filepath):
-                        utils.os.mkdir(voxel_filepath)
+                    pixel_growth_x_auto = 1
+                    pixel_growth_y_auto = 1
 
-                        if im1.size != im2.size:
-                            new_voxel_size_x = _voxel_size_signal_x * pixel_growth_x_signal
-                            new_voxel_size_y = _voxel_size_signal_y * pixel_growth_y_signal
-                        else:
-                            new_voxel_size_x = _voxel_size_signal_x
-                            new_voxel_size_y = _voxel_size_signal_y
-                        new_voxel_size_z = _voxel_size_signal_z
+                voxel_filepath = self.my_working_directory + "/" + self.channel_chosen + "_voxel_size_signal"
+                if not utils.os.path.exists(voxel_filepath):
+                    utils.os.mkdir(voxel_filepath)
 
-                        with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
-                            file.write(str(new_voxel_size_x))
-                            file.write(",")
-                            file.write(str(new_voxel_size_y))
-                            file.write(",")
-                            file.write(str(new_voxel_size_z))
+                new_voxel_size_x = _voxel_size_signal_x * pixel_growth_x_signal
+                new_voxel_size_y = _voxel_size_signal_y * pixel_growth_y_signal 
+                new_voxel_size_z = _voxel_size_signal_z
 
-                    voxel_filepath = self.my_working_directory + "/voxel_size_auto"
-                    if not utils.os.path.exists(voxel_filepath):
-                        utils.os.mkdir(voxel_filepath)
+                with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
+                    file.write(str(new_voxel_size_x))
+                    file.write(",")
+                    file.write(str(new_voxel_size_y))
+                    file.write(",")
+                    file.write(str(new_voxel_size_z))
 
-                        if im1.size != im2.size:
-                            new_voxel_size_x = _voxel_size_auto_x * pixel_growth_x_auto
-                            new_voxel_size_y = _voxel_size_auto_y * pixel_growth_y_auto
-                        else:
-                            new_voxel_size_x = _voxel_size_auto_x
-                            new_voxel_size_y = _voxel_size_auto_y
-                        new_voxel_size_z = _voxel_size_auto_z
+                voxel_filepath = self.my_working_directory + "/voxel_size_auto"
+                if not utils.os.path.exists(voxel_filepath):
+                    utils.os.mkdir(voxel_filepath)
 
-                        with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
-                            file.write(str(new_voxel_size_x))
-                            file.write(",")
-                            file.write(str(new_voxel_size_y))
-                            file.write(",")
-                            file.write(str(new_voxel_size_z))
+                new_voxel_size_x = _voxel_size_auto_x * pixel_growth_x_auto
+                new_voxel_size_y = _voxel_size_auto_y * pixel_growth_y_auto
+                new_voxel_size_z = _voxel_size_auto_z
 
-                flag = False
+                with open(voxel_filepath + "/voxel_sizes.txt", "w") as file:
+                    file.write(str(new_voxel_size_x))
+                    file.write(",")
+                    file.write(str(new_voxel_size_y))
+                    file.write(",")
+                    file.write(str(new_voxel_size_z))
+
                 print("Finished work!")
 
         else:
