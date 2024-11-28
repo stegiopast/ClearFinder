@@ -234,7 +234,7 @@ With this tab a ClearMap workspace can be initialized. The following steps shoul
 1. Please insert information about the resolution of signal_channel and atlas images as micrometer per pixel values for the X,Y,Z dimensions at Resample parameters.
 2. Similarly, insert information about the resolution of auto_channel and the reference atlas images for the X,Y,Z dimensions at Resample parameters.
 3. By inserting a filename the inserted resolutions can be saved and loaded for later experiments. (A unique basename has to be used)
-4. Add the orientation of the brain. The default settings match the orientation of the side of the right hemisphere facing the camera. For more information about which orientation to choose, visit -> <https://christophkirst.github.io/ClearMap2Documentation/html/CellMap.html>
+4. Add the orientation of the brain. The default settings match the orientation of the side of the right hemisphere facing the camera. For more information about which orientation to choose, visit [here](https://clearanatomics.github.io/ClearMapDocumentation/scripts/cell_map_tutorial.html)
 5. Resampling can be started by clicking the "Resample" button.
 
 
@@ -242,7 +242,7 @@ This process usually takes around 10-20 minutes.
 
 ### Cell-detection and atlas assignment
 
-1. For Cell detection we inserted default values that were tailored to our experiments. For each experiments the optimal values can vary. Please visit <https://christophkirst.github.io/ClearMap2Documentation/html/home.html> for more information. The possible processing settings are all based on options provided by ClearMap2.
+1. For Cell detection we inserted default values that were tailored to our experiments. For each experiments the optimal values can vary. Please visit [here](https://clearanatomics.github.io/ClearMapDocumentation/scripts/cell_map_tutorial.html) for more information. The possible processing settings are all based on options provided by ClearMap2.
 2. Please be aware that usually only half of the available threads should be used since the usage of working memory is extraordinary high with more threads. We used 10 parallel processes with 128GB RAM. We recommend 5 threads for 64GB RAM machines.
 3. Once the preferred settings are selected, one can start the cell detection by clicking the "Detects cells" button.
 4. After cell detection, one has to perform the alignment to the reference atlas by clicking the "Atlas assignment" button.
@@ -341,7 +341,7 @@ The resampling will resize your images, if they do not have the same size. We re
 
 ### Network training
 
-Training data can be generated with the Cellfinder plugin of napari. Please check the documentation on <https://docs.brainglobe.info/cellfinder-napari/user-guide/training-data-generation>.
+Training data can be generated with the Cellfinder plugin of napari. Please check the documentation [here](https://docs.brainglobe.info/cellfinder-napari/user-guide/training-data-generation).
 
 1. After generating the training data, click on "Choose Yaml" which opens a dialogue window. Navigate to the yaml file created with the cellfinder-napari plugin.
 2. Choose a pretrained model, if you want to continue training a custom model. A dialogue window will open where you have to choose a file that contains a model you want to continue training on. The file is in .h5 format. Click open in the dialogue window to proceed.
