@@ -1,3 +1,5 @@
+![GitHub Release](https://img.shields.io/github/v/release/stegiopast/ClearFinder) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/stegiopast/ClearFinder/total)
+
 # General information
 
 ClearFinder GUI is designed to assist working with ClearMap and Cell Finder, two tools for cell counting and atlas annotation of intact volumes of mouse brains. The data required for the applications is generated on a light-sheet microscope. The samples are whole mouse brains or hemispheres subjected to iDISCO+ tissue immunostaining and clearing protocol. Every sample requires an autofluorescence (Auto) and a signal datasets. The Auto is imaged in 488nm channel, therefore it's recommended to avoid the secondary antibodies coupled to fluorophores in this range for immunostaining. To result in good signal to noise ratio, it is recommended to use secondaries in red and far-red part of the spectrum. The quality of your analysis highly depends on the quality of the data: sample preparation, data acquisition and data preprocessing are steps that need to be optimized before starting with CellFinder.
