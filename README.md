@@ -6,7 +6,7 @@
 ClearFinder GUI is designed to assist working with ClearMap and Cell Finder, two tools for cell counting and atlas annotation of intact volumes of mouse brains. The data required for the applications is generated on a light-sheet microscope. The samples are whole mouse brains or hemispheres subjected to iDISCO+ tissue immunostaining and clearing protocol. Every sample requires an autofluorescence (Auto) and a signal datasets. The Auto is imaged in 488nm channel, therefore it's recommended to avoid the secondary antibodies coupled to fluorophores in this range for immunostaining. To result in good signal to noise ratio, it is recommended to use secondaries in red and far-red part of the spectrum. The quality of your analysis highly depends on the quality of the data: sample preparation, data acquisition and data preprocessing are steps that need to be optimized before starting with CellFinder.
 
 ```diff
-- !Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups!
+- Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
 ```
 
 # ClearFinder
@@ -224,7 +224,7 @@ Sample_folder
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
-$${\color{red}-> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !}$$
+-> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
 
 
 ### Determine Path | Rename samples
@@ -316,12 +316,15 @@ Sample_folder
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
-
- -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !
+```diff
+ - Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
+```
 
 ### Determine Path and rename samples
 
-Always use a copy of your original data for processing ! Make backups !
+```diff
+- Always use a copy of your original data for processing ! Make backups !
+```
 
 With this tab a CellFinder workspace can be initialized. The following steps should be performed:
 
