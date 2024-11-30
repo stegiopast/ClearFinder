@@ -67,14 +67,17 @@ conda deactivate
 If you want to have an access to your GPU permanently, 
 make sure to add this line "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/" 
 to the end of the ~/.bashrc file and safe the content. 
-This will allow your system to permanently remember this variable
+This will allow your system to permanently remember this variable.
+
+
+Please check if the GPU is available for tensorflow.
 
 ```bash
 conda activate Cellfinder_env
 python
 ```
 
-Please check if the GPU is available for tensorflow.
+
 
 ```python
 import tensorflow as tf
