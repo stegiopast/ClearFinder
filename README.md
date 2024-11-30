@@ -318,7 +318,7 @@ Sample_folder
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
 ```diff
- - Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
+- Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
 ```
 
 ### Determine Path and rename samples
