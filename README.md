@@ -36,11 +36,10 @@ Please follow the instructions of the conda installation guide
 ### 3. install nextflow
 
 ```bash
-conda install -c conda-forge mamba
-mamba install -c bioconda nextflow
+conda install bioconda::nextflow=22.04.0
 ```
 
-Please follow the instructions of the nextflow installation guide
+Please follow the instructions of the nextflow installation guide. It is necessary to use the exact version of nextflow.
 
 ### 4. install different environments
 
@@ -57,21 +56,25 @@ conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 python -m pip install cellfinder==0.4.20
 pip install brainreg==0.3.3
-mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 python -m pip install tensorflow
-mamba install pyqt
-mamba install pathlib
+conda install pyqt
+conda install pathlib
 conda deactivate
 ```
 
-Please check if the GPU is available for tensorflow.
+If you want to have an access to your GPU permanently, 
+make sure to add this line "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/" 
+to the end of the ~/.bashrc file and safe the content. 
+This will allow your system to permanently remember this variable
 
 ```bash
 conda activate Cellfinder_env
 python
 ```
 
+Please check if the GPU is available for tensorflow.
 
 ```python
 import tensorflow as tf
@@ -107,7 +110,7 @@ There are two possible ways of installing napari.
 
 ```bash
 conda create -y -n Napari_env -c conda-forge python=3.9
-mamba install -c conda-forge napari 
+conda install -c conda-forge napari 
 napari
 conda deactivate
 ```
