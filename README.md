@@ -224,8 +224,9 @@ Sample_folder
 
 ### Determine Path | Rename samples
 
-Always use a copy of your original data for processing ! Make backups !
-
+```diff
+- Always use a copy of your original data for processing ! Make backups !
+```
 With this tab a ClearMap workspace can be initialized. The following steps should be performed:
 
 1. Choose a Workspace by pressing the "Pick Workspace Directory" button. A dialogue window will open where one needs to choose the sample_folder of interest.
