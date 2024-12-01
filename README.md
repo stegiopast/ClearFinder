@@ -117,7 +117,8 @@ There are two possible ways of installing napari.
 
 ```bash
 conda create -y -n Napari_env -c conda-forge python=3.9
-conda install -c conda-forge napari 
+conda install -c conda-forge napari
+python -m pip install -U 'napari[pyqt5]'
 napari
 conda deactivate
 ```
