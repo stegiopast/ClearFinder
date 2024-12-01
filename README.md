@@ -5,6 +5,10 @@
 
 ClearFinder GUI is designed to assist working with ClearMap and Cell Finder, two tools for cell counting and atlas annotation of intact volumes of mouse brains. The data required for the applications is generated on a light-sheet microscope. The samples are whole mouse brains or hemispheres subjected to iDISCO+ tissue immunostaining and clearing protocol. Every sample requires an autofluorescence (Auto) and a signal datasets. The Auto is imaged in 488nm channel, therefore it's recommended to avoid the secondary antibodies coupled to fluorophores in this range for immunostaining. To result in good signal to noise ratio, it is recommended to use secondaries in red and far-red part of the spectrum. The quality of your analysis highly depends on the quality of the data: sample preparation, data acquisition and data preprocessing are steps that need to be optimized before starting with CellFinder.
 
+```diff
+- Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
+```
+
 # ClearFinder
 ## Installation
 
@@ -36,11 +40,10 @@ Please follow the instructions of the conda installation guide
 ### 3. install nextflow
 
 ```bash
-conda install -c conda-forge mamba
-mamba install -c bioconda nextflow
+conda install bioconda::nextflow=22.04.0
 ```
 
-Please follow the instructions of the nextflow installation guide
+Please follow the instructions of the nextflow installation guide. It is necessary to use the exact version of nextflow.
 
 ### 4. install different environments
 
@@ -57,13 +60,19 @@ conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
 python -m pip install cellfinder==0.4.20
 pip install brainreg==0.3.3
-mamba install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 python -m pip install tensorflow
-mamba install pyqt
-mamba install pathlib
+conda install pyqt
+conda install pathlib
 conda deactivate
 ```
+
+If you want to have an access to your GPU permanently, 
+make sure to add this line "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/" 
+to the end of the ~/.bashrc file and safe the content. 
+This will allow your system to permanently remember this variable.
+
 
 Please check if the GPU is available for tensorflow.
 
@@ -71,6 +80,7 @@ Please check if the GPU is available for tensorflow.
 conda activate Cellfinder_env
 python
 ```
+
 
 
 ```python
@@ -107,7 +117,8 @@ There are two possible ways of installing napari.
 
 ```bash
 conda create -y -n Napari_env -c conda-forge python=3.9
-mamba install -c conda-forge napari 
+conda install -c conda-forge napari
+python -m pip install -U 'napari[pyqt5]'
 napari
 conda deactivate
 ```
@@ -214,12 +225,15 @@ Sample_folder
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
- -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !
+```diff
+-> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
+```
 
 ### Determine Path | Rename samples
 
-Always use a copy of your original data for processing ! Make backups !
-
+```diff
+- Always use a copy of your original data for processing ! Make backups !
+```
 With this tab a ClearMap workspace can be initialized. The following steps should be performed:
 
 1. Choose a Workspace by pressing the "Pick Workspace Directory" button. A dialogue window will open where one needs to choose the sample_folder of interest.
@@ -304,12 +318,15 @@ Sample_folder
 
    Be aware that also the autofluorescence images need a _C01 signature in the filename.
 
-
- -> Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups !
+```diff
+- Always work with copies of the original datasets, since images could be converted or resized in order to enable the processing. Please never use the original data and always prepare backups
+```
 
 ### Determine Path and rename samples
 
-Always use a copy of your original data for processing ! Make backups !
+```diff
+- Always use a copy of your original data for processing ! Make backups !
+```
 
 With this tab a CellFinder workspace can be initialized. The following steps should be performed:
 
