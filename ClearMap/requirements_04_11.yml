@@ -4,6 +4,7 @@ channels:
   - anaconda
   - conda-forge
   - defaults
+  - bioconda
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
@@ -74,7 +75,7 @@ dependencies:
   - freetype=2.9.1
   - fsspec=2022.1.0
   - future=0.18.2
-  - gcc=10.4.0
+  - gcc=10.4.0 
   - gcc_impl_linux-64=10.4.0
   - gcc_linux-64=10.4.0
   - glib=2.63.1
@@ -157,6 +158,7 @@ dependencies:
   - libuuid=1.0.3
   - libvpx=1.7.0
   - libxcb=1.13
+  - libxcrypt
   - libxml2=2.9.9
   - libxslt=1.1.32
   - libzlib=1.2.13
@@ -175,9 +177,6 @@ dependencies:
   - mkl_random=1.1.1
   - mpfr=4.0.2
   - msgpack-python=1.0.2
-  - napari=0.3.4
-  - napari-plugin-engine=0.2.0
-  - napari-svg=0.1.5
   - natsort=7.0.1
   - nbconvert=5.6.1
   - nbformat=5.0.6
@@ -229,12 +228,12 @@ dependencies:
   - pyrsistent=0.16.0
   - pyside2=5.9.0a1
   - pysocks=1.7.1
-  - python=3.6.8
+  - python=3.6
   - python-dateutil=2.8.1
   - python-jsonrpc-server=0.3.4
   - python-language-server=0.31.10
   - python_abi=3.6
-  - pytorch=1.0.0
+  - pytorch=1.5.1
   - pytz=2020.1
   - pywavelets=1.1.1
   - pyxdg=0.26
