@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-
+nextflow.enable.dsl=1
 params.Cellfinder_env
 params.Clearmap_env
 params.Napari_env
