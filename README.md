@@ -43,11 +43,9 @@ Please follow the instructions of the conda installation guide
 
 Please install all drivers of your graphics device on the computer to make sure your GPU is working.
 You can find help with your GPU Setup on:
-
 <https://docs.brainglobe.info/cellfinder/installation/using-gpu>
 <https://www.nvidia.com/download/index.aspx>
 
-Try the easy installation attempt first:
 ```bash
 conda env create -f ~/ClearFinder/Cellfinder/requirements_04_11.yml
 ```
