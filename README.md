@@ -104,18 +104,14 @@ bash ./start_guis.sh
 
 ### 5.Alternative start
 
-Note that with it's first start ClearMap needs to be compiled, which takes around half an hour if not performed during the installation as mentioned above. Until then, the GUI window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
-
+For ClearMap type:
 ```bash
 conda activate Clearmap_env
 python3 ~/ClearFinder/ClearMap/gui.py
 conda deactivate
 ```
 
-Similarly the other GUIs can be started separately in a similar way.
-
 For Cellfinder type:
-
 ```bash
 conda activate Cellfinder_env
 python3 ~/ClearFinder/Cellfinder/gui.py
@@ -123,7 +119,6 @@ conda deactivate
 ```
 
 For napari type:
-
 ```bash
 conda activate Napari_env
 napari
