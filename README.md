@@ -134,13 +134,11 @@ conda deactivate
 
 Create a command alias in the ~/.bashrc file:
 
-If you want to use the nextflow version:
 ```bash
 # Replace path/to/ClearFinder by your real path
 echo "alias ClearFinder=\"cd path/to/ClearFinder && bash start_guis.sh\"" >> ~/.bashrc
 source ~/.bashrc
 ```
-If you want to evoke it directly from the shell:
 
 From now on, you can start the applications with the following command:
 
