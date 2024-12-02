@@ -1,0 +1,21 @@
+name: Cellfinder_env
+channels:
+  - anaconda
+  - bioconda
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.9
+  - cudatoolkit=11.2
+  - cudnn=8.1.0
+  - pip=21.0.1
+  - pip:
+    - cellfinder==0.4.20
+    - brainreg==0.3.3
+    - tensorflow==2.10.0
+  - pyqt
+  - pathlib
+
+
+
