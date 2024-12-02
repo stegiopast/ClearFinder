@@ -1,9 +1,11 @@
 #!/bin/bash
 
 eval "$(conda shell.bash hook)"
+conda activate base
 # Start Cellfinder in environment 1
 conda activate Cellfinder_env
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+echo $LD_LIBRARY_PATH
 cd Cellfinder
 python gui.py &
 PID1=$!  # Save process ID
