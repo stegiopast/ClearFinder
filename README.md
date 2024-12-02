@@ -55,13 +55,13 @@ You can find help with your GPU Setup on:
 <https://docs.brainglobe.info/cellfinder/installation/using-gpu>
 <https://www.nvidia.com/download/index.aspx>
 
-Try the easy installation first:
+Try the easy installation attempt first:
 ```bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 conda env create -f ~/ClearFinder/Cellfinder/requirements_04_11.yml
 ```
 
-If the latter version did not work you can try a manual installation:
+If the latter attempt did not work you can try a manual installation:
 ```bash
 conda env remove -n Cellfinder_env 
 conda create -n Cellfinder_env python=3.9
