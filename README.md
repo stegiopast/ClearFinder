@@ -37,15 +37,7 @@ conda update conda
 
 Please follow the instructions of the conda installation guide
 
-### 3. install nextflow
-
-```bash
-conda install bioconda::nextflow=22.04.0
-```
-
-Please follow the instructions of the nextflow installation guide. It is necessary to use the exact version of nextflow.
-
-### 4. install different environments
+### 3. install different environments
 
 #### Cellfinder_env
 
@@ -124,9 +116,8 @@ Type napari-cellfinder in the search bar and install the plugin. Restart napari 
 There are two possible ways of installing napari.
 
 ```bash
-conda create -y -n Napari_env -c conda-forge python=3.9
-conda install -c conda-forge napari
-conda install -c conda-forge pyqt
+conda env create -f Napari/requirements_04_11.yml
+conda activate Napari_env
 napari
 conda deactivate
 ```
@@ -136,26 +127,24 @@ If the installation did not succeed, try:
 ```bash
 conda env remove -n Napari_env
 conda create -y -n Napari_env -c conda-forge python=3.9
-conda activate Napari_env
-python -m pip install "napari[all]" --force-reinstall
-python -m pip install "napari[all]" --upgrade
+conda install -c conda-forge napari
+conda install -c conda-forge pyqt
 napari
 conda deactivate
 ```
 
 
 
-### 5.Start the application
+### 4.Start the application
 
 ```bash
 cd ~/ClearFinder
-nextflow run start_guis.nf
+bash ./start_guis.sh
 ```
 
+### 5.Alternative start
 
-### 6.Alternative start
-
-Note that with it's first start ClearMap needs to be compiled, which takes around half an hour. Until then, the GUI window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
+Note that with it's first start ClearMap needs to be compiled, which takes around half an hour if not performed during the installation as mentioned above. Until then, the GUI window will not appear. If you want to circumvent this problem and see how the compilation performs, run:
 
 ```bash
 conda activate Clearmap_env
@@ -181,15 +170,17 @@ napari
 conda deactivate
 ```
 
-### 7.Create an alias in the ~/.bashrc file for quickstart
+### 6.Create an alias in the ~/.bashrc file for quickstart
 
 Create a command alias in the ~/.bashrc file:
 
+If you want to use the nextflow version:
 ```bash
 # Replace path/to/ClearFinder by your real path
-echo "alias ClearFinder=\"cd path/to/ClearFinder && nextflow run start_guis.nf\"" >> ~/.bashrc
+echo "alias ClearFinder=\"cd path/to/ClearFinder && bash start_guis.sh\"" >> ~/.bashrc
 source ~/.bashrc
 ```
+If you want to evoke it directly from the shell:
 
 From now on, you can start the applications with the following command:
 

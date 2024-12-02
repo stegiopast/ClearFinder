@@ -1,0 +1,12 @@
+name: Napari_env
+channels:
+  - anaconda
+  - bioconda
+  - conda-forge
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.9
+  - napari=0.5.4
+  - pyqt=5.15.9
+
