@@ -49,51 +49,24 @@ You can find help with your GPU Setup on:
 
 Try the easy installation attempt first:
 ```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 conda env create -f ~/ClearFinder/Cellfinder/requirements_04_11.yml
 ```
 
-If the latter attempt did not work you can try a manual installation:
+Please check if the GPU is available for tensorflow:
 ```bash
-conda env remove -n Cellfinder_env 
-conda create -n Cellfinder_env python=3.9
 conda activate Cellfinder_env
-python -m pip install cellfinder==0.4.20
-python -m pip install brainreg==0.3.3
-conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
-python -m pip install tensorflow
-conda install pyqt
-conda install pathlib
-conda deactivate
-```
-
-If you want to have an access to your GPU permanently, 
-make sure to add the command "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/" 
-to the end of the ~/.bashrc file and safe the content. 
-This will allow your system to permanently remember this variable.
-
-
-Please check if the GPU is available for tensorflow.
-
-```bash
-conda activate Cellfinder_env
 python
 ```
-
-
-
 ```python
 import tensorflow as tf
 tf.test.is_gpu_available()
 quit()
 ```
-
-The GPU is available if the function output shows True in the final row.
-
 ```bash
 conda deactivate
 ```
+The GPU is available if the tensorflow function output shows True in the final row.
 
 
 
@@ -101,6 +74,10 @@ conda deactivate
 
 ```bash
 conda env create -f ~/ClearFinder/ClearMap/requirements_04_11.yml
+```
+
+Clearmap needs to be compiled in the first run (runtime ~30mins)
+```bash
 conda activate Clearmap_env
 cp ~/ClearFinder/ClearMap/compile.py ~/ClearFinder/ClearMap/ClearMap2/compile.py
 cd ~/ClearFinder/ClearMap/
@@ -110,29 +87,14 @@ cd ~
 ```
 
 #### Napari_env
-
-Once you start napari be aware to download the "cellfinder-napari" and "brainglobe-napari-io" plugins in the tab menu under Plugin -> Install/ Uninstall plugins.
-Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
-There are two possible ways of installing napari.
-
 ```bash
 conda env create -f Napari/requirements_04_11.yml
 conda activate Napari_env
 napari
 conda deactivate
 ```
-
-If the installation did not succeed, try:
-
-```bash
-conda env remove -n Napari_env
-conda create -y -n Napari_env -c conda-forge python=3.9
-conda install -c conda-forge napari
-conda install -c conda-forge pyqt
-napari
-conda deactivate
-```
-
+Once you start napari be aware to download the "cellfinder-napari" and "brainglobe-napari-io" plugins in the tab menu under Plugin -> Install/ Uninstall plugins.
+Type napari-cellfinder in the search bar and install the plugin. Restart napari for the plugin to be integrated.
 
 
 ### 4.Start the application
