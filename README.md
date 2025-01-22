@@ -428,8 +428,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Reference
-We are currently working on a preprint
-
+Pastore, S., Hillenbrand, P., Molnar, N. et al. 
+ClearFinder: a Python GUI for annotating cells in cleared mouse brain. 
+BMC Bioinformatics 26, 24 (2025). [https://doi.org/10.1186/s12859-025-06039-x](https://doi.org/10.1186/s12859-025-06039-x)
 
 ## Contact
 
