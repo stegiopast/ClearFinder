@@ -3,7 +3,21 @@ import utils
 # Contains all features of the grouping and normalization tab
 
 class GroupingAndNormalization:
-    def preanalysis_layout(self):
+    """
+    A class to create the UI and handle the functionalities for the 
+    grouping and normalization of data in the pre-analysis layout.
+    """
+    def preanalysis_layout(self) -> None:
+        """
+        Initializes the layout for the grouping and normalization tab.
+        
+        This includes setting up the outer and inner layouts, as well as 
+        adding widgets such as buttons, combo boxes, and tables for managing 
+        files, normalization options, and metadata.
+        
+        Returns:
+            QWidget: The main tab layout containing all UI elements.
+        """
         tab = utils.QWidget()
         outer_layout = utils.QHBoxLayout()
         inner_layout1 = utils.QVBoxLayout()
@@ -82,7 +96,13 @@ class GroupingAndNormalization:
         save_metadata.pressed.connect(lambda: save_metadata())
 
         # Functions for preprocessing
-        def add_analysis_file():
+        def add_analysis_file() -> None:
+            """
+            Opens a dialog to select and add an analysis file to the result list.
+
+            Validates that the file is of type 'embedded_ontology.csv'.
+            Alerts the user if an invalid file is selected.
+            """
             path = utils.QFileDialog.getOpenFileName(self, "Choose embedded_ontology.csv of interest")
             if "ontology.csv" in str(path[0]):
                 result_file_list.addItem(str(path[0]))
@@ -92,10 +112,18 @@ class GroupingAndNormalization:
                 alert.exec()
                 return
 
-        def remove_last_element():
+        def remove_last_element() -> None:
+            """
+            Removes the last file entry from the result file list.
+            """
             result_file_list.takeItem(result_file_list.count()-1)
 
-        def set_output_directory():
+        def set_output_directory() -> None:
+            """
+            Sets the directory for final output by creating it if it doesn't exist.
+
+            Alerts the user if the directory cannot be created.
+            """
             if not utils.os.path.exists(final_output_directory.text()):
                 try:
                     utils.os.makedirs(final_output_directory.text())
@@ -105,7 +133,13 @@ class GroupingAndNormalization:
                     alert.exec()
                     return
 
-        def save_metadata():
+        def save_metadata() -> None:
+            """
+            Saves metadata from the metadata table to a CSV file.
+
+            Validates that metadata and output directory are correctly set. 
+            Alerts the user if required fields are empty.
+            """
             metadata_list = []
             for i in range(metadata_table.rowCount()):
                 if metadata_table.cellWidget(i, 0).text() != ""  and metadata_table.cellWidget(i,1).text() != "":
@@ -125,10 +159,16 @@ class GroupingAndNormalization:
                 return
 
             metadata_df = utils.pd.DataFrame(utils.np.array(metadata_list), columns=["sample","condition"])
-            metadata_df.to_csv(final_output_directory.text()+"/metadata.csv", sep=";")
+            metadata_df.to_csv(f"{final_output_directory.text()}/metadata.csv", sep=";")
             print(metadata_list)
 
-        def preprocess_analysis_data():
+        def preprocess_analysis_data() -> None:
+            """
+            Preprocesses analysis data by reading selected files and saving processed data to CSV.
+
+            Reads data files, extracts specific columns, and writes processed data to output directory.
+            Alerts user if files are not selected or output directory is unset.
+            """
             files_to_analyse = [result_file_list.item(i).text() for i in range(result_file_list.count())]
             df_list = []
             print(files_to_analyse)
@@ -156,16 +196,23 @@ class GroupingAndNormalization:
                 alert.exec()
                 return
 
-            new_df.to_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";", index=False)
-            new_df2.to_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep=";", index=False)
-            new_df3.to_csv(final_output_directory.text() + "/list_information.csv", sep = ";", index=False)
+            new_df.to_csv(f"{final_output_directory.text()}/absolute_counts.csv", sep=";", index=False)
+            new_df2.to_csv(f"{final_output_directory.text()}/hierarchical_absolute_counts.csv", sep=";", index=False)
+            new_df3.to_csv(f"{final_output_directory.text()}/list_information.csv", sep = ";", index=False)
 
 
 
-        def logtransform_normalize_filter():
+        def logtransform_normalize_filter() -> None:
+            """
+            Applies log transformation and normalization on data and saves results.
+
+            Normalization options: Counts per million, Median of ratio.
+            Log transformation options: log_2, log_10.
+            Alerts user if output directory is not set.
+            """
             if utils.os.path.exists(final_output_directory.text()):
-                df_abs = utils.pd.read_csv(final_output_directory.text() + "/absolute_counts.csv", sep=";", header=0, index_col=0)
-                df_hier_abs = utils.pd.read_csv(final_output_directory.text() + "/hierarchical_absolute_counts.csv", sep=";", header=0, index_col=0)
+                df_abs = utils.pd.read_csv(f"{final_output_directory.text()}/absolute_counts.csv", sep=";", header=0, index_col=0)
+                df_hier_abs = utils.pd.read_csv(f"{final_output_directory.text()}/hierarchical_absolute_counts.csv", sep=";", header=0, index_col=0)
                 df_abs_filename = "absolute_counts.csv"
                 df_hier_abs_filename = "hierarchical_absolute_counts.csv"
 
@@ -176,8 +223,8 @@ class GroupingAndNormalization:
                     df_abs = df_abs / sum_df_abs * 1000000
                     df_hier_abs = df_hier_abs / sum_df_abs * 1000000
 
-                    df_abs_filename = "cpm_norm_" + df_abs_filename
-                    df_hier_abs_filename = "cpm_norm_" + df_hier_abs_filename
+                    df_abs_filename = f"cpm_norm_{df_abs_filename}"
+                    df_hier_abs_filename = f"cpm_norm_{df_hier_abs_filename}"
 
                 elif choose_normalization_ComboBox.currentText() == "Median of ratio":
                     print("Running Median of ratio normalization")
@@ -203,25 +250,25 @@ class GroupingAndNormalization:
                     df_abs = df_abs / df_abs_copy_median
                     df_hier_abs = df_hier_abs / df_hier_abs_copy_median
 
-                    df_abs_filename = "mor_norm_" + df_abs_filename
-                    df_hier_abs_filename = "mor_norm_" + df_hier_abs_filename
+                    df_abs_filename = f"mor_norm_{df_abs_filename}"
+                    df_hier_abs_filename = f"mor_norm_{df_hier_abs_filename}"
 
                 if choose_log_transformation_ComboBox.currentText() == "log_2":
                     print("Running log2 transformation")
 
                     df_abs = utils.np.log2(df_abs)
                     df_hier_abs = utils.np.log2(df_hier_abs)
-                    df_abs_filename = "log2_" + df_abs_filename
-                    df_hier_abs_filename = "log2_" + df_hier_abs_filename
+                    df_abs_filename = f"log2_{df_abs_filename}"
+                    df_hier_abs_filename = f"log2_{df_hier_abs_filename}"
 
                 elif choose_log_transformation_ComboBox.currentText() == "log_10":
                     df_abs = utils.np.log10(df_abs)
                     df_hier_abs = utils.np.log10(df_hier_abs)
-                    df_abs_filename = "log10_" + df_abs_filename
-                    df_hier_abs_filename = "log10_" + df_hier_abs_filename
+                    df_abs_filename = f"log10_{df_abs_filename}"
+                    df_hier_abs_filename = f"log10_{df_hier_abs_filename}"
 
-                df_abs.to_csv(final_output_directory.text() + "/" + df_abs_filename, sep=";")
-                df_hier_abs.to_csv(final_output_directory.text() + "/" + df_hier_abs_filename, sep=";")
+                df_abs.to_csv(f"{final_output_directory.text()}/{df_abs_filename}", sep=";")
+                df_hier_abs.to_csv(f"{final_output_directory.text()}/{df_hier_abs_filename}", sep=";")
 
             else:
                 alert = utils.QMessageBox()

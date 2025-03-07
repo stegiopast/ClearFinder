@@ -1,17 +1,30 @@
 import utils
 
-# Contains all features of the train network tab
-
 class TrainNetwork:
-    def train_network(self, _yaml_files="",
-                        _trained_model = "",
-                        _continue_training=True, 
-                        _test_fraction=0.1, 
-                        _learning_rate=0.0001, 
-                        _batch_size=32,
-                        _epochs=1,
-                        _output_directory=""):
+    def train_network(self, _yaml_files:str = "",
+                        _trained_model:str = "",
+                        _continue_training:bool = True, 
+                        _test_fraction:float = 0.1, 
+                        _learning_rate:float = 0.0001, 
+                        _batch_size:int = 32,
+                        _epochs:int = 1,
+                        _output_directory:str = "") -> None:
+        """
+        Trains a machine learning model using the specified configuration.
 
+        Args:
+            _yaml_files (str): Path to the YAML files for training data.
+            _trained_model (str): Path to a pre-trained model for continuing training.
+            _continue_training (bool): Whether to continue training from a pre-trained model.
+            _test_fraction (float): Fraction of the data to be used for testing.
+            _learning_rate (float): The learning rate to use for training.
+            _batch_size (int): The batch size for training.
+            _epochs (int): The number of epochs to train the model.
+            _output_directory (str): Directory where the output of training will be saved.
+
+        Raises:
+            QMessageBox: If the output directory is not specified or does not exist.
+        """
         output_directory = _output_directory
 
         print(output_directory)
@@ -27,19 +40,19 @@ class TrainNetwork:
         install_path = home / ".cellfinder"
                
         training_string = "cellfinder_train "
-        training_yml_string = "-y " + str(_yaml_files) + " "
+        training_yml_string = f"-y {str(_yaml_files)} "
         if _continue_training and _trained_model != "":
             continue_str = "--continue-training "
-            trained_model_str = "--trained-model " + str(_trained_model) + " "
+            trained_model_str = f"--trained-model {str(_trained_model)} "
         else:
             continue_str = ""
             trained_model_str = ""
 
-        learning_rate_string = "--learning-rate " + str(_learning_rate) + " "
+        learning_rate_string = f"--learning-rate {str(_learning_rate)} "
         
-        batch_size_str = "--batch-size " + str(_batch_size) + " "
-        epochs_str = "--epochs " + str(_epochs) + " "
-        output_dir_str = "-o " + str(output_directory)
+        batch_size_str = f"--batch-size {str(_batch_size)} "
+        epochs_str = f"--epochs {str(_epochs)} "
+        output_dir_str = f"-o {str(output_directory)}"
 
         final_string = training_string + training_yml_string + continue_str + trained_model_str + learning_rate_string + batch_size_str + epochs_str + output_dir_str
                          
@@ -52,7 +65,13 @@ class TrainNetwork:
             return
 
 class TrainingNetworkLayout:
-    def training_layout(self):  
+    def training_layout(self) -> utils.QWidget:
+        """
+        Creates the GUI layout for the training network tab.
+
+        Returns:
+            QWidget: The layout containing the widgets for setting up and starting the training process.
+        """  
         tab = utils.QWidget()
         outer_layout = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
@@ -112,7 +131,15 @@ class TrainingNetworkLayout:
         inner_layout.addWidget(train_network_button, 8, 3)
 
         ### Save and load paramters function
-        def save_config(save_path):
+        def save_config(save_path:str) -> None:
+            """
+            Saves the current configuration to a CSV file.
+
+            Args:
+                save_path (str): The path where the configuration file will be saved.
+
+            Displays a message if the file already exists.
+            """
             if not utils.os.path.exists(save_path):    
                 print(save_path)
                 resample_variable_list = [continue_training.isChecked(),
@@ -131,7 +158,15 @@ class TrainingNetworkLayout:
                 alert.setText("File already exists!")
                 alert.exec()
                
-        def load_config(load_path):
+        def load_config(load_path:str) -> None:
+            """
+            Loads configuration parameters from a CSV file.
+
+            Args:
+                load_path (str): The path to the configuration file to load.
+
+            Displays a message if the file does not exist.
+            """
             if utils.os.path.exists(load_path):    
                 print(load_path)
                 pd_df = utils.pd.read_csv(load_path, header=0)
@@ -147,8 +182,12 @@ class TrainingNetworkLayout:
                 alert.exec()   
 
 
-        def choose_yaml():
-            """Functions for choosing .yaml fiels or trained models (.h5) files"""
+        def choose_yaml() -> None:
+            """
+            Opens a file dialog to choose a YAML file for training data.
+
+            Updates the label with the selected file path.
+            """
             path = utils.QFileDialog.getOpenFileName(self, "Choose a Model file (.h5)")
             if path != ('', ''):
                 yaml_files.setText(str(path[0]))
@@ -157,7 +196,12 @@ class TrainingNetworkLayout:
                 yaml_files.setText('')
                 print("Yaml files text", yaml_files.text())
 
-        def choose_model():
+        def choose_model() -> None:
+            """
+            Opens a file dialog to choose a trained model file.
+
+            Updates the label with the selected file path.
+            """
             path = utils.QFileDialog.getOpenFileName(self, "Choose a Model file (.h5)")
             if path != ('', ''):
                 trained_model.setText(str(path[0]))
@@ -166,12 +210,16 @@ class TrainingNetworkLayout:
                 trained_model.setText('')
                 print("Trained model text",trained_model.text())
 
-        def choose_output_directory():
-            """Function for choosing output training directory"""
+        def choose_output_directory() -> None:
+            """
+            Opens a file dialog to choose an output directory for training.
+
+            Updates the label with the selected directory path.
+            """
             path = utils.QFileDialog.getExistingDirectory(self, "Save Output training data")
             print(path)
             if path != '':
-                training_output_directory.setText(str(path)+ "/")
+                training_output_directory.setText(f"{str(path)}/")
                 print("Output training", training_output_directory.text())
             else:
                 training_output_directory.setText('')
@@ -179,8 +227,8 @@ class TrainingNetworkLayout:
 
         ### Connection of widgets with fundtion, start training, save and load, choose yaml or trained models
         
-        load_config_button.pressed.connect(lambda: load_config(load_path = utils.os.getcwd() + "/train_network_" + config_path.text() + ".csv"))
-        save_config_button.pressed.connect(lambda: save_config(save_path = utils.os.getcwd() + "/train_network_" + config_path.text() + ".csv"))
+        load_config_button.pressed.connect(lambda: load_config(load_path = f"{utils.os.getcwd()}/train_network_{config_path.text()}.csv"))
+        save_config_button.pressed.connect(lambda: save_config(save_path = f"{utils.os.getcwd()}/train_network_{config_path.text()}.csv"))
                 
         train_network_button.clicked.connect(lambda: self.train_network(_yaml_files=str(yaml_files.text()),
                                                                         _trained_model =str(trained_model.text()),

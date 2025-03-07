@@ -23,6 +23,7 @@ import scipy.stats
 
 from ClearMap.Environment import *
 import numpy.lib.recfunctions as rfn
+import napari
 
 from dask_image.imread import imread
 from multiprocessing import Process

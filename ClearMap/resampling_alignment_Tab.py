@@ -2,44 +2,71 @@ import utils
 
 
 class ResamplingAlignment:
-    # Default values of resolution
+    """
+    This class handles the process of resampling and aligning images with specific resolutions.
+    It works with predefined parameters for source and sink resolutions, and performs 
+    image alignment using the elastix library.
+    """
     def init_reference(self, 
-                      source_res_x=3.02,
-                      source_res_y=3.02,
-                      source_res_z=3,
-                      sink_res_x=10,
-                      sink_res_y=10,
-                      sink_res_z=10,
-                      auto_source_res_x=3.02,
-                      auto_source_res_y=3.02,
-                      auto_source_res_z=3,
-                      auto_sink_res_x=25,
-                      auto_sink_res_y=25,
-                      auto_sink_res_z=25,
-                      orientation_x=1,
-                      orientation_y=2,
-                      orientation_z=3):
+                       source_res_x: float = 3.02,
+                       source_res_y: float = 3.02,
+                       source_res_z: float = 3,
+                       sink_res_x: float = 10,
+                       sink_res_y: float = 10,
+                       sink_res_z: float = 10,
+                       auto_source_res_x: float = 3.02,
+                       auto_source_res_y: float = 3.02,
+                       auto_source_res_z: float = 3,
+                       auto_sink_res_x: float = 25,
+                       auto_sink_res_y: float = 25,
+                       auto_sink_res_z: float = 25,
+                       orientation_x: int = 1,
+                       orientation_y: int = 2,
+                       orientation_z: int = 3) -> None:
+        """
+        Initializes the reference for resampling and alignment.
+        
+        Args:
+            source_res_x (float): Resolution in the x-direction for the source image.
+            source_res_y (float): Resolution in the y-direction for the source image.
+            source_res_z (float): Resolution in the z-direction for the source image.
+            sink_res_x (float): Resolution in the x-direction for the sink image.
+            sink_res_y (float): Resolution in the y-direction for the sink image.
+            sink_res_z (float): Resolution in the z-direction for the sink image.
+            auto_source_res_x (float): Resolution in the x-direction for the auto source image.
+            auto_source_res_y (float): Resolution in the y-direction for the auto source image.
+            auto_source_res_z (float): Resolution in the z-direction for the auto source image.
+            auto_sink_res_x (float): Resolution in the x-direction for the auto sink image.
+            auto_sink_res_y (float): Resolution in the y-direction for the auto sink image.
+            auto_sink_res_z (float): Resolution in the z-direction for the auto sink image.
+            orientation_x (int): Orientation in the x-direction for alignment.
+            orientation_y (int): Orientation in the y-direction for alignment.
+            orientation_z (int): Orientation in the z-direction for alignment.
+
+        Returns:
+            None
+        """
         if not utils.os.path.exists(self.my_working_directory):
             alert = utils.QMessageBox()
             alert.setText("Path to your working directory does not exist! Please check if your workspace was set correctly.")
             alert.exec()
             return
-        elif not utils.os.path.exists(self.my_working_directory + "/Signal") or not utils.os.path.exists(self.my_working_directory + "/Auto"):
+        elif not utils.os.path.exists(f"{self.my_working_directory}/Signal") or not utils.os.path.exists(f"{self.my_working_directory}/Auto"):
             alert = utils.QMessageBox()
             alert.setText("Path to your working directory does not contain a Signal or Auto folder! Please choose another path and check documentation about the folder structure.")
             alert.exec()
             return
 
 
-        if not utils.os.path.exists(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel):
-            utils.os.mkdir(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel)
+        if not utils.os.path.exists(f"{self.my_working_directory}/elastix_resampled_to_auto_{self.chosen_channel}"):
+            utils.os.mkdir(f"{self.my_working_directory}/elastix_resampled_to_auto_{self.chosen_channel}")
         else:
-            print(self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel + " already exists\n")
+            print(f"{self.my_working_directory}/elastix_resampled_to_auto_{self.chosen_channel} already exists\n")
 
-        if not utils.os.path.exists(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel):
-            utils.os.mkdir(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel)
+        if not utils.os.path.exists(f"{self.my_working_directory}/elastix_auto_to_reference_{self.chosen_channel}"):
+            utils.os.mkdir(f"{self.my_working_directory}/elastix_auto_to_reference_{self.chosen_channel}")
         else:
-            print(self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel + " already exists\n")
+            print(f"{self.my_working_directory}/elastix_auto_to_reference_{self.chosen_channel} already exists\n")
 
         resourcesDirectory = utils.settings.resources_path
         annotation_file, reference_file, distance_file = utils.ano.prepare_annotation_files(slicing=self.slicing,
@@ -56,13 +83,13 @@ class ResamplingAlignment:
                               "processes": 4,
                               "verbose": True}
 
-        source = self.ws.source('raw_' + self.chosen_channel)
-        sink = self.ws.filename('stitched_' + self.chosen_channel)
+        source = self.ws.source(f"raw_{self.chosen_channel}")
+        sink = self.ws.filename(f"stitched_{self.chosen_channel}")
         self.orientation = (orientation_x,orientation_y,orientation_z)
         utils.io.convert(source, sink, verbose=True)
 
-        utils.res.resample(self.ws.filename('stitched_' + self.chosen_channel),
-                     sink=self.ws.filename('resampled_' + self.chosen_channel), **resample_parameter)
+        utils.res.resample(self.ws.filename(f"stitched_{self.chosen_channel}"),
+                     sink=self.ws.filename(f"resampled_{self.chosen_channel}"), **resample_parameter)
 
         resample_parameter_auto = {"source_resolution": (auto_source_res_x, auto_source_res_y, auto_source_res_z),
                                    "sink_resolution": (auto_sink_res_x, auto_sink_res_y, auto_sink_res_z),
@@ -70,13 +97,13 @@ class ResamplingAlignment:
                                    "verbose": True}
 
         utils.res.resample(self.ws.filename('autofluorescence'),
-                     sink=self.ws.filename('resampled_' + self.chosen_channel,postfix='autofluorescence'),
+                     sink=self.ws.filename(f"resampled_{self.chosen_channel}",postfix='autofluorescence'),
                      **resample_parameter_auto)
 
         align_channels_parameter = {
             # moving and reference images
-            "moving_image": self.ws.filename('resampled_' + self.chosen_channel, postfix='autofluorescence'),
-            "fixed_image": self.ws.filename('resampled_' + self.chosen_channel),
+            "moving_image": self.ws.filename(f"resampled_{self.chosen_channel}", postfix='autofluorescence'),
+            "fixed_image": self.ws.filename(f"resampled_{self.chosen_channel}"),
 
             # elastix parameter files for alignment
             "affine_parameter_file": align_channels_affine_file,
@@ -84,7 +111,7 @@ class ResamplingAlignment:
 
             # directory of the alig'/home/nicolas.renier/Documents/ClearMap_Ressources/Par0000affine.txt',nment result
             # "result_directory" :  "/raid/CellRegistration_Margaryta/ClearMap1_2/ClearMap2/elastix_resampled_to_auto"
-            "result_directory": self.my_working_directory + "/elastix_resampled_to_auto_" + self.chosen_channel
+            "result_directory": f"{self.my_working_directory}/elastix_resampled_to_auto_{self.chosen_channel}"
         }
 
         # first alginment !
@@ -93,21 +120,31 @@ class ResamplingAlignment:
         align_reference_parameter = {
             # moving and reference images
             "moving_image": reference_file,
-            "fixed_image": self.ws.filename('resampled_' + self.chosen_channel, postfix='autofluorescence'),
+            "fixed_image": self.ws.filename(f"resampled_{self.chosen_channel}", postfix='autofluorescence'),
 
             # elastix parameter files for alignment
             "affine_parameter_file": align_reference_affine_file,
             "bspline_parameter_file": align_reference_bspline_file,
             # directory of the alignment result
-            "result_directory": self.my_working_directory + "/elastix_auto_to_reference_" + self.chosen_channel
+            "result_directory": f"{self.my_working_directory}/elastix_auto_to_reference_{self.chosen_channel}"
         }
         utils.elx.align(**align_reference_parameter)
         return
 
 
 class Resampling_Alignment_Layout:
-    """Layouting related tab"""
-    def resample_layout(self):
+    """
+    This class handles the user interface layout for resampling and alignment parameters.
+    It provides widgets to input and save configuration parameters for resampling and alignment.
+    """
+    def resample_layout(self) -> utils.QWidget:
+        """
+        Creates the layout for resampling and alignment configuration, including widgets 
+        for entering source/sink resolutions, orientation, and options to load/save configuration.
+
+        Returns:
+            utils.QWidget: The widget containing the resampling and alignment layout.
+        """
         tab = utils.QWidget()
         outer_layout = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
@@ -145,7 +182,24 @@ class Resampling_Alignment_Layout:
         save_config_button = utils.QPushButton("Save parameters")
 
 
-        def save_config(save_path):
+        def save_config(save_path:str) -> None:
+            """
+            Saves the current resampling and alignment configuration to a CSV file.
+            
+            The function retrieves the values from the input fields (source resolution, sink resolution, 
+            auto-source resolution, auto-sink resolution, and orientation) and stores them in a CSV file 
+            at the specified `save_path`. If the file already exists at the given path, an alert is shown.
+
+            Args:
+                save_path (str): The path where the configuration CSV file should be saved. This should 
+                                include the full file name and extension (e.g., 'config.csv').
+                                
+            Returns:
+                None
+                
+            Raises:
+                utils.QMessageBox: Displays an alert if the specified `save_path` already exists.
+            """
             if not utils.os.path.exists(save_path):
                 print(save_path)
                 resample_variable_list = [source_res_x.text(),
@@ -188,7 +242,23 @@ class Resampling_Alignment_Layout:
                 alert.exec()
 
 
-        def load_config(load_path):
+        def load_config(load_path:str) -> None:
+            """
+            Loads the configuration parameters from a CSV file and updates the corresponding widgets.
+            
+            The function reads the CSV file specified by `load_path`, extracts the resampling and alignment
+            parameters (source resolution, sink resolution, auto-source resolution, auto-sink resolution, 
+            and orientation), and updates the respective QLineEdit widgets with the values from the CSV.
+
+            Args:
+                load_path (str): The file path to the CSV file containing the configuration parameters.
+                
+            Returns:
+                None
+                
+            Raises:
+                utils.QMessageBox: Displays a message box with an error if the provided path does not exist.
+            """
             if utils.os.path.exists(load_path):
                 print(load_path)
                 pd_df = utils.pd.read_csv(load_path, header=0)
@@ -214,7 +284,7 @@ class Resampling_Alignment_Layout:
                 alert.exec()
 
         ### visualization of Widgets for resampling
-        inner_layout.addWidget(utils.QLabel("<b>Resample Paramter: <\b>"), 0, 0)
+        inner_layout.addWidget(utils.QLabel("<b>Resample Parameter: <\b>"), 0, 0)
         inner_layout.addWidget(utils.QLabel("Source Resolution: "), 1, 0)
         inner_layout.addWidget(utils.QLabel("X:"), 1, 1)
         inner_layout.addWidget(source_res_x, 1, 2)
@@ -232,7 +302,7 @@ class Resampling_Alignment_Layout:
         inner_layout.addWidget(sink_res_z, 2, 6)
 
         inner_layout.addWidget(utils.QLabel("     "), 3, 0)
-        inner_layout.addWidget(utils.QLabel("<b>Resample to Auto Paramter:</b>"), 4, 0)
+        inner_layout.addWidget(utils.QLabel("<b>Resample to Auto Parameter:</b>"), 4, 0)
         inner_layout.addWidget(utils.QLabel("Source Resolution: "), 5, 0)
         inner_layout.addWidget(utils.QLabel("X:"), 5, 1)
         inner_layout.addWidget(auto_source_res_x, 5, 2)
@@ -265,8 +335,8 @@ class Resampling_Alignment_Layout:
         inner_layout.addWidget(start_resampling_button, 10, 8)
 
         ## These two functions will load or save a variable list
-        load_config_button.pressed.connect(lambda: load_config(load_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
-        save_config_button.pressed.connect(lambda: save_config(save_path=utils.os.getcwd() + "/resampling_" + config_path.text() + ".csv"))
+        load_config_button.pressed.connect(lambda: load_config(load_path=f"{utils.os.getcwd()}/resampling_{config_path.text()}.csv"))
+        save_config_button.pressed.connect(lambda: save_config(save_path=f"{utils.os.getcwd()}/resampling_{config_path.text()}.csv"))
         
         start_resampling_button.clicked.connect(lambda: self.init_reference(source_res_x=float(source_res_x.text()),
                                                                            source_res_y=float(source_res_y.text()),

@@ -3,7 +3,19 @@ import utils
 # Contains all features of the analysis and plots tab
 
 class PlotWindow(utils.QDialog):
+    """A class for the Plot Window, providing a figure and a canvas with navigation toolbar for plotting.
+
+    Attributes:
+        figure (Figure): The figure instance for plotting.
+        canvas (FigureCanvas): The canvas widget displaying the figure.
+        toolbar (NavigationToolbar): A toolbar for navigation linked to the canvas.
+    """
     def __init__(self, parent=None):
+        """Initializes the PlotWindow with a figure, canvas, and toolbar for plotting.
+
+        Args:
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super(PlotWindow, self).__init__(parent)
 
         # a figure instance to plot on
@@ -41,8 +53,24 @@ class PlotWindow(utils.QDialog):
         self.setLayout(layout)
 
 class AnalysisAndPlots:
-    """Organization of the Analysis and Plots functionality"""
+    """Organization of the Analysis and Plots functionality.
+
+    This class encapsulates methods for data analysis and various plots
+    for exploratory data analysis. It integrates input, metadata, and
+    information file selection, ontology display, and layout organization.
+
+    Attributes:
+        input_csv (DataFrame): Data from the input file.
+        metadata_csv (DataFrame): Data from the metadata file.
+        information_csv (DataFrame): Data from the information file.
+    """
     def analysis_layout(self):
+        """Constructs the layout for analysis and plots with file selection, plot, and display widgets.
+
+        Returns:
+            QWidget: The constructed tab with all layout elements.
+        """
+        ...
         tab = utils.QWidget()
 
         outer_layout_hor = utils.QHBoxLayout()
@@ -69,7 +97,13 @@ class AnalysisAndPlots:
 
 
         def ontology_mouse_overview():
-            """Creating an overview for the user to select a specific region (*name*) and st_level"""
+            """Generates an overview for user selection of specific regions and structure levels.
+
+            Loads and filters an ontology file to create a selection table.
+
+            Returns:
+                DataFrame: A DataFrame with sorted columns `st_level` and `name`.
+            """
             df_selected_table = utils.pd.read_csv("./ontology_mouse.csv", sep=";",header=0)
             selected_columns = ["st_level", "name"]
             df_selected_table = df_selected_table[selected_columns]
@@ -185,18 +219,25 @@ class AnalysisAndPlots:
         set_input.pressed.connect(lambda: set_input_and_metadata())
 
         def select_input_file():
+            """Prompts the user to select an input file and sets the file path in the input field."""
             path = utils.QFileDialog.getOpenFileName(self, "Choose input file of interest")
             input_file.setText(path[0])
 
         def select_metadata_file():
+            """Prompts the user to select a metadata file and sets the file path in the metadata field."""
             path = utils.QFileDialog.getOpenFileName(self, "Choose metadata file of interest")
             metadata_file.setText(path[0])
 
         def select_information_file():
+            """Prompts the user to select an information file and sets the file path in the information field."""
             path = utils.QFileDialog.getOpenFileName(self, "Choose metadata file of interest")
             input_information_file.setText(path[0])
 
         def set_input_and_metadata():
+            """Loads the input, metadata, and information files as DataFrames if files exist.
+
+            If any file is missing, an alert is shown.
+            """
             if utils.os.path.exists(input_file.text()) and utils.os.path.exists(metadata_file.text()) and utils.os.path.exists(input_information_file.text()):
                 self.input_csv = utils.pd.read_csv(input_file.text(), sep=";", header = 0, index_col = 0)
                 self.metadata_csv = utils.pd.read_csv(metadata_file.text(), sep=";", header = 0, index_col = 0)
@@ -211,6 +252,10 @@ class AnalysisAndPlots:
                 return
 
         def pca():
+            """Performs PCA on the input data and plots the first two principal components with conditions as hues.
+
+            PCA results are drawn on the plot window.
+            """
             if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
                 alert = utils.QMessageBox()
                 alert.setText("Some of the input files do not exist!")
@@ -231,7 +276,7 @@ class AnalysisAndPlots:
             print(sample_names)
 
             output_dir = utils.os.path.dirname(input_file.text())
-            output_name = "/PCA_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
+            output_name = f"/PCA_{utils.os.path.basename(input_file.text())[:-4]}.png"
 
             pca = utils.decomposition.PCA(n_components=2)
             pc = pca.fit_transform(input_csv)
@@ -250,7 +295,7 @@ class AnalysisAndPlots:
             pc_df["Condition"] = condition_array
 
             var_df = utils.pd.DataFrame({'var':pca.explained_variance_ratio_, 'PC':['PC1', 'PC2']})
-            fig = utils.sns.lmplot( x="PC1", y="PC2",data=pc_df,fit_reg=False, hue='Condition', legend=True,scatter_kws={"s": 80})
+            fig = utils.sns.scatterplot(data=pc_df,x="PC1", y="PC2",fit_reg=False, hue='Condition', legend=True,s=80)
 
             for i,txt in enumerate(pc_df["Cluster"]):
                 utils.plt.annotate(txt, (list(pc_df["PC1"])[i], list(pc_df["PC2"])[i]), ha = "center", va = "bottom")
@@ -292,6 +337,10 @@ class AnalysisAndPlots:
 
 
         def heatmap():
+            """Generates a heatmap based on filtered input data and displays it in the plot window.
+
+            Raises an alert if data is empty or filtered out of bounds.
+            """
             if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
                 alert = utils.QMessageBox()
                 alert.setText("Some of the input files do not exist!")
@@ -319,7 +368,7 @@ class AnalysisAndPlots:
                     alert.setText("Region does not exist in ontology file! Please check if Region is written in the correct way!")
                     alert.exec()
                     return
-                brainregion = "region_" + region
+                brainregion = f"region_{region}"
 
             if filter_level_combobox.currentText() != "None":
                 level = int(filter_level_combobox.currentText())
@@ -330,9 +379,9 @@ class AnalysisAndPlots:
                         index_list.append(i)
                 input_csv = input_csv.iloc[index_list, :]
                 information = information.iloc[index_list, :]
-                brainregion = "level_" + str(level)
+                brainregion = f"level_{str(level)}"
 
-            brainregion = brainregion + "_heatmap"
+            brainregion = f"{brainregion}_heatmap"
 
             if input_csv.empty:
                 alert = utils.QMessageBox()
@@ -363,7 +412,7 @@ class AnalysisAndPlots:
                 return
 
             output_dir = utils.os.path.dirname(input_file.text())
-            output_name = "/" + brainregion + "_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
+            output_name = f"/{brainregion}_{utils.os.path.basename(input_file.text())[:-4]}.png"
 
             #utils.sns.heatmap(input_csv, yticklabels=regions, annot=False)
             #utils.plt.title(brainregion)
@@ -384,6 +433,10 @@ class AnalysisAndPlots:
 
 
         def boxplot():
+            """Creates boxplots of conditions for specific brain regions, using input data.
+
+            Raises an alert if the specified region is not found.
+            """
             if self.input_csv.empty or self.metadata_csv.empty or self.information_csv.empty:
                 alert = utils.QMessageBox()
                 alert.setText("Some of the input files do not exist!")
@@ -413,7 +466,7 @@ class AnalysisAndPlots:
 
                 sample_names = list(input_csv.columns)
                 for i in sample_names:
-                    cpm_name = i + "_processed"
+                    cpm_name = f"{i}_processed"
                     input_csv[cpm_name] = input_csv[i]
 
                 for i in conditions:
@@ -427,7 +480,7 @@ class AnalysisAndPlots:
                         array_of_condition_samples = []
                         for k in range(len(input_csv.iloc[0, :])):
                             print(input_csv.columns[k])
-                            processed_list = list([str(l) + "_processed" for l in list(metadata_list_tmp["sample"])])
+                            processed_list = list([f"{str(l)}_processed" for l in list(metadata_list_tmp["sample"])])
                             print(processed_list)
                             if input_csv.columns[k] in processed_list:
                                 array_of_cpms.append(input_csv.iloc[j, k])
@@ -444,16 +497,16 @@ class AnalysisAndPlots:
                         array_of_stdd.append(stdd)
                         array_of_medians.append(med)
                         array_of_single_values.append(array_of_cpms)
-                    input_csv[str(i) + "_mean"] = array_of_means
-                    input_csv[str(i) + "_stdd"] = array_of_stdd
-                    input_csv[str(i) + "_med"] = array_of_medians
-                    input_csv[str(i) + "_single_values"] = array_of_single_values
+                    input_csv[f"{str(i)}_mean"] = array_of_means
+                    input_csv[f"{str(i)}_stdd"] = array_of_stdd
+                    input_csv[f"{str(i)}_med"] = array_of_medians
+                    input_csv[f"{str(i)}_single_values"] = array_of_single_values
 
                 print(input_csv)
                 array_for_boxplots = []
 
                 for i in conditions:
-                    spread = list(input_csv[str(i) + "_single_values"])
+                    spread = list(input_csv[f"{str(i)}_single_values"])
 
                     data = utils.np.concatenate(spread)
                     array_for_boxplots.append(data)
@@ -476,7 +529,7 @@ class AnalysisAndPlots:
                     utils.plt.title(region)
 
                 output_dir = utils.os.path.dirname(input_file.text())
-                output_name = "/" + region + "_boxplot_" + utils.os.path.basename(input_file.text())[:-4] + ".png"
+                output_name = f"/{region}_boxplot_{utils.os.path.basename(input_file.text())[:-4]}.png"
                 #utils.plt.savefig(output_dir + output_name, bbox_inches='tight')
                 utils.plt.close
 
@@ -486,5 +539,4 @@ class AnalysisAndPlots:
                 utils.sns.swarmplot(x="condition", y=method, data=df_boxplot, color=".25", ax=ax2)
                 plot_window.figure.tight_layout()
                 plot_window.canvas.draw()
-               
         return tab

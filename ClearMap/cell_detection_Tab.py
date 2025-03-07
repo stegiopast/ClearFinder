@@ -2,6 +2,37 @@ import utils
 
 
 def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
+    """
+    Generates a tracking list of hierarchical levels for each entry in the input dataframe.
+
+    This function creates two lists for each entry in the dataframe:
+    - `TrackedWay`: Contains the hierarchical path of `name` values for each row, following
+      the `parent_structure_id` field up through the hierarchy until reaching the top level.
+    - `CorrespondingLevel`: Contains the corresponding structural levels (`st_level`) for each entry
+      in the `TrackedWay` list.
+
+    Parameters:
+    -----------
+    dataframe : utils.pd.DataFrame
+        Input DataFrame containing the hierarchical data. It should contain the columns:
+        - `id`: Unique identifier for each row.
+        - `name`: Name of the structure/entry.
+        - `st_level`: Structural level, where 0 indicates the top level.
+        - `parent_structure_id`: ID of the parent structure.
+
+    Returns:
+    --------
+    utils.pd.DataFrame
+        A DataFrame with two columns:
+        - `TrackedWay`: List of names representing the hierarchical path for each entry.
+        - `CorrespondingLevel`: List of structural levels for each entry in the `TrackedWay`.
+
+    Example:
+    --------
+    Given a dataframe with columns `id`, `name`, `st_level`, and `parent_structure_id`, the
+    function will return a new dataframe with each row representing the traced path of names
+    and levels from each entry up to the top level in the hierarchy.
+    """
     reference_df_id = dataframe.set_index(dataframe["id"])
     reference_df_name = dataframe.set_index(dataframe["name"])
 
@@ -33,12 +64,42 @@ def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
                                "CorrespondingLevel"])
     return df
 
-"""
-#Input: pd.Dataframe (mouse_ontology.csv) , tracked_list (pd.Dataframe from create_tracking_list), and the length of the pd.Dataframe
-#Creates a Template-Resultframe, which can be used for every sample
-#Cols: Region, trackedWay, CorrespondingLevel, RegionCellCount, RegionCellCountSummedUp
-"""
-def create_resultframe(df, tracked_list):
+def create_resultframe(df: utils.pd.DataFrame, tracked_list: utils.pd.DataFrame) -> utils.pd.DataFrame:
+    """
+    Creates a template result DataFrame for tracking brain region data in samples.
+
+    This function generates a result DataFrame to serve as a template for tracking brain region 
+    cell counts in each sample, structured with columns relevant for hierarchical brain region 
+    information and count tracking. The DataFrame contains initial counts of zero and can be 
+    populated with actual sample data.
+
+    Parameters:
+    -----------
+    df : utils.pd.DataFrame
+        Input DataFrame (e.g., loaded from `mouse_ontology.csv`) containing brain region names 
+        in a `name` column.
+
+    tracked_list : utils.pd.DataFrame
+        DataFrame generated from `create_tracking_list`, containing two columns:
+        - `TrackedWay`: List of hierarchical brain region names for each region.
+        - `CorrespondingLevel`: List of structural levels associated with each entry in `TrackedWay`.
+
+    Returns:
+    --------
+    utils.pd.DataFrame
+        A template result DataFrame with the following columns:
+        - `Region`: Name of the brain region.
+        - `TrackedWay`: Hierarchical path of names for each brain region.
+        - `CorrespondingLevel`: Corresponding structural level for each entry in `TrackedWay`.
+        - `RegionCellCount`: Count of cells in each region, initialized to 0.
+        - `RegionCellCountSummedUp`: Summed-up cell count for each region and its hierarchy, initialized to 0.
+
+    Example:
+    --------
+    Given a brain region DataFrame (`df`) and the tracked list DataFrame from `create_tracking_list`, 
+    this function creates a result frame that can be filled with sample-specific data in the columns 
+    `RegionCellCount` and `RegionCellCountSummedUp`.
+    """
     resultframe = utils.np.array([list(df["name"]),  # Takes all important Brain Regions in first Col
                             tracked_list["TrackedWay"],
                             tracked_list["CorrespondingLevel"],
@@ -58,15 +119,62 @@ def create_resultframe(df, tracked_list):
 
     return resultframe
 
-"""
-#df = summarized_counts
-#reference = mouse_ontology.csv as pd.Dataframe
-#tracked_levels = pd.Dataframe of the tracked regions and corresponding Levels
-
-#Output: The Template-Resultframe from (create_resultframe) but filled with values of the cellcount of each region
-"""
 def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked_levels: list, my_working_directory: str) -> utils.pd.DataFrame:
+    """
+    Analyzes brain region data from a sample DataFrame, summarizing cell counts across hierarchical brain regions.
+
+    This function processes a DataFrame containing cell count information for different brain regions. 
+    Using a reference DataFrame with hierarchical information, it generates a result DataFrame with 
+    cumulative cell counts for each region, allowing for hierarchical summarization. Unmapped regions are 
+    saved to a separate CSV file in the working directory.
+
+    Parameters:
+    -----------
+    df : utils.pd.DataFrame
+        Input DataFrame containing cell count data for each brain region in the sample. 
+        Expected columns include:
+        - `structure_name`: Name of the brain region.
+        - `total_cells`: Total number of cells in the region.
+
+    reference_df : utils.pd.DataFrame
+        DataFrame containing reference brain region information, including hierarchical structure.
+        Expected columns include:
+        - `id`: Unique identifier for each region.
+        - `name`: Name of the brain region.
+        - `st_level`: Structural level in the hierarchy.
+        - `parent_structure_id`: ID of the parent region.
+
+    tracked_levels : list
+        List of tracked hierarchical levels for each brain region, created by `create_tracking_list`.
+
+    my_working_directory : str
+        Path to the working directory where unmapped regions will be saved as a CSV file.
+
+    Returns:
+    --------
+    utils.pd.DataFrame
+        A DataFrame (`resultframe`) with columns:
+        - `Region`: Brain region name.
+        - `TrackedWay`: List of hierarchical names from the region up to the root.
+        - `CorrespondingLevel`: List of corresponding levels for each tracked name.
+        - `RegionCellCount`: Total cell count for each region.
+        - `RegionCellCountSummedUp`: Summed cell count, including counts from subregions in the hierarchy.
+
+    Process:
+    --------
+    1. Initializes a result DataFrame with hierarchical information using `create_resultframe`.
+    2. Iterates over each entry in `df` to match and embed cell counts into `resultframe`.
+    3. For each region, adds cell counts to parent regions recursively until the root region is reached.
+    4. Saves unmapped regions (not in `reference_df`) to a separate CSV file in `my_working_directory`.
+
+    Example:
+    --------
+    This function can be used to generate cumulative cell count data for brain regions in a hierarchical 
+    structure, helping to analyze the distribution of cells across different levels in the ontology.
+    """
+    print("-------------------DF HEAD---------------------------",df.head())
     total_cellcount = int(df["total_cells"].sum())  # get total cellcount for reference
+    print("total_cellcount!!! ", total_cellcount)
     df["name"] = df["structure_name"]
 
     #Reference_df_ID becomes copied twice to allow O(1) access to "id" or "name" as index of reference_frame
@@ -89,10 +197,11 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
             df_temp = reference_df_name.loc[name]
         except KeyError:
             samplename = utils.os.path.basename(my_working_directory)
-            filename = my_working_directory + "/" + samplename + "_unmapped_regions.csv"
+            filename = f"{my_working_directory}/{samplename}_unmapped_regions.csv"
 
             with open(filename, "a+") as key_error_file:
-                key_error_file.write(str(name) + ";" + str(df.iloc[i]["total_cells"]) + "\n")
+                total_cells = str(df.iloc[i]["total_cells"])
+                key_error_file.write(f"{str(name)};{total_cells}\n")
             continue
 
         temp_name = df_temp["name"] #Name of current region
@@ -111,119 +220,231 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
                 resultframe.loc[index_inner_count[0], "RegionCellCountSummedUp"] += cell_count_region # Add cell count of leaf structure to parent structure
     return resultframe
 
-"""
-#Converts a CSV to a XML File, for visualization in napari
-"""
-def write_xml(df_non_cells:utils.pd.DataFrame,df_cells: utils.pd.DataFrame, pathname:str, filename:str):
+def write_xml(df_non_cells:utils.pd.DataFrame,df_cells: utils.pd.DataFrame, pathname:str, filename:str) -> None:
+    """
+    Writes cell and non-cell marker data from DataFrames to an XML file in a specified format.
+
+    This function generates an XML file containing coordinates for cell and non-cell markers. 
+    The XML is structured according to a specific schema, with separate marker types for cells 
+    and non-cells, including 3D coordinates (X, Y, Z) for each marker. The function also prints 
+    progress messages for every 10,000 entries processed in each DataFrame.
+
+    Parameters:
+    -----------
+    df_non_cells : utils.pd.DataFrame
+        DataFrame containing non-cell marker coordinates, expected to have columns:
+        - `x`: X-coordinate of the marker.
+        - `y`: Y-coordinate of the marker.
+        - `z`: Z-coordinate of the marker.
+
+    df_cells : utils.pd.DataFrame
+        DataFrame containing cell marker coordinates, expected to have columns:
+        - `x`: X-coordinate of the marker.
+        - `y`: Y-coordinate of the marker.
+        - `z`: Z-coordinate of the marker.
+
+    pathname : str
+        Directory path where the XML file will be saved.
+
+    filename : str
+        Base filename for the XML file. The function modifies this to have an `.xml` extension.
+
+    Returns:
+    --------
+    None
+        Writes the output directly to an XML file in the specified directory.
+
+    Process:
+    --------
+    1. Initializes an XML structure with header and image properties.
+    2. Writes marker data from `df_non_cells` as `<Marker>` elements under `<Type>1</Type>`.
+    3. Writes marker data from `df_cells` as `<Marker>` elements under `<Type>2</Type>`.
+    4. Adds progress output for every 10,000 markers processed to monitor large DataFrame handling.
+
+    Example:
+    --------
+    Given DataFrames `df_non_cells` and `df_cells` with appropriate coordinate columns, 
+    this function creates an XML file with markers categorized by type, useful for 
+    applications needing spatial tracking of cell markers.
+    """
     df_non_cells = utils.pd.DataFrame(df_non_cells)
     df_cells = utils.pd.DataFrame(df_cells)
-    filename = filename[0:-3] + "xml"
+    filename = f"{filename[0:-3]}xml"
     row_counter = 1
     row_counter2 = 1
     df_non_cells_length = len(df_non_cells)
     df_cells_length = len(df_cells)
-    with open(pathname+filename, "w") as file:
-        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        file.write('<CellCounter_Marker_File>\n')
-        file.write('  <Image_Properties>\n')
-        file.write('    <Image_Filename>placeholder.tif</Image_Filename>\n')
-        file.write('  </Image_Properties>\n')
-        file.write('  <Marker_Data>\n')
-        file.write('    <Current_Type>1</Current_Type>\n')
-        file.write('    <Marker_Type>\n')
-        file.write('      <Type>1</Type>\n')
+    with open(f"{pathname}{filename}", "w") as file:
+        file.write(f"<?xml version='1.0' encoding='UTF-8'?>\n")
+        file.write("<CellCounter_Marker_File>\n")
+        file.write("  <Image_Properties>\n")
+        file.write("    <Image_Filename>placeholder.tif</Image_Filename>\n")
+        file.write("  </Image_Properties>\n")
+        file.write("  <Marker_Data>\n")
+        file.write("    <Current_Type>1</Current_Type>\n")
+        file.write("    <Marker_Type>\n")
+        file.write("      <Type>1</Type>\n")
         for i in range(len(df_non_cells.iloc[:, 0])):
             row_counter = row_counter + 1
             if row_counter % 10000 == 0:
                 print(str(row_counter), "/", str(df_non_cells_length), " lines are processed")
-            file.write('      <Marker>\n')
-            file.write('        <MarkerX>' + str(df_non_cells.iloc[i, :].x) + '</MarkerX>\n')
-            file.write('        <MarkerY>' + str(df_non_cells.iloc[i, :].y) + '</MarkerY>\n')
-            file.write('        <MarkerZ>' + str(df_non_cells.iloc[i, :].z) + '</MarkerZ>\n')
-            file.write('      </Marker>\n')
-        file.write('    </Marker_Type>\n')
-        file.write('    <Marker_Type>\n')
-        file.write('      <Type>2</Type>\n')
+            file.write("      <Marker>\n")
+            file.write(f"        <MarkerX>{str(df_non_cells.iloc[i, :].x)}</MarkerX>\n")
+            file.write(f"        <MarkerY>{str(df_non_cells.iloc[i, :].y)}</MarkerY>\n")
+            file.write(f"        <MarkerZ>{str(df_non_cells.iloc[i, :].z)}</MarkerZ>\n")
+            file.write("      </Marker>\n")
+        file.write("    </Marker_Type>\n")
+        file.write("    <Marker_Type>\n")
+        file.write("      <Type>2</Type>\n")
         for i in range(len(df_cells.iloc[:, 0])):
             row_counter2 = row_counter2 + 1
             if row_counter2 % 10000 == 0:
                 print(str(row_counter2), "/", str(df_cells_length), " lines are processed")
-            file.write('      <Marker>\n')
-            file.write('        <MarkerX>' + str(df_cells.iloc[i, :].x) + '</MarkerX>\n')
-            file.write('        <MarkerY>' + str(df_cells.iloc[i, :].y) + '</MarkerY>\n')
-            file.write('        <MarkerZ>' + str(df_cells.iloc[i, :].z) + '</MarkerZ>\n')
-            file.write('      </Marker>\n')
-        file.write('    </Marker_Type>\n')
-        file.write('  </Marker_Data>\n')
-        file.write('</CellCounter_Marker_File>\n')
+            file.write("      <Marker>\n")
+            file.write(f"        <MarkerX>{str(df_cells.iloc[i, :].x)}</MarkerX>\n")
+            file.write(f"        <MarkerY>{str(df_cells.iloc[i, :].y)}</MarkerY>\n")
+            file.write(f"        <MarkerZ>{str(df_cells.iloc[i, :].z)}</MarkerZ>\n")
+            file.write("      </Marker>\n")
+        file.write("    </Marker_Type>\n")
+        file.write("  </Marker_Data>\n")
+        file.write("</CellCounter_Marker_File>\n")
 
 
 
 def write_transformed_xml(df_non_cells: utils.pd.DataFrame,df_cells: utils.pd.DataFrame, pathname:str, filename:str):
+    """
+    Writes transformed cell and non-cell data to an XML file in the format expected by CellCounter.
+
+    This function generates an XML file that contains the coordinates of both cells and non-cells in 3D space.
+    It processes two DataFrames containing the transformed coordinates of non-cell and cell points, and writes them
+    into the appropriate XML structure. The XML file is saved with the specified `filename` at the given `pathname`.
+
+    Parameters:
+    df_non_cells (pandas.DataFrame): A DataFrame containing the transformed coordinates of non-cell points.
+                                      The DataFrame should have at least the columns 'xt', 'yt', and 'zt' for x, y, and z coordinates.
+    df_cells (pandas.DataFrame): A DataFrame containing the transformed coordinates of cell points.
+                                  The DataFrame should have at least the columns 'xt', 'yt', and 'zt' for x, y, and z coordinates.
+    pathname (str): The directory path where the XML file will be saved.
+    filename (str): The name of the output XML file. The file extension will be automatically set to ".xml".
+
+    Returns:
+    None: The function writes the output XML file directly to the specified location.
+
+    Example:
+    >>> df_non_cells = pd.DataFrame({'xt': [1.0, 2.0], 'yt': [3.0, 4.0], 'zt': [5.0, 6.0]})
+    >>> df_cells = pd.DataFrame({'xt': [7.0, 8.0], 'yt': [9.0, 10.0], 'zt': [11.0, 12.0]})
+    >>> write_transformed_xml(df_non_cells, df_cells, '/path/to/save/', 'output.xml')
+
+    File Format:
+    The function creates an XML file with the following structure:
+    - The root element `<CellCounter_Marker_File>` contains metadata and marker data.
+    - `<Image_Properties>` holds information about the image (e.g., the filename).
+    - `<Marker_Data>` contains two `<Marker_Type>` sections:
+      - The first `<Marker_Type>` represents non-cell data (Type 1).
+      - The second `<Marker_Type>` represents cell data (Type 2).
+    - Each marker is represented by `<Marker>` elements with `MarkerX`, `MarkerY`, and `MarkerZ` for the coordinates.
+    """
     df_non_cells = utils.pd.DataFrame(df_non_cells)
     df_cells = utils.pd.DataFrame(df_cells)
-    filename = filename[0:-3] + "xml"
+    filename = f"{filename[0:-3]}xml"
     row_counter = 1
     row_counter2 = 1
     df_non_cells_length = len(df_non_cells)
     df_cells_length = len(df_cells)
-    with open(pathname+filename, "w") as file:
-        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        file.write('<CellCounter_Marker_File>\n')
-        file.write('  <Image_Properties>\n')
-        file.write('    <Image_Filename>placeholder.tif</Image_Filename>\n')
-        file.write('  </Image_Properties>\n')
-        file.write('  <Marker_Data>\n')
-        file.write('    <Current_Type>1</Current_Type>\n')
-        file.write('    <Marker_Type>\n')
-        file.write('      <Type>1</Type>\n')
+    with open(f"{pathname}{filename}", "w") as file:
+        file.write("<?xml version='1.0' encoding='UTF-8'?>\n")
+        file.write("<CellCounter_Marker_File>\n")
+        file.write("  <Image_Properties>\n")
+        file.write("    <Image_Filename>placeholder.tif</Image_Filename>\n")
+        file.write("  </Image_Properties>\n")
+        file.write("  <Marker_Data>\n")
+        file.write("    <Current_Type>1</Current_Type>\n")
+        file.write("    <Marker_Type>\n")
+        file.write("      <Type>1</Type>\n")
         for i in range(len(df_non_cells.iloc[:, 0])):
             row_counter = row_counter + 1
             if row_counter % 10000 == 0:
                 print(str(row_counter), "/", str(df_non_cells_length), " lines are processed")
-            file.write('      <Marker>\n')
-            file.write('        <MarkerX>' + str(df_non_cells.iloc[i, :].xt) + '</MarkerX>\n')
-            file.write('        <MarkerY>' + str(df_non_cells.iloc[i, :].yt) + '</MarkerY>\n')
-            file.write('        <MarkerZ>' + str(df_non_cells.iloc[i, :].zt) + '</MarkerZ>\n')
-            file.write('      </Marker>\n')
-        file.write('    </Marker_Type>\n')
-        file.write('    <Marker_Type>\n')
-        file.write('      <Type>2</Type>\n')
+            file.write("      <Marker>\n")
+            file.write(f"        <MarkerX>{str(df_non_cells.iloc[i, :].xt)}</MarkerX>\n")
+            file.write(f"        <MarkerY>{str(df_non_cells.iloc[i, :].yt)}</MarkerY>\n")
+            file.write(f"        <MarkerZ>{str(df_non_cells.iloc[i, :].zt)}</MarkerZ>\n")
+            file.write("      </Marker>\n")
+        file.write("    </Marker_Type>\n")
+        file.write("    <Marker_Type>\n")
+        file.write("      <Type>2</Type>\n")
         for i in range(len(df_cells.iloc[:, 0])):
             row_counter2 = row_counter2 + 1
             if row_counter2 % 10000 == 0:
                 print(str(row_counter2), "/", str(df_cells_length), " lines are processed")
-            file.write('      <Marker>\n')
-            file.write('        <MarkerX>' + str(df_cells.iloc[i, :].xt) + '</MarkerX>\n')
-            file.write('        <MarkerY>' + str(df_cells.iloc[i, :].yt) + '</MarkerY>\n')
-            file.write('        <MarkerZ>' + str(df_cells.iloc[i, :].zt) + '</MarkerZ>\n')
-            file.write('      </Marker>\n')
-        file.write('    </Marker_Type>\n')
-        file.write('  </Marker_Data>\n')
-        file.write('</CellCounter_Marker_File>\n')
+            file.write("      <Marker>\n")
+            file.write(f"        <MarkerX>{str(df_cells.iloc[i, :].xt)}</MarkerX>\n")
+            file.write(f"        <MarkerY>{str(df_cells.iloc[i, :].yt)}</MarkerY>\n")
+            file.write(f"        <MarkerZ>{str(df_cells.iloc[i, :].zt)}</MarkerZ>\n")
+            file.write("      </Marker>\n")
+        file.write("    </Marker_Type>\n")
+        file.write("  </Marker_Data>\n")
+        file.write("</CellCounter_Marker_File>\n")
 
-"""
-#Calls the writeXML-Function to actually transfer certain CSV Files to XML
-"""
-def process_cells_csv(my_working_directory, chosen_channel):
-    pathname2xmlfolder = my_working_directory + "/" + chosen_channel + "xmlFiles"
+def process_cells_csv(my_working_directory: str, chosen_channel: str) -> None:
+    """
+    Processes cell data from CSV files, filters specific markers, and saves transformed data to XML and CSV files.
+
+    This function reads cell data from a CSV file, filters for specific region markers (like "universe" and "No label"),
+    and prepares separate files for these markers. It also performs multiprocessing to convert the data into XML format 
+    for specific types of cell classifications, as well as generating a summary count of cells in each brain region.
+
+    Parameters:
+    -----------
+    my_working_directory : str
+        Directory path where the CSV and XML files will be saved and accessed.
+
+    chosen_channel : str
+        Channel name (used as a filename prefix) for the cell data to specify processing output files.
+
+    Returns:
+    --------
+    None
+        Outputs various CSV and XML files directly to `my_working_directory`.
+
+    Process:
+    --------
+    1. Creates an XML output directory if it doesn’t already exist.
+    2. Reads cell data from a specified CSV file (`cells_<chosen_channel>.csv`).
+    3. Filters the data into separate DataFrames for:
+       - Cells marked as "No label" (`cells_<chosen_channel>_no_label.csv`).
+       - Cells marked as "universe" (`cells_<chosen_channel>_universe.csv`).
+       - Both "No label" and "universe" (`non_cells_<chosen_channel>.csv`).
+    4. Generates a final filtered DataFrame excluding "universe" and "No label" markers, and saves it as `cell_classification_<chosen_channel>.csv`.
+    5. Uses multiprocessing to convert these CSV files into XML format by invoking:
+       - `write_xml` for standard cell classification.
+       - `write_transformed_xml` for transformed cell classification.
+    6. Counts the abundance of cells in each brain region and saves the summarized count to `cells_<chosen_channel>_summarized_counts.csv`.
+
+    Example:
+    --------
+    Calling `process_cells_csv('/path/to/dir', 'ch1')` will:
+    - Process CSV files in `/path/to/dir` for the specified channel (`ch1`).
+    - Generate filtered and transformed data files in both CSV and XML formats.
+    """
+    pathname2xmlfolder = f"{my_working_directory}/{chosen_channel}xmlFiles"
     if not utils.os.path.exists(pathname2xmlfolder):
-        utils.os.makedirs(my_working_directory + "/" + chosen_channel + "xmlFiles")
+        utils.os.makedirs(f"{my_working_directory}/{chosen_channel}xmlFiles")
 
-    df_filename = "/cells_" + chosen_channel + ".csv"
-    df_name = my_working_directory + df_filename
+    df_filename = f"/cells_{chosen_channel}.csv"
+    df_name = f"{my_working_directory}{df_filename}"
     df = utils.pd.read_csv(df_name, header=0, sep=";")
 
-    df_no_label_filename = "/cells_" + chosen_channel + "_no_label.csv"
+    df_no_label_filename = f"/cells_{chosen_channel}_no_label.csv"
     df_no_label = df[df["name"] == "No label"]
 
 
-    df_universe_filename = "/cells_" + chosen_channel + "_universe.csv"
+    df_universe_filename = f"/cells_{chosen_channel}_universe.csv"
     df_universe = df[df["name"] == "universe"]
 
 
-    df_universe_plus_no_label_filename = "/non_cells_" + chosen_channel + ".csv"
-    df_universe_plus_no_label_name = my_working_directory + df_universe_plus_no_label_filename
+    df_universe_plus_no_label_filename = f"/non_cells_{chosen_channel}.csv"
+    df_universe_plus_no_label_name = f"{my_working_directory}{df_universe_plus_no_label_filename}"
     df_universe_plus_no_label = utils.pd.concat([df_no_label,df_universe], axis=0)
     df_universe_plus_no_label.to_csv(df_universe_plus_no_label_name)
 
@@ -232,8 +453,8 @@ def process_cells_csv(my_working_directory, chosen_channel):
     df_final = df_final[df_final["name"] != "No label"]
 
 
-    df_final_filename = "/cell_classification_" + chosen_channel + ".csv"
-    df_final_transformed_filename = "/cell_classification_" + chosen_channel + "_transformed.csv"
+    df_final_filename = f"/cell_classification_{chosen_channel}.csv"
+    df_final_transformed_filename = f"/cell_classification_{chosen_channel}_transformed.csv"
 
 
     # Multiprocessing the convertion from CSV to XML
@@ -252,13 +473,47 @@ def process_cells_csv(my_working_directory, chosen_channel):
 
     #Writes a final csv with single cell counts
     df_final.rename(columns={"name": "total_cells"}, inplace=True)
-    df_final.to_csv(my_working_directory + "/cells_" + chosen_channel + "_summarized_counts.csv", sep=";")
+    df_final.to_csv(f"{my_working_directory}/cells_{chosen_channel}_summarized_counts.csv", sep=";")
 
-"""
-#calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
-"""
+
 #check from where workinDir and chosen channel is coming from
 def embed_ontology(my_working_directory, chosen_channel):
+    """
+    Embeds hierarchical ontology information into cell data, saving the result as an enriched CSV file.
+
+    This function reads brain region ontology information and cell data, mapping cell counts to 
+    hierarchical brain structures. It outputs an enriched DataFrame, which includes cumulative cell 
+    counts for each brain region across different hierarchy levels. This result is saved as a new CSV file.
+
+    Parameters:
+    -----------
+    my_working_directory : str
+        Directory path where input cell data is stored and output CSV files will be saved.
+
+    chosen_channel : str
+        Channel name for the cell data (used as a suffix for file naming).
+
+    Returns:
+    --------
+    None
+        The function saves an embedded ontology CSV file in the specified working directory.
+
+    Process:
+    --------
+    1. Reads `ontology_mouse.csv`, a reference ontology file containing brain region hierarchies.
+    2. Calls `create_tracking_list` to generate a tracked level list with hierarchical abundances and mappings.
+    3. Reads the cell data file (`cells_<chosen_channel>_summarized_counts.csv`), which contains summarized cell counts for each region.
+    4. Calls `analyse_csv` to:
+       - Embed ontology levels into the cell data.
+       - Summarize cell counts for each brain region, incorporating hierarchical information.
+    5. Saves the enriched DataFrame as `<samplename>_<chosen_channel>_embedded_ontology.csv` in `my_working_directory`.
+
+    Example:
+    --------
+    Running `embed_ontology('/path/to/dir', 'ch1')`:
+    - Embeds ontology information from `ontology_mouse.csv` into the cell data for channel `ch1`.
+    - Saves the enriched ontology data as a CSV file in `/path/to/dir`.
+    """
     # Reads ontology file holding the reference region dictionairy
     reference_df = utils.pd.read_csv("ontology_mouse.csv",
                                # Current Refernce Dataframe for mapping
@@ -272,53 +527,138 @@ def embed_ontology(my_working_directory, chosen_channel):
     tracked_levels = create_tracking_list(reference_df)
 
     #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
-    df = utils.pd.read_csv(my_working_directory + "/cells_" + chosen_channel + "_summarized_counts.csv", header=0, sep=";")
+    df = utils.pd.read_csv(f"{my_working_directory}/cells_{chosen_channel}_summarized_counts.csv", header=0, sep=";")
 
     samplename = utils.os.path.basename(my_working_directory)
     new_df = analyse_csv(df,reference_df, tracked_levels, my_working_directory)
-    new_df_name = my_working_directory + "/" + samplename + "_" + chosen_channel + "_embedded_ontology.csv"
+    new_df_name = f"{my_working_directory}/{samplename}_{chosen_channel}_embedded_ontology.csv"
     new_df.to_csv(new_df_name, sep=";", index=0)
     return
 
 
 class CellDetection:
-    def cell_detection(self,    # Defaul Parameter of CellDetectionTab
-                       flatfield_illumination=None,
-                       scaling_illumination="max",
-                       shape_background_x=7,
-                       shape_background_y=7,
-                       form_background="Disk",
-                       execute_equalization=False,
-                       percentile_equalization_low=0.5,
-                       percentile_equalization_high=0.95,
-                       max_value_equalization=1.5,
-                       selem_equalization_x=200,
-                       selem_equalization_y=200,
-                       selem_equalization_z=5,
-                       spacing_equalization_x=50,
-                       spacing_equalization_y=50,
-                       spacing_equalization_z=5,
-                       interpolate_equalization=1,
-                       execute_dog_filter=False,
-                       shape_dog_filter_x=6,
-                       shape_dog_filter_y=6,
-                       shape_dog_filter_z=6,
-                       sigma_dog_filter=None,
-                       sigma2_dog_filter=None,
-                       hmax_maxima_det=None,
-                       shape_maxima_det_x=6,
-                       shape_maxima_det_y=6,
-                       shape_maxima_det_z=11,
-                       measure_intensity_det="Source",
-                       method_intensity_det="mean",
-                       threshold_shape_det=200,
-                       save_shape_det=True,
-                       amount_processes=10,
-                       size_maximum=20,
-                       size_minimum=11,
-                       area_of_overlap=10,
-                       ): 
+   
+    def cell_detection(self, 
+                   flatfield_illumination = None,           
+                   scaling_illumination: str = "max",                    
+                   shape_background_x: int = 7,                           
+                   shape_background_y: int = 7,                           
+                   form_background: str = "Disk",                     
+                   execute_equalization: bool = False,                   
+                   percentile_equalization_low: float = 0.5,            
+                   percentile_equalization_high: float = 0.95,          
+                   max_value_equalization: float = 1.5,                  
+                   selem_equalization_x: int = 200,                       
+                   selem_equalization_y: int = 200,                       
+                   selem_equalization_z: int = 5,                         
+                   spacing_equalization_x: int = 50,                      
+                   spacing_equalization_y: int = 50,                      
+                   spacing_equalization_z: int = 5,                       
+                   interpolate_equalization: int = 1,                     
+                   execute_dog_filter: bool = False,                    
+                   shape_dog_filter_x: int = 6,                           
+                   shape_dog_filter_y: int = 6,                           
+                   shape_dog_filter_z: int = 6,                           
+                   sigma_dog_filter:float = None,              
+                   sigma2_dog_filter:float = None,            
+                   hmax_maxima_det = None,                 
+                   shape_maxima_det_x: int = 6,                           
+                   shape_maxima_det_y: int = 6,                           
+                   shape_maxima_det_z: int = 11,                          
+                   measure_intensity_det: str = "Source",                 
+                   method_intensity_det: str = "mean",                  
+                   threshold_shape_det: int = 200,                        
+                   save_shape_det: bool = True,                         
+                   amount_processes: int = 10,                            
+                   size_maximum: int = 20,                                
+                   size_minimum: int = 11,                                
+                   area_of_overlap: int = 10                              
+                   ):
+        """
+        Detects cells in imaging data based on specified preprocessing, filtering, and detection parameters.
 
+        This function configures and executes cell detection in 3D imaging data. It allows for image equalization, 
+        background correction, difference of Gaussian (DoG) filtering, and maxima detection, providing flexibility 
+        for identifying cellular structures based on shape, intensity, and size thresholds.
+
+        Parameters:
+        -----------
+        flatfield_illumination : Optional[int]
+            Determines flatfield illumination for correction; default is None (no correction).
+        
+        scaling_illumination : str
+            Method of scaling after flatfield correction ("max" or "mean").
+        
+        shape_background_x, shape_background_y : int
+            Dimensions for background correction (cell shape parameters).
+        
+        form_background : str
+            Shape of background correction element; "Disk" or "Sphere".
+
+        execute_equalization : bool
+            If True, performs histogram equalization on the data.
+
+        percentile_equalization_low, percentile_equalization_high : float
+            Percentiles used to clip intensity values during equalization.
+
+        max_value_equalization : float
+            Maximum intensity value for equalization scaling.
+        
+        selem_equalization_x, selem_equalization_y, selem_equalization_z : int
+            Shape elements for 3D equalization structuring.
+        
+        spacing_equalization_x, spacing_equalization_y, spacing_equalization_z : int
+            Spacing for equalization in x, y, and z dimensions.
+        
+        interpolate_equalization : int
+            Interpolation method for equalization (e.g., nearest, linear).
+        
+        execute_dog_filter : bool
+            If True, applies a difference of Gaussian filter.
+        
+        shape_dog_filter_x, shape_dog_filter_y, shape_dog_filter_z : int
+            Shape of DoG filter elements.
+        
+        sigma_dog_filter, sigma2_dog_filter : Optional[float]
+            Gaussian standard deviations for the DoG filter; `None` uses default values.
+
+        hmax_maxima_det : Optional[int]
+            Height threshold for maxima detection; None uses simple local maxima detection.
+
+        shape_maxima_det_x, shape_maxima_det_y, shape_maxima_det_z : int
+            Dimensions for maxima detection structuring.
+
+        measure_intensity_det : str
+            Source for intensity measurement ("source", "illumination", "background", etc.).
+
+        method_intensity_det : str
+            Method to measure intensity for each detected cell ("mean" or "max").
+
+        threshold_shape_det : int
+            Threshold for shape-based cell detection.
+        
+        save_shape_det : bool
+            If True, saves detected shapes.
+
+        amount_processes : int
+            Number of parallel processes to use in detection.
+
+        size_maximum, size_minimum : int
+            Maximum and minimum cell size thresholds.
+
+        area_of_overlap : int
+            Overlap area threshold for cell detection.
+
+        Returns:
+        --------
+        None
+            The function performs cell detection and saves results but does not return values.
+
+        Notes:
+        ------
+        1. Adjusting the parameters optimizes detection for different types of cellular imaging data.
+        2. Results are saved in workspace filenames according to the specified channel.
+        """
         # Coversion of illumination_correction integers to dictionairy entries of ClearMap
         if flatfield_illumination == 0:
             flatfield_illumination = None
@@ -447,159 +787,163 @@ class CellDetection:
             return
 
 
-        utils.cells.detect_cells(self.ws.filename('stitched_' + self.chosen_channel),
-                           self.ws.filename('cells', postfix='raw_' + self.chosen_channel),
+        utils.cells.detect_cells(self.ws.filename(f"stitched_{self.chosen_channel}"),
+                           self.ws.filename('cells', postfix=f"raw_{self.chosen_channel}"),
                            cell_detection_parameter=cell_detection_parameter,
                            processing_parameter=processing_parameter)
 
 
-    def filter_cells(self, filt_size=20):
+    def filter_cells(self, filt_size:int = 20) -> None:
+        """
+        Filters the detected cells based on size and intensity thresholds.
 
+        This function applies a size-based filter to remove small or large cells from the detection results.
+        The size threshold is defined by the `filt_size` parameter, which specifies the minimum cell size in pixels.
+        It then passes the filtered data to the `filter_cells` function of the `utils.cells` module.
+
+        Parameters:
+        filt_size (int): The minimum size of the cells to retain, specified in pixels. Cells smaller than this size will be removed.
+                        Default is 20.
+
+        Returns:
+        None: The function does not return any value. It directly saves the filtered results to the workspace.
+
+        Notes:
+        - This function expects the workspace (`self.ws`) to contain the raw cell detection data.
+        - The output is saved as a filtered cell dataset in the workspace with a postfix of '_filtered_' and the current channel.
+        """
         thresholds = {'source': None, 'size': (filt_size, None)}
-        utils.cells.filter_cells(self.ws.filename('cells', postfix='raw_' + self.chosen_channel),
-                           self.ws.filename('cells', postfix='filtered_' + self.chosen_channel),
+        utils.cells.filter_cells(self.ws.filename('cells', postfix=f"raw_{self.chosen_channel}"),
+                           self.ws.filename('cells', postfix=f"filtered_{self.chosen_channel}"),
                            thresholds=thresholds)
 
 
-    """
-    #ClearMap-Code +
-    #ProcessCellsCsv +
-    #embed_ontology
-    """
-    def atlas_assignment(self, orientation_x = 3, orientation_y = 2, orientation_z = 1):
+    def atlas_assignment(self, orientation_x:int = 3, orientation_y:int = 2, orientation_z:int = 1):
+        """
+        Performs cell annotation by transforming the cell coordinates and aligning them with a reference brain atlas.
+
+        This function processes the cell data, applies transformations to the cell coordinates, and then annotates the 
+        transformed coordinates by comparing them to a specified brain atlas. The resulting annotated data is saved in various formats,
+        including as a numpy array, CSV file, and ClearMap1 format.
+
+        The process involves several key steps:
+        1. The function filters the cell data based on previously defined criteria.
+        2. The cell coordinates are transformed through resampling and elastix-based transformations.
+        3. The transformed coordinates are annotated by matching them to a brain atlas.
+        4. The final annotated data is saved to the workspace and exported in different formats.
+
+        Parameters:
+        orientation_x (int): The x-axis orientation for the atlas (default is 3).
+        orientation_y (int): The y-axis orientation for the atlas (default is 2).
+        orientation_z (int): The z-axis orientation for the atlas (default is 1).
+
+        Returns:
+        None: The function does not return any value. It saves the annotated cell data to the workspace and exports it in CSV and ClearMap1 formats.
+
+        Raises:
+        - If no workspace is selected (`self.ws` is None), an alert message is shown to inform the user.
+
+        Notes:
+        - The transformation of coordinates involves resampling and elastix-based affine transformations.
+        - The annotation file is selected based on the specified orientation and is used to map transformed coordinates to the brain atlas.
+        - The function supports multiple export formats, including CSV for cell data and ClearMap1 format for 3D visualization tools.
+        - The transformed cell data is stored in the workspace with the chosen channel as a postfix.
+        """
         if self.ws == None:
             alert = utils.QMessageBox()
             alert.setText("You did not choose a workspace yet!")
             alert.exec()
             return
         # sink_maxima = self.ws.filename('cells_', postfix = 'raw_'+self.channel_chosen)
-        source = self.ws.source('cells', postfix = 'raw_' + self.chosen_channel)
+        source = self.ws.source('cells', postfix = f"raw_{self.chosen_channel}")
         #sink_raw = self.ws.source('cells', postfix='raw_' + self.chosen_channel)
 
         self.filter_cells()
 
         # Assignment of the cells with filtered maxima
         # Filtered cell maxima are used to execute the alignment to the atlas
-        source = self.ws.source('cells', postfix='filtered_' + self.chosen_channel)
+        source = self.ws.source('cells', postfix=f"filtered_{self.chosen_channel}")
 
         # Didn't understand the functions so far. Seems like coordinates become transformed by each function and reassigned.
-        print("Transformation\n")
+        #print("Transformation\n")
 
 
-        def transformation(coordinates, permutation = None):
-            print(coordinates)
+        def transformation(coordinates:utils.np.array):
+            """
+            Transforms the input coordinates through a series of resampling and elastix-based affine transformations.
+
+            This function applies a series of transformations to the provided 3D coordinates. The coordinates are first resampled 
+            to match the shape of a target image. Then, two successive elastix transformations are applied to map the coordinates 
+            from the resampled space to an intermediate space and finally to a reference space. Additionally, it searches for 
+            an appropriate brain atlas annotation file based on the specified orientation parameters.
+
+            Parameters:
+            coordinates (array-like): The 3D coordinates to be transformed, typically representing cell positions.
+            permutation (tuple, optional): A tuple of three integers that defines the orientation of the atlas. 
+                                            If not provided, defaults to `None`.
+
+            Returns:
+            tuple: A tuple containing:
+                - Transformed coordinates (array-like): The coordinates after applying resampling and elastix transformations.
+                - annotation_file (str): The file path to the corresponding brain atlas annotation file.
+
+            Raises:
+            - If no annotation file matching the pattern is found, `None` is returned for the annotation file.
+            
+            Notes:
+            - The `coordinates` array is resampled to match the dimensions of the reference image and then transformed using elastix.
+            - The annotation file search is based on a regex pattern that incorporates the specified `orientation_x`, `orientation_y`, 
+            and `orientation_z` parameters.
+            - The function assumes a directory structure where elastix transformation files and brain atlas files are stored.
+
+            Example:
+            >>> coordinates_transformed, annotation_file = transformation(coordinates, permutation=(3, 2, 1))
+            """
+            #print(coordinates)
             coordinates = utils.res.resample_points(coordinates,
                                               sink=None,
                                               orientation=None,
                                               resample_source=None,
-                                              source_shape=utils.io.shape(self.ws.filename('stitched_' + self.chosen_channel)),
-                                              sink_shape=utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel)))
-            print(coordinates)
+                                              source_shape=utils.io.shape(self.ws.filename(f"stitched_{self.chosen_channel}")),
+                                              sink_shape=utils.io.shape(self.ws.filename(f"resampled_{self.chosen_channel}")))
+            #print(coordinates)
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
-                                               transform_directory=self.my_working_directory + '/elastix_resampled_to_auto_' + self.chosen_channel,
+                                               transform_directory=f"{self.my_working_directory}/elastix_resampled_to_auto_{self.chosen_channel}",
                                                binary=True,
                                                indices=False)
-            print(coordinates)
+            #print(coordinates)
             coordinates = utils.elx.transform_points(coordinates,
                                                sink=None,
-                                               transform_directory=self.my_working_directory + '/elastix_auto_to_reference_' + self.chosen_channel,
+                                               transform_directory=f"{self.my_working_directory}/elastix_auto_to_reference_{self.chosen_channel}",
                                                binary=True,
                                                indices=False)
-            print(coordinates)
+            #print(coordinates)
+            path_to_annotation_file = "./ClearMap2/ClearMap/Resources/Atlas/"
+            annotation_file_regex = f"ABA_25um_annotation__{str(orientation_x)}_{str(orientation_y)}_{str(orientation_z)}__*.tif" 
+            def find_annotation_file(directory:str, pattern:str):
+                # Combines directory with the glob pattern
+                matched_files = utils.glob.glob(utils.os.path.join(directory, pattern), recursive=False)
+                return matched_files[0] if matched_files else None
+            annotation_file = find_annotation_file(path_to_annotation_file,annotation_file_regex)
+            #annotation_file = "/home/margaryta/ClearFinder/ClearMap/ClearMap2/ClearMap/Resources/Atlas/ABA_25um_annotation__-1_3_2__slice_None_None_None__slice_None_None_None__slice_None_None_None__.tif"
+            return coordinates, annotation_file
             
-            if permutation == (1,2,3):
-                return coordinates
-            
-            elif permutation == (1,-2,3):
-                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
-                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
-                coordinates = coordinates_new   
-                for i in coordinates: 
-                    i[1] = -i[1]
-                #for i in coordinates:
-                #    i[1] = i[1] + shape[1]
-
-
-            elif permutation == (-1,2,3): #Left up and rostral in front
-                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
-                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
-                coordinates = coordinates_new
-                for i in coordinates:
-                    i[0] = -i[0]
-                #for i in coordinates:
-                #    i[0] = i[0] + shape[0]
-
-
-            elif permutation == (-1,-2,3): #Left up and rostral in back
-                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
-                coordinates_new = utils.np.array([(i[0],i[1],i[2]) for i in coordinates])
-                coordinates = coordinates_new
-                for i in coordinates:
-                    i[0] = -i[0]
-                #for i in coordinates:
-                #    i[0] = i[0] + shape[0]
-                for i in coordinates:
-                    i[1] = -i[1]
-                #for i in coordinates:
-                #    i[1] = i[1] + shape[1]
-            
-            elif permutation == (3,2,1):
-                coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
-                coordinates = coordinates_new
-            
-            elif permutation == (3,-2,1):
-                shape = utils.io.shape(self.ws.filename('resampled_' + self.chosen_channel_ + 'autofluorescence'))
-                shape_new = [shape[2],shape[1],shape[0]]
-                shape = shape_new
-                coordinates_new = utils.np.array([(i[2],i[1],i[0]) for i in coordinates])
-                coordinates = coordinates_new
-                for i in coordinates:
-                    i[1] = -i[1]
-                #for i in coordinates:
-                #    i[0] = i[0] + shape[0]
-            print(coordinates)
-            return coordinates
-            '''
-            max_x = 0
-            max_y = 0
-            max_z = 0
-            min_x = 1000000
-            min_y = 1000000
-            min_z = 1000000
-            for i in coordinates:
-                if i[0] > max_x:
-                    max_x = i[0]
-                if i[1] > max_y:
-                    max_y = i[1]
-                if i[2] > max_z:
-                    max_z = i[2]
-                if i[0] < min_x:
-                    min_x = i[0]
-                if i[1] < min_y:
-                    min_y = i[1]
-                if i[2] < min_z:
-                    min_z = i[2]
-            print("Maxima in coordinates:\n", (max_x,max_y,max_z), "\n")
-            print("Minima in coordinates:\n", (min_x,min_y,min_z), "\n")
-            return coordinates
-        '''
         # These are the initial coordinates originating in the file cells_filtered.npy containing the coordinates of the filtered maxima.
         # Each coordinate of 3 dimensional space x,y,z  is written into a new numpy array. [[x1,y1,z1],[x2,y2,3],...,[x_last,y_last,z_last]]
         coordinates = utils.np.array([source[c] for c in 'xyz']).T
         
-        permutation = (orientation_x,orientation_y,orientation_z)
         margins = [0,0,0]
-        array_of_files = utils.os.listdir(self.my_working_directory + "/Signal" + "/" + self.chosen_channel)
-        print(array_of_files)
+        array_of_files = utils.os.listdir(f"{self.my_working_directory}/Signal/{self.chosen_channel}")
+        #print(array_of_files)
         margins[2] = len(array_of_files)
-        first_signal_image = utils.imread(self.my_working_directory + "/Signal" + "/" + self.chosen_channel + "/" + array_of_files[0])
+        first_signal_image = utils.imread(f"{self.my_working_directory}/Signal/{self.chosen_channel}/{array_of_files[0]}")
         margins[0] = first_signal_image.shape[1]
         margins[1] = first_signal_image.shape[2]
-        print(margins)
+        #print(margins)
     
         # Coordinates become transformed by the above defined transformation function
-        coordinates_transformed = transformation(coordinates, permutation)
+        coordinates_transformed, annotation_file_transformed = transformation(coordinates)
 
         # Cell annotation
         # Transformed coordinates are used as input to annotate cells by comparing with brain atlas
@@ -607,7 +951,7 @@ class CellDetection:
         coordinates_transformed_tuple = utils.np.array(tuple(coordinates_transformed))
 
         print("Label Point\n")
-        label = utils.ano.label_points(coordinates_transformed, key='order')
+        label = utils.ano.label_points(points = coordinates_transformed,annotation_file = annotation_file_transformed, key='order')
         print("Convert labeled points\n")
         names = utils.ano.convert_label(label, key='order', value='name')
 
@@ -659,7 +1003,31 @@ class CellDetection:
 
 
     def voxelization(self):
-        
+        """
+        Performs voxelization of the cell coordinates to generate a density map.
+
+        This function processes the cell coordinates and intensity values, then voxelizes them to create a 3D density map
+        based on the given cell data. The voxelization method uses a spherical kernel to assign values to a 3D grid, which 
+        represents the spatial distribution and density of cells.
+
+        The voxelization process involves the following steps:
+        1. Preparation of annotation and reference files for spatial information.
+        2. Extraction of cell coordinates and intensity values.
+        3. Application of the voxelization algorithm, with specific parameters such as radius and method.
+        4. Saving the resulting density map to the workspace.
+
+        Parameters:
+        None: This method does not take any arguments other than the instance itself.
+
+        Returns:
+        None: The function does not return any value. It directly saves the voxelized density map to the workspace.
+
+        Notes:
+        - The function requires the workspace (`self.ws`) to contain the cell coordinates and intensities data.
+        - The voxelization process uses a spherical kernel with a default radius of (7, 7, 7) for the 3D grid.
+        - The output is stored as a density map in the workspace with the postfix '_counts_' and the chosen channel name.
+        - If no workspace is selected, the function will show an alert message.
+        """
         if self.ws == None:
             alert = utils.QMessageBox()
             alert.setText("You did not choose a workspace yet!")
@@ -687,7 +1055,7 @@ class CellDetection:
                                       verbose=True)
 
         utils.vox.voxelize(coordinates,
-                     sink=self.ws.filename('density', postfix='counts_' + self.chosen_channel),
+                     sink=self.ws.filename('density', postfix=f"counts_{self.chosen_channel}"),
                      **voxelization_parameter)
 
 
@@ -774,7 +1142,7 @@ class Cell_Detection_Layout:
         orientation_z = utils.QLineEdit("3")
 
 
-        def save_config(save_path):
+        def save_config(save_path:str):
             if not utils.os.path.exists(save_path):
                 cd_variable_list = [flatfield_illumination.currentIndex(),
                                     scaling_illumination.currentIndex(),
@@ -854,7 +1222,7 @@ class Cell_Detection_Layout:
                 alert.exec()
 
 
-        def load_config(load_path):
+        def load_config(load_path:str):
             if utils.os.path.exists(load_path):
                 cd_df = utils.pd.read_csv(load_path, header=0)
                 flatfield_illumination.setCurrentIndex(cd_df["flatfield illumination"][0])
@@ -1005,9 +1373,9 @@ class Cell_Detection_Layout:
 
         # Connection of signals and slots for cell detection
         load_config_button.clicked.connect(
-            lambda: load_config(load_path = utils.os.getcwd() + "/cell_detection_" + config_path.text() + ".csv"))
+            lambda: load_config(load_path = f"{utils.os.getcwd()}/cell_detection_{config_path.text()}.csv"))
         save_config_button.clicked.connect(
-            lambda: save_config(save_path =utils.os.getcwd() + "/cell_detection_" + config_path.text() + ".csv"))
+            lambda: save_config(save_path = f"{utils.os.getcwd()}/cell_detection_{config_path.text()}.csv"))
         detect_cells_button.clicked.connect(
             lambda: self.cell_detection(flatfield_illumination=flatfield_illumination.currentIndex(),
                                         scaling_illumination=scaling_illumination.currentIndex(),

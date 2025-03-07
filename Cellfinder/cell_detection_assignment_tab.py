@@ -3,6 +3,16 @@ import utils
 # Contains all features of the grouping and normalization tab
 
 def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
+    """
+    Creates a tracking list for brain regions based on hierarchy levels.
+    
+    Parameters:
+        dataframe (pd.DataFrame): DataFrame containing information on regions (e.g., mouse ontology data).
+    
+    Returns:
+        pd.DataFrame: DataFrame with 'TrackedWay' and 'CorrespondingLevel' columns.
+                      Each row provides a list of names and hierarchy levels for a region.
+    """
     reference_df_ID = dataframe.set_index(dataframe["id"])
     reference_df_Name = dataframe.set_index(dataframe["name"])
     trackedlevels = [[] for x in range(dataframe.shape[0])]
@@ -27,12 +37,18 @@ def create_tracking_list(dataframe: utils.pd.DataFrame) -> utils.pd.DataFrame:
     df = utils.pd.DataFrame(data=df, columns=["TrackedWay", "CorrespondingLevel"])
     return df
 
-"""
-Input: pd.Dataframe (mouse_ontology.csv) , trackedList (pd.Dataframe from create_tracking_list), and the length of the pd.Dataframe
-Creates a Template-Resultframe, which can be used for every sample
-Cols: Region, trackedWay, CorrespondingLevel, RegionCellCount, RegionCellCountSummedUp
-"""
-def create_result_frame(df, trackedList):
+
+def create_result_frame(df: utils.pd.DataFrame, trackedList: utils.pd.DataFrame) -> utils.pd.DataFrame:
+    """
+    Creates a template DataFrame for storing cell counts for each brain region.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing the ontology or reference regions.
+        trackedList (pd.DataFrame): DataFrame from create_tracking_list with tracked regions and levels.
+    
+    Returns:
+        pd.DataFrame: DataFrame with columns: 'Region', 'TrackedWay', 'CorrespondingLevel', 'RegionCellCount', 'RegionCellCountSummedUp'.
+    """
     resultframe = utils.np.array([list(df["name"]),  # Takes all important Brain Regions in first Col
                             trackedList["TrackedWay"],
                             trackedList["CorrespondingLevel"],
@@ -50,14 +66,21 @@ def create_result_frame(df, trackedList):
     resultframe["RegionCellCountSummedUp"] = utils.pd.to_numeric(resultframe["RegionCellCountSummedUp"])
     return resultframe
 
-"""
-df = summarized_counts
-reference = mouse_ontology.csv as pd.Dataframe
-trackedLevels = pd.Dataframe of the tracked regions and corresponding Levels
 
-Output: The Template-Resultframe from (create_result_frame) but filled with values of the cellcount of each region
-"""
 def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, trackedLevels: list, choice: str, my_working_directory: str) -> utils.pd.DataFrame:
+    """
+    Analyzes and fills cell count data based on hierarchical brain regions.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame with summarized counts for regions.
+        reference_df (pd.DataFrame): Reference ontology DataFrame with hierarchy levels.
+        trackedLevels (pd.DataFrame): Tracking list of regions and levels from create_tracking_list.
+        choice (str): Region selection choice, e.g., "Whole brain", "Left hemisphere".
+        my_working_directory (str): Working directory path for file output.
+
+    Returns:
+        pd.DataFrame: Filled result DataFrame with cell counts for each region and hierarchy.
+    """
     if choice == "Whole brain":
         total_cells = "total_cells"
     elif choice == "Left hemisphere":
@@ -88,10 +111,10 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
             df_temp = reference_df_Name.loc[name]
         except KeyError:
             samplename = utils.os.path.basename(my_working_directory)
-            filename = my_working_directory + "/" + samplename + "_unmapped_regions.csv"
+            filename = f"{my_working_directory}/{samplename}_unmapped_regions.csv"
 
             with open(filename, "a+") as KeyError_file:
-                KeyError_file.write(str(name) + ";" + str(df.iloc[i][total_cells]) + "\n")
+                KeyError_file.write(f"{str(name)};{str(df.iloc[i][total_cells])}\n")
             utils.continuetraining_layout
 
         temp_name = df_temp["name"] #Name of current region
@@ -109,29 +132,36 @@ def analyse_csv(df: utils.pd.DataFrame,reference_df: utils.pd.DataFrame, tracked
 
     return resultframe
 
-"""
-Calls the writeXML-Function to actually transfer certain CSV Files to XML
-"""
-def process_cells_csv(my_working_directory):
+def process_cells_csv(my_working_directory:str) -> None:
+    """
+    Processes cell counts CSV files to create a summarized counts file.
+
+    Parameters:
+        my_working_directory (str): Directory path where CSV files are located.
+    """
     df_filename = "/analysis/summary.csv"
-    df_name = my_working_directory + df_filename
+    df_name = f"{my_working_directory}{df_filename}"
     df = utils.pd.read_csv(df_name, header=0)
     df_final_filename = "/analysis/cells_final.csv"
-    df_final_name = my_working_directory + df_final_filename
+    df_final_name = f"{my_working_directory}{df_final_filename}"
     df_final = df[df["structure_name"] != "universe"]
     df_final = df_final[df_final["structure_name"] != "No label"]
     df_final.to_csv(df_final_name, sep=";")
     #Counts abundancy in different brain regions
     df_final = utils.pd.DataFrame(df_final)
     #Writes a final csv with single cell counts
-    df_final.to_csv(my_working_directory + "/analysis/cells_summarized_counts.csv", sep=";")
+    df_final.to_csv(f"{my_working_directory}/analysis/cells_summarized_counts.csv", sep=";")
 
-"""
-calls the analyse_csv Function to actually create the embedded_ontology.csv which is needed from each sample for the analysis
-"""
-def embeded_ontology(choice, my_working_directory):
+def embeded_ontology(choice:str, my_working_directory:str) -> None:
+    """
+    Embeds cell counts into hierarchical ontology levels and exports the result as CSV.
+
+    Parameters:
+        choice (str): Region choice, e.g., "Whole brain".
+        my_working_directory (str): Working directory path for file output.
+    """
     # Reads ontology file holding the reference region dictionairy
-    reference_df = utils.pd.read_csv(str(utils.os.path.dirname(utils.os.path.realpath(utils.sys.argv[0]))) + "/ontology_mouse.csv",
+    reference_df = utils.pd.read_csv(f"{str(utils.os.path.dirname(utils.os.path.realpath(utils.sys.argv[0])))}/ontology_mouse.csv",
                             # Current Refernce Dataframe for mapping
                             # File which stores all important Brain Regions (Atlas?)
                             sep=";",  # Separator
@@ -143,15 +173,22 @@ def embeded_ontology(choice, my_working_directory):
     trackedLevels = create_tracking_list(reference_df)
 
     #Reads the cell detection csv on a single cell basis (coordinates, transformed coordinates and regionname)
-    df = utils.pd.read_csv(my_working_directory + "/analysis/cells_summarized_counts.csv", header=0, sep=";")
+    df = utils.pd.read_csv(f"{my_working_directory}/analysis/cells_summarized_counts.csv", header=0, sep=";")
 
     samplename = utils.os.path.basename(my_working_directory)
     new_df = analyse_csv(df,reference_df, trackedLevels, choice, my_working_directory)
-    new_df_name = my_working_directory + "/" + samplename + "_embedded_ontology.csv"
+    new_df_name = f"{my_working_directory}/{samplename}_embedded_ontology.csv"
     new_df.to_csv(new_df_name, sep=";", index=0)
     return
 
-def assignment(choice, wd):
+def assignment(choice:str, wd:str) -> None:
+    """
+    Manages sample analysis assignment, error checking, and initiates ontology embedding.
+    
+    Parameters:
+        choice (str): Hemisphere choice (e.g., "Whole brain").
+        wd (str): Working directory.
+    """
     if wd == "":
         alert = utils.QMessageBox()
         alert.setText("You did not chosse a sample yet!")
@@ -162,7 +199,7 @@ def assignment(choice, wd):
         alert.setText("You did not choose a sample yet!")
         alert.exec()
         return
-    elif not utils.os.path.exists(wd + "/analysis/summary.csv"):
+    elif not utils.os.path.exists(f"{wd}/analysis/summary.csv"):
         alert = utils.QMessageBox()
         alert.setText("You did not run the cell detection yet!")
         alert.exec()
@@ -173,17 +210,35 @@ def assignment(choice, wd):
     return
 
 class CellDetection:
-    def detect_cells(self, _number_of_free_cpus=4,
-                           _n_sds_above_mean_thresh=10,
-                           _trained_model="",
-                           _soma_diameter=16,
-                           _xy_cell_size=6,
-                           _z_cell_size=6,
-                           _gaussian_filter=0.2,
-                           _orientation = "asl",
-                           _batch_size = 256,):
+    """
+    Class for managing cell detection using customizable parameters for cell detection algorithms.
+    """
+    def detect_cells(self, _number_of_free_cpus:int = 4,
+                           _n_sds_above_mean_thresh:int = 10,
+                           _trained_model:str = "",
+                           _soma_diameter:int = 16,
+                           _xy_cell_size:int = 6,
+                           _z_cell_size:int = 6,
+                           _gaussian_filter:float = 0.2,
+                           _orientation:str = "asl",
+                           _batch_size:int = 256,) -> None:
+        """
+        Detects cells in images by constructing and executing a command-line cell detection command.
+        
+        Parameters:
+            _number_of_free_cpus (int): Number of free CPUs to use.
+            _n_sds_above_mean_thresh (int): Threshold for mean standard deviation above mean.
+            _trained_model (str): Path to a trained model for cell detection.
+            _soma_diameter (int): Average cell soma diameter.
+            _xy_cell_size (int): Average cell size in XY plane.
+            _z_cell_size (int): Average cell size in Z plane.
+            _gaussian_filter (float): Gaussian filter value for smoothing.
+            _orientation (str): Image orientation.
+            _batch_size (int): Batch size for processing.
 
-        ##Basic comman for cellfinder
+        Returns:
+            str: Command executed for cell detection.
+        """
         if self.my_working_directory != "":
             basic_string = "cellfinder "
             # Not used
@@ -192,9 +247,9 @@ class CellDetection:
             #else:
             #    filepath = self.my_working_directory + "/Signal"
 
-            if utils.os.path.exists(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal"):
+            if utils.os.path.exists(f"{self.my_working_directory}/{self.channel_chosen}_voxel_size_signal"):
 
-                with open(self.my_working_directory +"/" + self.channel_chosen + "_voxel_size_signal/voxel_sizes.txt", "r") as file:
+                with open(f"{self.my_working_directory}/{self.channel_chosen}_voxel_size_signal/voxel_sizes.txt", "r") as file:
                     x = file.read().split(sep=",")
                     voxel_x = x[0]
                     voxel_y = x[1]
@@ -203,54 +258,54 @@ class CellDetection:
 
                 ###Mandatory Signal folder path
                 if self.channel_chosen != "":
-                    signal_string = "-s " + str(self.my_working_directory) + "/Signal/" + str(self.channel_chosen) + " "
+                    signal_string = f"-s {str(self.my_working_directory)}/Signal/{str(self.channel_chosen)} "
                 else:
-                    signal_string = "-s " + self.my_working_directory + "/Signal" + " "
+                    signal_string = f"-s {self.my_working_directory}/Signal "
 
                 ###Mandatory Background folder path
-                background_string = "-b " + self.my_working_directory + "/Auto" + " "
+                background_string = f"-b {self.my_working_directory}/Auto "
 
                 ###Mandatory voxel sizes
-                voxel_sizes_string = "-v " + str(voxel_x) + " " + str(voxel_y) + " " + str(voxel_z) + " "
+                voxel_sizes_string = f"-v {str(voxel_x)} {str(voxel_y)} {str(voxel_z)} "
 
                 ###Threshold
-                threshold_string = "--threshold " + str(_n_sds_above_mean_thresh) + " "
+                threshold_string = f"--threshold {str(_n_sds_above_mean_thresh)} "
 
                 ###Trained model
                 if _trained_model == "":
                     trained_model_string = ""
                 else:
                     if utils.os.path.exists(_trained_model):
-                        trained_model_string = "--trained-model " + _trained_model + " "
+                        trained_model_string = f"--trained-model {_trained_model} "
                     else:
                         trained_model_string = ""
                         alert = utils.QMessageBox()
                         alert.setText("Path to trained model does not exist!\n Process continued without trained model")
 
                 ###Number of free CPUs
-                cpu_string = "--n-free-cpus " + str(_number_of_free_cpus) + " "
+                cpu_string = f"--n-free-cpus {str(_number_of_free_cpus)} "
 
                 ###Soma diameter
-                soma_diameter_string = "--soma-diameter " + str(_soma_diameter) + " "
+                soma_diameter_string = f"--soma-diameter {str(_soma_diameter)} "
 
                 ###Cell size in XY Plane
-                xy_cell_size_string = "--ball-xy-size " + str(_xy_cell_size) + " "
+                xy_cell_size_string = f"--ball-xy-size {str(_xy_cell_size)} "
 
                 ###Cell size in Z
-                z_cell_size_string = "--ball-z-size " + str(_z_cell_size) + " "
+                z_cell_size_string = f"--ball-z-size {str(_z_cell_size)} "
 
                 ###Gaussian filter sigma
-                gaussian_filter_string = "--log-sigma-size " + str(_gaussian_filter) + " "
+                gaussian_filter_string = f"--log-sigma-size {str(_gaussian_filter)} "
 
                 ###Orientation
-                orientation_string = "--orientation " + _orientation + " "
+                orientation_string = f"--orientation {_orientation} "
 
                 ###Batch size
-                batch_size_string = "--batch-size " + str(_batch_size) + " "
+                batch_size_string = f"--batch-size {str(_batch_size)} "
               
 
                 ###Output
-                output_string = "-o " + self.my_working_directory + " "
+                output_string = f"-o {self.my_working_directory} "
 
                 ###Final command construction
                 final_string = (basic_string +
@@ -278,8 +333,25 @@ class CellDetection:
             self.warning_ws()
 
 class CellDetectionLayout:
-    def cd_layout(self):
-        """Celldetection Layout"""
+    """
+    Layout class for configuring cell detection parameters, managing model selection,
+    and providing options to save/load configurations in the GUI.
+    """
+    def cd_layout(self) -> utils.QWidget:
+        """
+        Constructs and returns the cell detection layout, with widgets for setting technical parameters,
+        selecting a pretrained model, and embedding cell count data within a hierarchical ontology.
+
+        This layout includes:
+            - Widgets for specifying technical settings like available CPUs.
+            - Input fields for setting cell detection parameters (e.g., soma diameter, Gaussian filter).
+            - Controls for selecting a pretrained model.
+            - Options to save or load configurations.
+            - A combo box for selecting the structure for analysis (e.g., Whole brain).
+        
+        Returns:
+            QWidget: A tab widget containing the complete layout for cell detection configuration.
+        """
         tab = utils.QWidget()
         outer_layout = utils.QVBoxLayout()
         inner_layout = utils.QGridLayout()
@@ -300,7 +372,10 @@ class CellDetectionLayout:
         choose_model_button = utils.QPushButton("Choose model")
 
         def choose_model():
-            """Selecting a training model"""
+            """
+            Opens a file dialog to select a pretrained model file. Updates the trained model label
+            with the chosen file path, or clears the label if no selection is made.
+            """
             path = utils.QFileDialog.getOpenFileName(self, "Choose a Model file (.h5)")
             if path != ('', ''):
                 trained_model.setText(str(path[0]))
@@ -354,7 +429,13 @@ class CellDetectionLayout:
         inner_layout.addWidget(choose_structure, 11, 0)
         inner_layout.addWidget(assignment_button, 11, 1)
 
-        def save_config(save_path):
+        def save_config(save_path:str) -> None:
+            """
+            Saves the current cell detection configuration to a CSV file if the file does not already exist.
+
+            Parameters:
+                save_path (str): The full file path where the configuration will be saved.
+            """
             if not utils.os.path.exists(save_path):
                 print(save_path)
                 resample_variable_list = [n_cpus.text(),
@@ -378,7 +459,13 @@ class CellDetectionLayout:
                 alert.setText("File already exists!")
                 alert.exec()
 
-        def load_config(load_path):
+        def load_config(load_path:str) -> None:
+            """
+            Loads a saved cell detection configuration from a CSV file if the file exists.
+
+            Parameters:
+                load_path (str): The full file path from which to load the configuration.
+            """
             if utils.os.path.exists(load_path):
                 print(load_path)
                 pd_df = utils.pd.read_csv(load_path, header = 0)
@@ -396,8 +483,8 @@ class CellDetectionLayout:
                 alert.exec()
 
        ### Connection of Widgets with CellDetection functions
-        load_config_button.pressed.connect(lambda: load_config(load_path = utils.os.getcwd() + "/CellDetection_" + config_path.text() + ".csv"))
-        save_config_button.pressed.connect(lambda: save_config(save_path = utils.os.getcwd() + "/CellDetection_" + config_path.text() + ".csv"))
+        load_config_button.pressed.connect(lambda: load_config(load_path = f"{utils.os.getcwd()}/CellDetection_{config_path.text()}.csv"))
+        save_config_button.pressed.connect(lambda: save_config(save_path = f"{utils.os.getcwd()}/CellDetection_{config_path.text()}.csv"))
 
         start_CellDetection_button.clicked.connect(lambda: self.detect_cells(_number_of_free_cpus=int(n_cpus.text()),
                                                                               _n_sds_above_mean_thresh=int(n_sds_above_mean.text()),
