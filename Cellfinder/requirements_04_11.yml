@@ -6,6 +6,7 @@ channels:
   - pytorch
   - defaults
 dependencies:
+  - numpy=1.23.2
   - python=3.9
   - cudatoolkit=11.2
   - cudnn=8.1.0
