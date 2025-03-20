@@ -15,7 +15,7 @@ dependencies:
     - cellfinder==0.4.20
     - brainreg==0.3.3
     - tensorflow==2.10.0
-  - pyqt
+  - pyqt=5
   - pathlib
 
 
