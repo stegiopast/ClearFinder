@@ -86,7 +86,7 @@ cd ~
 
 #### Napari_env
 ```bash
-conda env create -f Napari/requirements_04_11.yml
+conda env create -f ~/ClearFinder/Napari/requirements_04_11.yml
 conda activate Napari_env
 napari
 conda deactivate
