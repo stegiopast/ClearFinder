@@ -1,5 +1,3 @@
-![GitHub Release](https://img.shields.io/github/v/release/stegiopast/ClearFinder?include_prereleases) 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/stegiopast/ClearFinder/total)
 
 # General information
 
